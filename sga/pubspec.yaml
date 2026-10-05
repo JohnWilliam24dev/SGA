@@ -1,0 +1,24 @@
+name: sga
+description: "SGA - Sistema de Gerenciamento Artístico."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  easy_ui:
+    git:
+      url: https://github.com/JohnWilliam24dev/Easy_UI_Framework.git
+      ref: main
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  # Necessário para os ícones do Material (Icons.*).
+  uses-material-design: true

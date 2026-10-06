@@ -15,11 +15,16 @@ Visual limpo, de sistema de saúde, com azul `#1E90FF` como cor da marca
 lib/
   main.dart              ponto de entrada
   Core/                  tema (tokens + StylePack), rotas e a raiz SgaApp
-  Domain/                entidades: Maker, Credenciais
-  Shared/                widgets reutilizáveis: SgaLogo, PulseLine, FadeIn, AuthShell
+  Domain/                Maker, Credenciais, Commission, CommissionColumn,
+                         regra de mover (moverCommission) e o repositório
+                         (interface + versão simulada em memória)
+  Shared/                widgets reutilizáveis: KanbanBoard, AdaptiveDrawerScaffold,
+                         SgaLogo, PulseLine, FadeIn, AuthShell
   View/                  telas
     welcome/             tela inicial (Cadastre-se / Login)
     auth/                login e cadastro
+    main/                área autenticada (navegação lateral responsiva)
+    commissions/         quadro kanban de commissions
 test/                    espelha a estrutura de lib/
 ```
 
@@ -27,8 +32,23 @@ test/                    espelha a estrutura de lib/
 
 - **Inicial:** marca animada e os botões Cadastre-se e Login.
 - **Cadastro:** nome, e-mail, senha, confirmar senha e aceite dos termos de
-  uso. Ao enviar, gera um `Maker` (ainda sem envio a servidor).
+  uso. Ao enviar, gera um `Maker` e abre o app (ainda sem servidor).
 - **Login:** e-mail, senha e o link "Esqueci a senha" (ainda sem função).
+  Qualquer login válido entra, enquanto não há autenticação.
+- **Commissions (página principal):** quadro kanban no estilo Trello/Jira.
+  As colunas vêm de uma lista (não são fixas) e os cards são commissions
+  (cliente + começo da descrição, em altura padrão).
+  - *Desktop/tablet:* colunas lado a lado, arrastar e soltar com o mouse
+    (entre colunas e reordenando), rolagem automática nas bordas.
+  - *Celular:* uma coluna por vez, que sempre encaixa (nunca no meio); um leve
+    deslizar troca de coluna. O card é pego com toque longo e, levado até a
+    borda da tela, o quadro troca de coluna sozinho.
+- **Navegação:** tablet/desktop com barra lateral fixa; celular com drawer
+  (fundo escurece ao abrir).
+
+Os dados de commissions são simulados em
+`lib/Domain/commission_repository.dart` (`FakeCommissionRepository`); a
+integração com o banco entra trocando essa implementação.
 
 ## Rodando
 

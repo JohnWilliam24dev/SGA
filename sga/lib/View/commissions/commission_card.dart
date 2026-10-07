@@ -3,15 +3,22 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
 
-/// Pack só dos cards do quadro: padding enxuto para caber nome e um pedaço
-/// da descrição na altura padrão, qualquer que seja o pack da tela.
-final StylePack _cardPack = StylePack.define(
-  name: 'sga_commission_card',
+/// Pack do quadro de commissions: card com padding enxuto e uma tipografia
+/// um pouco menor que a do resto do app (nome e título de coluna em ~15px,
+/// descrição em ~13px), para caber nome e um pedaço da descrição na altura
+/// padrão do card.
+///
+/// O card o aplica a si mesmo (assim o card "na mão" durante o arrasto, que
+/// é desenhado fora da página, fica igual) e a página o aplica ao quadro
+/// (para os títulos das colunas).
+final StylePack sgaKanbanPack = StylePack.define(
+  name: 'sga_kanban',
   card: const CardStyleSpec(
     radius: 12,
     elevation: ElevationLevel.subtle,
     paddingSteps: 1.5,
   ),
+  label: const LabelStyleSpec(subtitleScale: 1.05, captionScale: 0.93),
 );
 
 /// Card de uma [Commission]: cliente em destaque e o começo da descrição
@@ -25,7 +32,7 @@ class CommissionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StylePackScope(
-      pack: _cardPack,
+      pack: sgaKanbanPack,
       child: Card(
         child: Div(
           width: 100.pct,

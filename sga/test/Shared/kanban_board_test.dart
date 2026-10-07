@@ -1,4 +1,6 @@
 import 'package:easy_ui/easy_ui.dart' show Tela;
+import 'package:flutter/foundation.dart' show TargetPlatform;
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Shared/shared.dart';
@@ -148,5 +150,66 @@ void main() {
       expect(pagina, closeTo(pagina.roundToDouble(), 0.001)); // nunca no meio
       expect(pagina.round(), 1);
     });
+  });
+
+  group('desktop com mouse', () {
+    testWidgets('janela estreita continua com colunas lado a lado (sem páginas)',
+        (tester) async {
+      _viewport(tester, const Size(400, 800));
+      await tester.pumpWidget(_board());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PageView), findsNothing);
+      expect(find.text('Coluna A'), findsOneWidget);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
+
+    testWidgets('arrastar o card com o mouse (sem toque longo) o leva a outra coluna',
+        (tester) async {
+      _viewport(tester, const Size(1200, 800));
+      KanbanMove? movimento;
+      await tester.pumpWidget(_board(onMove: (m) => movimento = m));
+      await tester.pumpAndSettle();
+
+      final origem = tester.getCenter(find.text('a1'));
+      final destino = tester.getCenter(find.text('b1'));
+      final gesto = await tester.startGesture(origem, kind: PointerDeviceKind.mouse);
+      await gesto.moveTo(origem + const Offset(12, 12));
+      await tester.pump();
+      await gesto.moveTo(destino);
+      await tester.pump(const Duration(milliseconds: 50));
+      await gesto.up();
+      await tester.pumpAndSettle();
+
+      expect(
+        movimento,
+        const KanbanMove(itemId: 'a1', fromColumnId: 'a', toColumnId: 'b', toIndex: 0),
+      );
+    }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
+
+    testWidgets('arrastar o fundo com o mouse rola o quadro na horizontal',
+        (tester) async {
+      _viewport(tester, const Size(400, 800));
+      await tester.pumpWidget(_board());
+      await tester.pumpAndSettle();
+
+      final topo = tester.getTopLeft(find.byType(KanbanBoard<String>));
+      final gesto = await tester.startGesture(
+        topo + const Offset(6, 300),
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesto.moveBy(const Offset(-100, 0));
+      await tester.pump();
+      await gesto.moveBy(const Offset(-100, 0));
+      await tester.pump();
+      await gesto.up();
+      await tester.pumpAndSettle();
+
+      final rolagem = tester.widget<SingleChildScrollView>(
+        find.byWidgetPredicate(
+          (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
+        ),
+      );
+      expect(rolagem.controller!.offset, greaterThan(50));
+    }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
   });
 }

@@ -5,6 +5,7 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform;
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart' show Scrollbar;
 import 'package:flutter/rendering.dart' show RenderBox;
 import 'package:flutter/widgets.dart' hide Icon;
@@ -61,6 +62,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
 
   // Rolagem automática.
   static const double _edge = 72;
+  static const double _boardEdge = 110;
   static const double _maxSpeed = 14;
   static const double _pageEdge = 44;
   static const Duration _pageDwell = Duration(milliseconds: 350);
@@ -246,13 +248,13 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     _updateHover();
   }
 
-  double _edgeDelta(double value, double start, double end) {
-    if (value < start + _edge) {
-      final t = ((start + _edge - value) / _edge).clamp(0.0, 1.0).toDouble();
+  double _edgeDelta(double value, double start, double end, [double edge = _edge]) {
+    if (value < start + edge) {
+      final t = ((start + edge - value) / edge).clamp(0.0, 1.0).toDouble();
       return -_maxSpeed * t;
     }
-    if (value > end - _edge) {
-      final t = ((value - (end - _edge)) / _edge).clamp(0.0, 1.0).toDouble();
+    if (value > end - edge) {
+      final t = ((value - (end - edge)) / edge).clamp(0.0, 1.0).toDouble();
       return _maxSpeed * t;
     }
     return 0;
@@ -281,7 +283,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     if (rect == null) return;
     _scrollBy(
       _horizontalController,
-      _edgeDelta(pointer.dx, rect.left, rect.right),
+      _edgeDelta(pointer.dx, rect.left, rect.right, _boardEdge),
     );
   }
 
@@ -331,14 +333,26 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.hasBoundedHeight ? constraints.maxHeight : 480.0;
-        final mobile = Breakpoints.standard.sizeFor(width) == ScreenSize.mobile;
+        // Páginas (uma coluna por vez) só em aparelho de toque: com mouse, uma
+        // janela estreita continua com as colunas lado a lado e rolagem.
+        final mobile = _useLongPress &&
+            Breakpoints.standard.sizeFor(width) == ScreenSize.mobile;
         _mobileLayout = mobile;
 
-        return SizedBox(
-          key: _boardKey,
-          width: width,
-          height: height,
-          child: mobile ? _buildMobile(width) : _buildDesktop(height),
+        // Por padrão o Flutter não deixa o mouse arrastar áreas roláveis;
+        // aqui deixamos (arrastar o fundo do quadro rola, como no Trello).
+        final behavior = ScrollConfiguration.of(context).copyWith(
+          dragDevices: PointerDeviceKind.values.toSet(),
+        );
+
+        return ScrollConfiguration(
+          behavior: behavior,
+          child: SizedBox(
+            key: _boardKey,
+            width: width,
+            height: height,
+            child: mobile ? _buildMobile(width) : _buildDesktop(height),
+          ),
         );
       },
     );

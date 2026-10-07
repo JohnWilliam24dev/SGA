@@ -96,19 +96,24 @@ class _CommissionsPageState extends State<CommissionsPage> {
       return const Loader(message: 'Carregando commissions...');
     }
 
-    return KanbanBoard<Commission>(
-      columns: [
-        for (final coluna in colunas)
-          KanbanColumnData<Commission>(
-            id: coluna.id,
-            title: coluna.titulo,
-            items: coluna.commissions,
-          ),
-      ],
-      itemId: (commission) => commission.id,
-      itemBuilder: (context, commission) => CommissionCard(commission: commission),
-      onMove: _mover,
-      emptyLabel: 'Nenhuma commission aqui',
+    return StylePackScope(
+      pack: sgaKanbanPack,
+      child: KanbanBoard<Commission>(
+        cardHeight: 120,
+        columns: [
+          for (final coluna in colunas)
+            KanbanColumnData<Commission>(
+              id: coluna.id,
+              title: coluna.titulo,
+              items: coluna.commissions,
+            ),
+        ],
+        itemId: (commission) => commission.id,
+        itemBuilder: (context, commission) =>
+            CommissionCard(commission: commission),
+        onMove: _mover,
+        emptyLabel: 'Nenhuma commission aqui',
+      ),
     );
   }
 }

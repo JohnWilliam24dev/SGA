@@ -10,7 +10,11 @@ const _destinos = [
   NavDestination(id: 'clientes', label: 'Clientes', icon: Icons.people_outline),
 ];
 
-Widget _app({ValueChanged<String>? onSelect, VoidCallback? onLogout}) {
+Widget _app({
+  ValueChanged<String>? onSelect,
+  VoidCallback? onLogout,
+  bool initiallyCollapsed = false,
+}) {
   return sgaHome(
     AdaptiveDrawerScaffold(
       destinations: _destinos,
@@ -19,6 +23,7 @@ Widget _app({ValueChanged<String>? onSelect, VoidCallback? onLogout}) {
       title: 'Commissions',
       body: const Text('conteudo'),
       onLogout: onLogout,
+      initiallyCollapsed: initiallyCollapsed,
     ),
   );
 }
@@ -54,6 +59,36 @@ void main() {
 
       await tester.tap(find.text('Clientes'));
       expect(escolhido, 'clientes');
+    });
+
+    testWidgets('a barra lateral pode ser recolhida (só ícones) e expandida',
+        (tester) async {
+      _viewport(tester, const Size(1000, 800));
+      await tester.pumpWidget(_app());
+      await tester.pumpAndSettle();
+      expect(find.text('Clientes'), findsOneWidget);
+
+      await tester.tap(find.text('Recolher menu'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Clientes'), findsNothing); // só o ícone, com dica
+      expect(find.byTooltip('Clientes'), findsOneWidget);
+      final recolhido = tester.getTopLeft(find.text('conteudo')).dx;
+      expect(recolhido, lessThan(AdaptiveDrawerScaffold.sidebarWidth));
+      expect(recolhido, greaterThanOrEqualTo(AdaptiveDrawerScaffold.collapsedWidth));
+
+      await tester.tap(find.byTooltip('Expandir menu'));
+      await tester.pumpAndSettle();
+      expect(find.text('Clientes'), findsOneWidget);
+    });
+
+    testWidgets('pode começar recolhida', (tester) async {
+      _viewport(tester, const Size(1000, 800));
+      await tester.pumpWidget(_app(initiallyCollapsed: true));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Clientes'), findsNothing);
+      expect(find.byTooltip('Expandir menu'), findsOneWidget);
     });
 
     testWidgets('Sair aparece quando há onLogout', (tester) async {

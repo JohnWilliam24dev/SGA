@@ -19,8 +19,18 @@ class _RepositorioQueFalha extends FakeCommissionRepository {
   }
 }
 
-Widget _pagina(CommissionRepository repo) {
-  return sgaHome(Tela(child: CommissionsPage(repository: repo)));
+Widget _pagina(
+  CommissionRepository repo, {
+  void Function(CommissionResumoModel, String)? onOpen,
+}) {
+  return sgaHome(
+    Tela(
+      child: CommissionsPage(
+        repository: repo,
+        onOpenCommission: onOpen ?? (_, __) {},
+      ),
+    ),
+  );
 }
 
 Finder _naColuna(String colunaId, String texto) {
@@ -61,16 +71,79 @@ void main() {
     expect(_naColuna('orcamento', 'Marina Costa'), findsOneWidget);
   });
 
-  testWidgets('o card mostra o cliente e só o começo da descrição', (tester) async {
+  testWidgets('o card mostra cliente, tipo de produto e valor', (tester) async {
     viewport(tester);
     await tester.pumpWidget(_pagina(FakeCommissionRepository(latencia: Duration.zero)));
     await tester.pumpAndSettle();
 
-    final descricao = tester.widget<Text>(
-      find.textContaining('Ilustração full body da personagem original'),
+    // c1: ainda sem orçamento final, mostra o simulado.
+    expect(_naColuna('orcamento', 'Ilustração'), findsWidgets);
+    expect(_naColuna('orcamento', 'R\$ 280,00 (simulado)'), findsOneWidget);
+    // c4: orçamento final fechado, mostra só ele.
+    expect(_naColuna('producao', 'R\$ 560,00'), findsOneWidget);
+  });
+
+  testWidgets('tocar no card abre o detalhe com a coluna dele', (tester) async {
+    viewport(tester);
+    CommissionResumoModel? aberta;
+    String? status;
+    await tester.pumpWidget(
+      _pagina(
+        FakeCommissionRepository(latencia: Duration.zero),
+        onOpen: (commission, statusNome) {
+          aberta = commission;
+          status = statusNome;
+        },
+      ),
     );
-    expect(descricao.maxLines, 3);
-    expect(descricao.overflow, TextOverflow.ellipsis);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Beatriz Lima'));
+    await tester.pumpAndSettle();
+
+    expect(aberta?.id, 'c4');
+    expect(status, 'Em produção');
+  });
+
+  testWidgets('apertar e segurar move o card e não abre o detalhe', (tester) async {
+    viewport(tester);
+    var aberturas = 0;
+    await tester.pumpWidget(
+      _pagina(
+        FakeCommissionRepository(latencia: Duration.zero),
+        onOpen: (_, __) => aberturas++,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await _arrastar(
+      tester,
+      tester.getCenter(find.text('Marina Costa')),
+      tester.getCenter(find.text('Beatriz Lima')),
+    );
+
+    expect(_naColuna('producao', 'Marina Costa'), findsOneWidget);
+    expect(aberturas, 0);
+  });
+
+  testWidgets('segurar sem soltar na hora e largar no mesmo lugar não abre o detalhe',
+      (tester) async {
+    viewport(tester);
+    var aberturas = 0;
+    await tester.pumpWidget(
+      _pagina(
+        FakeCommissionRepository(latencia: Duration.zero),
+        onOpen: (_, __) => aberturas++,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final gesto = await tester.startGesture(tester.getCenter(find.text('Marina Costa')));
+    await tester.pump(const Duration(milliseconds: 400));
+    await gesto.up();
+    await tester.pumpAndSettle();
+
+    expect(aberturas, 0);
   });
 
   testWidgets('arrastar um pedido para outra coluna o move', (tester) async {

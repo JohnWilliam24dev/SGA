@@ -37,6 +37,7 @@ class KanbanBoard<T> extends StatefulWidget {
     required this.itemId,
     required this.itemBuilder,
     required this.onMove,
+    this.onItemTap,
     this.cardHeight = 112,
     this.emptyLabel = 'Nenhum item aqui',
   }) : assert(cardHeight > 0, 'cardHeight deve ser > 0.');
@@ -45,6 +46,10 @@ class KanbanBoard<T> extends StatefulWidget {
   final String Function(T item) itemId;
   final Widget Function(BuildContext context, T item) itemBuilder;
   final ValueChanged<KanbanMove> onMove;
+
+  /// Chamado num clique/toque simples no card. Apertar e segurar (mover) e
+  /// deslizar (rolar) não disparam esse callback.
+  final ValueChanged<T>? onItemTap;
   final double cardHeight;
   final String emptyLabel;
 
@@ -361,6 +366,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       emptyLabel: widget.emptyLabel,
       itemId: widget.itemId,
       itemBuilder: widget.itemBuilder,
+      onItemTap: widget.onItemTap,
       onDragStarted: (id) => _onDragStarted(id, column.id),
       onDragUpdate: _onDragUpdate,
       onDragEnd: _onDragEnd,

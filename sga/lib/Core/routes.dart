@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart' hide Icon;
 import '../Domain/domain.dart';
 import '../View/auth/login_page.dart';
 import '../View/auth/register_page.dart';
+import '../View/commissions/commission_detail_page.dart';
 import '../View/main/main_shell.dart';
 import '../View/welcome/welcome_page.dart';
 
@@ -63,9 +64,31 @@ Widget buildLoginScreen(BuildContext context) {
 Widget buildMainScreen(BuildContext context) {
   return MainShell(
     commissionRepository: _commissionRepository,
+    onOpenCommission: (commission, statusNome) => Navigator.of(context).push(
+      _route(
+        (_) => buildCommissionDetailScreen(
+          commission: commission,
+          statusNome: statusNome,
+        ),
+      ),
+    ),
     onLogout: () => Navigator.of(context).pushAndRemoveUntil(
       _route(buildWelcomeScreen),
       (route) => false,
+    ),
+  );
+}
+
+Widget buildCommissionDetailScreen({
+  required CommissionResumoModel commission,
+  required String statusNome,
+}) {
+  return Builder(
+    builder: (context) => CommissionDetailPage(
+      repository: _commissionRepository,
+      commission: commission,
+      statusNome: statusNome,
+      onBack: () => Navigator.of(context).pop(),
     ),
   );
 }

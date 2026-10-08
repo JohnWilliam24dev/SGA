@@ -1,6 +1,7 @@
 /// Widgets reutilizáveis entre as telas do SGA.
 library;
 
+export 'formatters.dart';
 export 'widgets/adaptive_drawer_scaffold.dart';
 export 'widgets/auth_shell.dart';
 export 'widgets/fade_in.dart';

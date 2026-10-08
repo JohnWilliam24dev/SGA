@@ -1,4 +1,4 @@
-import 'commission.dart';
+import 'models/commission_resumo_model.dart';
 import 'commission_column.dart';
 
 /// Move uma commission para [paraColunaId], na posição [paraIndice].
@@ -12,7 +12,7 @@ List<CommissionColumn> moverCommission(
   required String paraColunaId,
   required int paraIndice,
 }) {
-  Commission? movida;
+  CommissionResumoModel? movida;
   final restantes = <CommissionColumn>[];
 
   for (final coluna in colunas) {

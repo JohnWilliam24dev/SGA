@@ -12,10 +12,13 @@ class MainShell extends StatefulWidget {
   const MainShell({
     super.key,
     required this.commissionRepository,
+    required this.onOpenCommission,
     required this.onLogout,
   });
 
   final CommissionRepository commissionRepository;
+  final void Function(CommissionResumoModel commission, String statusNome)
+      onOpenCommission;
   final VoidCallback onLogout;
 
   @override
@@ -39,7 +42,10 @@ class _MainShellState extends State<MainShell> {
     switch (_selecionado) {
       case _commissions:
       default:
-        return CommissionsPage(repository: widget.commissionRepository);
+        return CommissionsPage(
+          repository: widget.commissionRepository,
+          onOpenCommission: widget.onOpenCommission,
+        );
     }
   }
 

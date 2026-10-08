@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
 
-import 'commission.dart';
+import 'models/commission_resumo_model.dart';
 
 /// Uma coluna do quadro de commissions (ex.: "Em produção").
 ///
@@ -11,14 +11,14 @@ class CommissionColumn {
   const CommissionColumn({
     required this.id,
     required this.titulo,
-    this.commissions = const <Commission>[],
+    this.commissions = const <CommissionResumoModel>[],
   });
 
   final String id;
   final String titulo;
-  final List<Commission> commissions;
+  final List<CommissionResumoModel> commissions;
 
-  CommissionColumn copyWith({List<Commission>? commissions}) {
+  CommissionColumn copyWith({List<CommissionResumoModel>? commissions}) {
     return CommissionColumn(
       id: id,
       titulo: titulo,

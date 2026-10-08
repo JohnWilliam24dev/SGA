@@ -57,6 +57,39 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
   final String? email;
   final List<CommissionAdicionalModel> adicionais;
 
+  /// Só a parte de resumo (o que a listagem mostra no card).
+  CommissionResumoModel get resumo => CommissionResumoModel(
+        id: id,
+        token: token,
+        nomeCliente: nomeCliente,
+        tipoProdutoNome: tipoProdutoNome,
+        precoSimulado: precoSimulado,
+        orcamentoFinal: orcamentoFinal,
+        posicao: posicao,
+        criadoEm: criadoEm,
+      );
+
+  /// Cópia com outro status e/ou outra posição (o que muda ao mover o card).
+  CommissionDetalhadaModel copyWith({String? statusId, int? posicao}) {
+    return CommissionDetalhadaModel(
+      id: id,
+      token: token,
+      nomeCliente: nomeCliente,
+      tipoProdutoNome: tipoProdutoNome,
+      precoSimulado: precoSimulado,
+      orcamentoFinal: orcamentoFinal,
+      posicao: posicao ?? this.posicao,
+      criadoEm: criadoEm,
+      statusId: statusId ?? this.statusId,
+      tipoProdutoId: tipoProdutoId,
+      contato: contato,
+      descricao: descricao,
+      imagemRefUrl: imagemRefUrl,
+      email: email,
+      adicionais: adicionais,
+    );
+  }
+
   @override
   Map<String, dynamic> toJson() => {
         ...super.toJson(),

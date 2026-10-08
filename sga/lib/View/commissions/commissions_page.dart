@@ -7,13 +7,22 @@ import 'commission_card.dart';
 
 /// Página principal: o quadro kanban de commissions.
 ///
-/// As colunas e os pedidos vêm do [repository] (hoje simulado). Ao soltar um
+/// As colunas e os resumos vêm do [repository] (hoje simulado). Ao soltar um
 /// card, a tela atualiza o quadro na hora e avisa o repositório; se ele
 /// falhar, o quadro volta ao que era e um aviso aparece.
+///
+/// Um toque simples no card avisa por [onOpenCommission] (com o título da
+/// coluna onde ele está) para abrir o detalhe; apertar e segurar move o card.
 class CommissionsPage extends StatefulWidget {
-  const CommissionsPage({super.key, required this.repository});
+  const CommissionsPage({
+    super.key,
+    required this.repository,
+    required this.onOpenCommission,
+  });
 
   final CommissionRepository repository;
+  final void Function(CommissionResumoModel commission, String statusNome)
+      onOpenCommission;
 
   @override
   State<CommissionsPage> createState() => _CommissionsPageState();
@@ -71,6 +80,15 @@ class _CommissionsPageState extends State<CommissionsPage> {
     }
   }
 
+  void _abrir(CommissionResumoModel commission) {
+    final colunas = _colunas ?? const <CommissionColumn>[];
+    final coluna = colunas.firstWhere(
+      (c) => c.commissions.any((item) => item.id == commission.id),
+      orElse: () => CommissionColumn(id: '', titulo: ''),
+    );
+    widget.onOpenCommission(commission, coluna.titulo);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colunas = _colunas;
@@ -98,11 +116,11 @@ class _CommissionsPageState extends State<CommissionsPage> {
 
     return StylePackScope(
       pack: sgaKanbanPack,
-      child: KanbanBoard<Commission>(
+      child: KanbanBoard<CommissionResumoModel>(
         cardHeight: 120,
         columns: [
           for (final coluna in colunas)
-            KanbanColumnData<Commission>(
+            KanbanColumnData<CommissionResumoModel>(
               id: coluna.id,
               title: coluna.titulo,
               items: coluna.commissions,
@@ -112,6 +130,7 @@ class _CommissionsPageState extends State<CommissionsPage> {
         itemBuilder: (context, commission) =>
             CommissionCard(commission: commission),
         onMove: _mover,
+        onItemTap: _abrir,
         emptyLabel: 'Nenhuma commission aqui',
       ),
     );

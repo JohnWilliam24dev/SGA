@@ -24,6 +24,7 @@ class KanbanColumnView<T> extends StatelessWidget {
     required this.emptyLabel,
     required this.itemId,
     required this.itemBuilder,
+    this.onItemTap,
     required this.onDragStarted,
     required this.onDragUpdate,
     required this.onDragEnd,
@@ -55,6 +56,7 @@ class KanbanColumnView<T> extends StatelessWidget {
   final String emptyLabel;
   final String Function(T item) itemId;
   final Widget Function(BuildContext context, T item) itemBuilder;
+  final ValueChanged<T>? onItemTap;
   final ValueChanged<String> onDragStarted;
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
@@ -169,9 +171,20 @@ class KanbanColumnView<T> extends StatelessWidget {
   }
 
   Widget _draggable(BuildContext context, T item, String id) {
+    // O toque simples fica no próprio card; o LongPressDraggable só vence a
+    // disputa de gestos depois de segurar por [holdToDrag], e a rolagem vence
+    // ao deslizar. Por isso clicar, segurar e deslizar não se confundem.
+    final onTap = onItemTap;
+    final card = SizedBox(height: cardHeight, child: itemBuilder(context, item));
     final cell = Padding(
       padding: EdgeInsets.only(bottom: gap),
-      child: SizedBox(height: cardHeight, child: itemBuilder(context, item)),
+      child: onTap == null
+          ? card
+          : GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onTap(item),
+              child: card,
+            ),
     );
     final feedback = Material(
       type: MaterialType.transparency,

@@ -15,16 +15,20 @@ Visual limpo, de sistema de saúde, com azul `#1E90FF` como cor da marca
 lib/
   main.dart              ponto de entrada
   Core/                  tema (tokens + StylePack), rotas e a raiz SgaApp
-  Domain/                Maker, Credenciais, Commission, CommissionColumn,
-                         regra de mover (moverCommission) e o repositório
-                         (interface + versão simulada em memória)
-  Shared/                widgets reutilizáveis: KanbanBoard, AdaptiveDrawerScaffold,
-                         SgaLogo, PulseLine, FadeIn, AuthShell
+  Domain/                Maker, Credenciais, CommissionColumn, regra de mover
+                         (moverCommission) e o repositório (interface + versão
+                         simulada em memória)
+    models/              modelos da API (fromJson/toJson): Status, TipoProduto,
+                         Adicional, Produto, CommissionResumo e
+                         CommissionDetalhada
+  Shared/                widgets reutilizáveis (KanbanBoard, AdaptiveDrawerScaffold,
+                         SgaLogo, PulseLine, FadeIn, AuthShell) e formatadores
+                         (moeda e data)
   View/                  telas
     welcome/             tela inicial (Cadastre-se / Login)
     auth/                login e cadastro
     main/                área autenticada (navegação lateral responsiva)
-    commissions/         quadro kanban de commissions
+    commissions/         quadro kanban e detalhe da commission
 test/                    espelha a estrutura de lib/
 ```
 
@@ -36,11 +40,12 @@ test/                    espelha a estrutura de lib/
 - **Login:** e-mail, senha e o link "Esqueci a senha" (ainda sem função).
   Qualquer login válido entra, enquanto não há autenticação.
 - **Commissions (página principal):** quadro kanban no estilo Trello/Jira.
-  As colunas vêm de uma lista (não são fixas) e os cards são commissions
-  (cliente + começo da descrição, em altura padrão).
-  - *Mover um card:* apertar e segurar por um instante (mouse ou toque). Um
-    clique/toque simples fica livre para abrir os detalhes e deslizar sem
-    segurar rola o quadro.
+  As colunas vêm de uma lista (não são fixas) e os cards são o resumo da
+  commission (cliente, tipo de produto e valor: o orçamento final, ou o
+  simulado enquanto não fechou), em altura padrão.
+  - *Abrir o detalhe:* um clique/toque simples no card.
+  - *Mover um card:* apertar e segurar por um instante (mouse ou toque).
+    Deslizar sem segurar rola o quadro.
   - *Largura de tablet/desktop:* colunas lado a lado, arrastar e soltar entre
     colunas e reordenando, rolagem automática nas bordas e arrastar o fundo do
     quadro para rolar na horizontal.
@@ -48,14 +53,21 @@ test/                    espelha a estrutura de lib/
     coluna por vez, que sempre encaixa (nunca no meio); um leve deslizar troca
     de coluna. Com o card na mão, levá-lo até a borda da tela troca de coluna
     sozinho.
+- **Detalhe da commission:** abre ao tocar no card. O cabeçalho aparece na
+  hora (vem do resumo) e o restante é buscado no repositório: orçamento
+  (simulado e final), descrição e imagem de referência, adicionais (quantidade,
+  valor unitário e subtotal), contato, e-mail (quando houver), código de
+  acompanhamento e data de criação.
 - **Navegação:** tablet/desktop com barra lateral fixa, recolhida pelo ícone
   de painel no topo dela (vira uma faixa só de ícones; recolhida, a logo do
   sistema vira o ícone de "mostrar a barra" ao passar o mouse); celular com
   drawer (fundo escurece ao abrir).
 
 Os dados de commissions são simulados em
-`lib/Domain/commission_repository.dart` (`FakeCommissionRepository`); a
-integração com o banco entra trocando essa implementação.
+`lib/Domain/commission_repository.dart` (`FakeCommissionRepository`): o quadro
+usa `CommissionResumoModel` e o detalhe usa `CommissionDetalhadaModel`, os
+mesmos modelos que a API vai devolver. A integração com o servidor entra
+trocando essa implementação.
 
 ## Rodando
 

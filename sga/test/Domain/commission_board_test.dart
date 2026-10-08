@@ -1,7 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Domain/domain.dart';
 
-Commission _c(String id) => Commission(id: id, cliente: 'Cliente $id', descricao: 'd');
+CommissionResumoModel _c(String id) => CommissionResumoModel(
+      id: id,
+      token: 'tok-$id',
+      nomeCliente: 'Cliente $id',
+      tipoProdutoNome: 'Ilustração',
+      precoSimulado: 100,
+      posicao: 0,
+      criadoEm: DateTime.utc(2026, 9, 1),
+    );
 
 List<CommissionColumn> _quadro() => [
       CommissionColumn(id: 'a', titulo: 'A', commissions: [_c('1'), _c('2'), _c('3')]),
@@ -65,5 +73,36 @@ void main() {
     final depois = await repo.carregarQuadro();
     expect(_ids(depois, 'producao').first, 'c1');
     expect(_ids(depois, 'orcamento'), isNot(contains('c1')));
+  });
+
+  group('detalhe no repositório simulado', () {
+    test('traz os dados completos e acompanha a coluna do quadro', () async {
+      final repo = FakeCommissionRepository(latencia: Duration.zero);
+
+      final antes = await repo.carregarDetalhe('c1');
+      expect(antes.nomeCliente, 'Marina Costa');
+      expect(antes.statusId, 'orcamento');
+      expect(antes.posicao, 0);
+      expect(antes.adicionais, isNotEmpty);
+
+      await repo.mover(commissionId: 'c1', paraColunaId: 'producao', paraIndice: 1);
+      final depois = await repo.carregarDetalhe('c1');
+      expect(depois.statusId, 'producao');
+      expect(depois.posicao, 1);
+    });
+
+    test('o resumo do quadro bate com o detalhe', () async {
+      final repo = FakeCommissionRepository(latencia: Duration.zero);
+      final colunas = await repo.carregarQuadro();
+      final resumo = colunas.first.commissions.first;
+      final detalhe = await repo.carregarDetalhe(resumo.id);
+
+      expect(detalhe.resumo, resumo);
+    });
+
+    test('commission inexistente falha', () {
+      final repo = FakeCommissionRepository(latencia: Duration.zero);
+      expect(repo.carregarDetalhe('nao-existe'), throwsStateError);
+    });
   });
 }

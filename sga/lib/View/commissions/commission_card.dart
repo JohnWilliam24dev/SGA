@@ -2,11 +2,11 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
+import '../../Shared/shared.dart';
 
 /// Pack do quadro de commissions: card com padding enxuto e uma tipografia
 /// um pouco menor que a do resto do app (nome e título de coluna em ~15px,
-/// descrição em ~13px), para caber nome e um pedaço da descrição na altura
-/// padrão do card.
+/// textos de apoio em ~13px), para caber tudo na altura padrão do card.
 ///
 /// O card o aplica a si mesmo (assim o card "na mão" durante o arrasto, que
 /// é desenhado fora da página, fica igual) e a página o aplica ao quadro
@@ -21,13 +21,21 @@ final StylePack sgaKanbanPack = StylePack.define(
   label: const LabelStyleSpec(subtitleScale: 1.05, captionScale: 0.93),
 );
 
-/// Card de uma [Commission]: cliente em destaque e o começo da descrição
-/// (o resto fica cortado com reticências). O tamanho é dado por quem o
-/// coloca (o quadro usa uma altura padrão).
+/// Valor que o card destaca: o orçamento final, quando já foi fechado, ou o
+/// valor simulado (marcado como tal).
+String valorDoCard(CommissionResumoModel commission) {
+  final fechado = commission.orcamentoFinal;
+  if (fechado != null) return formatarMoeda(fechado);
+  return '${formatarMoeda(commission.precoSimulado)} (simulado)';
+}
+
+/// Card de uma [CommissionResumoModel]: cliente em destaque, o tipo de
+/// produto e o valor. O tamanho é dado por quem o coloca (o quadro usa uma
+/// altura padrão); os detalhes completos abrem ao tocar no card.
 class CommissionCard extends StatelessWidget {
   const CommissionCard({super.key, required this.commission});
 
-  final Commission commission;
+  final CommissionResumoModel commission;
 
   @override
   Widget build(BuildContext context) {
@@ -43,24 +51,26 @@ class CommissionCard extends StatelessWidget {
               align: Alignment.centerLeft,
               gap: 8.px,
               children: [
-                Avatar(name: commission.cliente, size: AvatarSize.sm),
+                Avatar(name: commission.nomeCliente, size: AvatarSize.sm),
                 LayoutItem(
                   size: 1.fr,
                   child: Label(
                     type: LabelType.subtitle,
-                    text: commission.cliente,
+                    text: commission.nomeCliente,
                     maxLines: 1,
                   ),
                 ),
               ],
             ),
-            LayoutItem(
-              size: 1.fr,
-              child: Label(
-                type: LabelType.caption,
-                text: commission.descricao,
-                maxLines: 3,
-              ),
+            Label(
+              type: LabelType.caption,
+              text: commission.tipoProdutoNome,
+              maxLines: 1,
+            ),
+            Label(
+              type: LabelType.caption,
+              text: valorDoCard(commission),
+              maxLines: 1,
             ),
           ],
         ),

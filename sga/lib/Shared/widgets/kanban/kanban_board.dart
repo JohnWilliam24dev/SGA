@@ -3,8 +3,6 @@ import 'dart:math' as math;
 
 import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart' show Scrollbar;
 import 'package:flutter/rendering.dart' show RenderBox;
@@ -19,14 +17,16 @@ import 'kanban_models.dart';
 /// ao soltar um card o board só avisa por [onMove]; quem guarda o estado
 /// atualiza a lista e o board se redesenha.
 ///
-/// **Desktop/tablet largo:** colunas lado a lado numa faixa com rolagem
-/// horizontal. Arrasta-se o card direto com o mouse; perto das bordas o
-/// quadro rola sozinho (na horizontal e dentro de cada coluna).
+/// **Mover um card** exige apertar e segurar por um instante (mouse ou
+/// toque); um clique/toque simples fica livre para abrir os detalhes, e
+/// deslizar sem segurar rola o quadro. Perto das bordas o quadro rola sozinho.
 ///
-/// **Celular:** uma coluna por vez, em páginas que sempre encaixam (nunca
-/// ficam pela metade); um leve deslizar vai para a coluna seguinte. O card é
-/// pego com um toque longo; ao levá-lo até a borda da tela, o quadro troca de
-/// coluna sozinho.
+/// **Largura de tablet/desktop:** colunas lado a lado numa faixa com rolagem
+/// horizontal (arrastar o fundo também rola).
+///
+/// **Largura de celular:** uma coluna por vez, em páginas que sempre encaixam
+/// (nunca ficam pela metade); um leve deslizar vai para a coluna seguinte e,
+/// com o card na mão, levá-lo até a borda da tela troca de coluna sozinho.
 ///
 /// [cardHeight] é a altura padrão dos cards: o conteúdo mostra só o começo
 /// do texto, não precisa caber inteiro.
@@ -88,19 +88,6 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
   DateTime? _edgeSince;
   DateTime? _lastFlip;
   bool _mobileLayout = false;
-
-  bool get _useLongPress {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-      case TargetPlatform.iOS:
-      case TargetPlatform.fuchsia:
-        return true;
-      case TargetPlatform.windows:
-      case TargetPlatform.macOS:
-      case TargetPlatform.linux:
-        return false;
-    }
-  }
 
   @override
   void dispose() {
@@ -333,10 +320,10 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.hasBoundedHeight ? constraints.maxHeight : 480.0;
-        // Páginas (uma coluna por vez) só em aparelho de toque: com mouse, uma
-        // janela estreita continua com as colunas lado a lado e rolagem.
-        final mobile = _useLongPress &&
-            Breakpoints.standard.sizeFor(width) == ScreenSize.mobile;
+        // Largura de celular: uma coluna por vez, em páginas que encaixam.
+        // Vale pela largura (e não pela plataforma) para funcionar também
+        // numa janela de navegador estreita.
+        final mobile = Breakpoints.standard.sizeFor(width) == ScreenSize.mobile;
         _mobileLayout = mobile;
 
         // Por padrão o Flutter não deixa o mouse arrastar áreas roláveis;
@@ -371,7 +358,6 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       listPadding: _listPadding,
       draggingId: _draggingId,
       hoverIndex: _hoverColumnId == column.id ? _hoverIndex : null,
-      useLongPress: _useLongPress,
       emptyLabel: widget.emptyLabel,
       itemId: widget.itemId,
       itemBuilder: widget.itemBuilder,

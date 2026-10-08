@@ -38,16 +38,20 @@ test/                    espelha a estrutura de lib/
 - **Commissions (página principal):** quadro kanban no estilo Trello/Jira.
   As colunas vêm de uma lista (não são fixas) e os cards são commissions
   (cliente + começo da descrição, em altura padrão).
-  - *Desktop/tablet:* colunas lado a lado, arrastar e soltar com o mouse
-    (entre colunas e reordenando), rolagem automática nas bordas e arrastar o
-    fundo do quadro para rolar na horizontal. Em janela estreita com mouse,
-    as colunas continuam lado a lado (as páginas são só para aparelhos de toque).
-  - *Celular:* uma coluna por vez, que sempre encaixa (nunca no meio); um leve
-    deslizar troca de coluna. O card é pego com toque longo e, levado até a
-    borda da tela, o quadro troca de coluna sozinho.
-- **Navegação:** tablet/desktop com barra lateral fixa que pode ser recolhida
-  (vira uma faixa só de ícones, com dica ao passar o mouse; botão no rodapé
-  dela); celular com drawer (fundo escurece ao abrir).
+  - *Mover um card:* apertar e segurar por um instante (mouse ou toque). Um
+    clique/toque simples fica livre para abrir os detalhes e deslizar sem
+    segurar rola o quadro.
+  - *Largura de tablet/desktop:* colunas lado a lado, arrastar e soltar entre
+    colunas e reordenando, rolagem automática nas bordas e arrastar o fundo do
+    quadro para rolar na horizontal.
+  - *Largura de celular (< 600px, inclusive janela estreita de navegador):* uma
+    coluna por vez, que sempre encaixa (nunca no meio); um leve deslizar troca
+    de coluna. Com o card na mão, levá-lo até a borda da tela troca de coluna
+    sozinho.
+- **Navegação:** tablet/desktop com barra lateral fixa, recolhida pelo ícone
+  de painel no topo dela (vira uma faixa só de ícones; recolhida, a logo do
+  sistema vira o ícone de "mostrar a barra" ao passar o mouse); celular com
+  drawer (fundo escurece ao abrir).
 
 Os dados de commissions são simulados em
 `lib/Domain/commission_repository.dart` (`FakeCommissionRepository`); a

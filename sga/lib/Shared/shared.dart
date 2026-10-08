@@ -8,3 +8,4 @@ export 'widgets/kanban/kanban_board.dart';
 export 'widgets/kanban/kanban_models.dart';
 export 'widgets/pulse_line.dart';
 export 'widgets/sga_logo.dart';
+export 'widgets/sidebar_toggle_icon.dart';

@@ -2,9 +2,11 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart'
     show AppBar, Drawer, Icons, InkWell, Material, Scaffold, Tooltip;
+import 'package:flutter/services.dart' show SystemMouseCursors;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import 'sga_logo.dart';
+import 'sidebar_toggle_icon.dart';
 
 /// Um destino da navegação lateral.
 class NavDestination {
@@ -22,9 +24,9 @@ class NavDestination {
 /// Estrutura do app autenticado, com a navegação lateral responsiva:
 ///
 /// - **tablet/desktop:** a navegação vira uma barra lateral fixa e o conteúdo
-///   principal é empurrado para o lado. A barra pode ser **recolhida** (vira
-///   uma faixa só de ícones, com dica ao passar o mouse) pelo botão do
-///   rodapé dela;
+///   principal é empurrado para o lado. A barra pode ser **recolhida** pelo
+///   ícone de painel no topo dela e vira uma faixa só de ícones; recolhida, a
+///   logo do sistema vira o ícone de "mostrar a barra" ao passar o mouse;
 /// - **celular:** a navegação fica num drawer, aberto pelo botão do menu na
 ///   barra de cima; ao abrir, o fundo escurece.
 class AdaptiveDrawerScaffold extends StatefulWidget {
@@ -208,7 +210,8 @@ class _NavPanel extends StatelessWidget {
   final VoidCallback? onLogout;
   final bool compact;
 
-  /// Se informado, aparece o botão de recolher/expandir (só no desktop).
+  /// Se informado, o cabeçalho ganha o controle de recolher/expandir (só no
+  /// desktop).
   final VoidCallback? onToggleCollapse;
 
   @override
@@ -245,14 +248,6 @@ class _NavPanel extends StatelessWidget {
                   compact: compact,
                   onTap: onLogout!,
                 ),
-              if (onToggleCollapse != null)
-                _NavTile(
-                  icon: compact ? Icons.chevron_right : Icons.chevron_left,
-                  label: compact ? 'Expandir menu' : 'Recolher menu',
-                  selected: false,
-                  compact: compact,
-                  onTap: onToggleCollapse!,
-                ),
             ],
           ),
         ),
@@ -262,18 +257,18 @@ class _NavPanel extends StatelessWidget {
 
   Widget _header() {
     if (compact) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: SgaLogo(size: 36)),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Center(child: _CollapsedLogoButton(onTap: onToggleCollapse)),
       );
     }
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(20, 24, 20, 20),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 12, 16),
       child: Row(
         children: [
-          SgaLogo(size: 40),
-          SizedBox(width: 14),
-          Expanded(
+          const SgaLogo(size: 40),
+          const SizedBox(width: 14),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -286,7 +281,83 @@ class _NavPanel extends StatelessWidget {
               ],
             ),
           ),
+          if (onToggleCollapse != null) ...[
+            const SizedBox(width: 6),
+            Tooltip(
+              message: 'Recolher menu',
+              child: Material(
+                color: const Color(0x00000000),
+                borderRadius: BorderRadius.circular(10),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: onToggleCollapse,
+                  child: const Padding(
+                    padding: EdgeInsets.all(9),
+                    child: SidebarToggleIcon(),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+/// Barra recolhida: mostra a logo do sistema e, com o mouse por cima, troca
+/// pelo ícone de "mostrar a barra lateral". Tocar (ou clicar) expande.
+class _CollapsedLogoButton extends StatefulWidget {
+  const _CollapsedLogoButton({required this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  State<_CollapsedLogoButton> createState() => _CollapsedLogoButtonState();
+}
+
+class _CollapsedLogoButtonState extends State<_CollapsedLogoButton> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppThemeScope.tokensOf(context);
+
+    return Tooltip(
+      message: 'Expandir menu',
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hover = true),
+        onExit: (_) => setState(() => _hover = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onTap,
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 150),
+                child: _hover
+                    ? SizedBox(
+                        key: const ValueKey<String>('expandir'),
+                        width: 40,
+                        height: 40,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: tokens.primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: SidebarToggleIcon(size: 24, showArrow: true),
+                          ),
+                        ),
+                      )
+                    : const SgaLogo(key: ValueKey<String>('logo'), size: 36),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

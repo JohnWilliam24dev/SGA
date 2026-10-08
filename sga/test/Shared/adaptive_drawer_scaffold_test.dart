@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart' show AppBar, Drawer, Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -61,14 +62,15 @@ void main() {
       expect(escolhido, 'clientes');
     });
 
-    testWidgets('a barra lateral pode ser recolhida (só ícones) e expandida',
+    testWidgets('o ícone de painel recolhe a barra (só ícones) e a logo a expande',
         (tester) async {
       _viewport(tester, const Size(1000, 800));
       await tester.pumpWidget(_app());
       await tester.pumpAndSettle();
       expect(find.text('Clientes'), findsOneWidget);
+      expect(find.text('Recolher menu'), findsNothing); // é só um ícone, sem texto
 
-      await tester.tap(find.text('Recolher menu'));
+      await tester.tap(find.byTooltip('Recolher menu'));
       await tester.pumpAndSettle();
 
       expect(find.text('Clientes'), findsNothing); // só o ícone, com dica
@@ -80,6 +82,29 @@ void main() {
       await tester.tap(find.byTooltip('Expandir menu'));
       await tester.pumpAndSettle();
       expect(find.text('Clientes'), findsOneWidget);
+    });
+
+    testWidgets('recolhida, a logo vira o ícone de mostrar a barra no hover',
+        (tester) async {
+      _viewport(tester, const Size(1000, 800));
+      await tester.pumpWidget(_app(initiallyCollapsed: true));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SgaLogo), findsOneWidget);
+      expect(find.byType(SidebarToggleIcon), findsNothing);
+
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: const Offset(1, 1));
+      addTearDown(mouse.removePointer);
+      await mouse.moveTo(tester.getCenter(find.byType(SgaLogo)));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SgaLogo), findsNothing);
+      expect(find.byType(SidebarToggleIcon), findsOneWidget);
+
+      await mouse.moveTo(const Offset(900, 700)); // sai de cima
+      await tester.pumpAndSettle();
+      expect(find.byType(SgaLogo), findsOneWidget);
     });
 
     testWidgets('pode começar recolhida', (tester) async {

@@ -21,7 +21,6 @@ class KanbanColumnView<T> extends StatelessWidget {
     required this.listPadding,
     required this.draggingId,
     required this.hoverIndex,
-    required this.useLongPress,
     required this.emptyLabel,
     required this.itemId,
     required this.itemBuilder,
@@ -49,9 +48,9 @@ class KanbanColumnView<T> extends StatelessWidget {
   /// arrastado), ou `null` se o arrasto não está sobre ela.
   final int? hoverIndex;
 
-  /// Toque: o card só sai do lugar após segurar (para não brigar com a
-  /// rolagem). Mouse: arrasta direto.
-  final bool useLongPress;
+  /// Quanto é preciso segurar o card antes de ele poder ser arrastado.
+  /// Evita que um clique/toque simples (ou um deslize para rolar) pegue o card.
+  static const Duration holdToDrag = Duration(milliseconds: 200);
 
   final String emptyLabel;
   final String Function(T item) itemId;
@@ -186,22 +185,10 @@ class KanbanColumnView<T> extends StatelessWidget {
       ),
     );
 
-    if (useLongPress) {
-      return LongPressDraggable<String>(
-        key: ValueKey<String>(id),
-        data: id,
-        delay: const Duration(milliseconds: 250),
-        feedback: feedback,
-        childWhenDragging: const SizedBox.shrink(),
-        onDragStarted: () => onDragStarted(id),
-        onDragUpdate: (details) => onDragUpdate(details.globalPosition),
-        onDragEnd: (_) => onDragEnd(),
-        child: cell,
-      );
-    }
-    return Draggable<String>(
+    return LongPressDraggable<String>(
       key: ValueKey<String>(id),
       data: id,
+      delay: holdToDrag,
       feedback: feedback,
       childWhenDragging: const SizedBox.shrink(),
       onDragStarted: () => onDragStarted(id),

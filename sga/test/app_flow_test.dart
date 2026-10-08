@@ -40,8 +40,9 @@ void main() {
     expect(find.byType(WelcomePage), findsOneWidget);
   });
 
-  testWidgets('login válido abre o app em Commissions e Sair volta ao início',
-      (tester) async {
+  testWidgets('login válido abre o app em Commissions e Sair volta ao início', (
+    tester,
+  ) async {
     useTallViewport(tester);
     await tester.pumpWidget(const SgaApp());
     await tester.pumpAndSettle();
@@ -63,28 +64,31 @@ void main() {
     expect(find.byType(WelcomePage), findsOneWidget);
   });
 
-  testWidgets('tocar num card abre o detalhe e Voltar retorna ao quadro', (tester) async {
-    useTallViewport(tester);
-    await tester.pumpWidget(const SgaApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'tocar num card abre o detalhe em modal e fechar retorna ao quadro',
+    (tester) async {
+      useTallViewport(tester);
+      await tester.pumpWidget(const SgaApp());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Login'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField).at(0), 'maria@exemplo.com');
-    await tester.enterText(find.byType(TextField).at(1), 'senha1234');
-    await tester.pump();
-    await tester.tap(find.byType(ElevatedButton));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Login'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).at(0), 'maria@exemplo.com');
+      await tester.enterText(find.byType(TextField).at(1), 'senha1234');
+      await tester.pump();
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Marina Costa'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Marina Costa'));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(CommissionDetailPage), findsOneWidget);
-    expect(find.text('Ainda não fechado'), findsOneWidget);
+      expect(find.byType(CommissionDetailPage), findsOneWidget);
+      expect(find.text('Ainda não fechado'), findsOneWidget);
 
-    await tester.tap(find.text('Voltar'));
-    await tester.pumpAndSettle();
-    expect(find.byType(CommissionDetailPage), findsNothing);
-    expect(find.byType(CommissionsPage), findsOneWidget);
-  });
+      await tester.tap(find.byTooltip('Fechar detalhes'));
+      await tester.pumpAndSettle();
+      expect(find.byType(CommissionDetailPage), findsNothing);
+      expect(find.byType(CommissionsPage), findsOneWidget);
+    },
+  );
 }

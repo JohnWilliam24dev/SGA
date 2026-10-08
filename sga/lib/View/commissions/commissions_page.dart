@@ -22,7 +22,7 @@ class CommissionsPage extends StatefulWidget {
 
   final CommissionRepository repository;
   final void Function(CommissionResumoModel commission, String statusNome)
-      onOpenCommission;
+  onOpenCommission;
 
   @override
   State<CommissionsPage> createState() => _CommissionsPageState();
@@ -114,24 +114,30 @@ class _CommissionsPageState extends State<CommissionsPage> {
       return const Loader(message: 'Carregando commissions...');
     }
 
-    return StylePackScope(
-      pack: sgaKanbanPack,
-      child: KanbanBoard<CommissionResumoModel>(
-        cardHeight: 120,
-        columns: [
-          for (final coluna in colunas)
-            KanbanColumnData<CommissionResumoModel>(
-              id: coluna.id,
-              title: coluna.titulo,
-              items: coluna.commissions,
-            ),
-        ],
-        itemId: (commission) => commission.id,
-        itemBuilder: (context, commission) =>
-            CommissionCard(commission: commission),
-        onMove: _mover,
-        onItemTap: _abrir,
-        emptyLabel: 'Nenhuma commission aqui',
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: GlassPanel(
+        padding: const EdgeInsets.all(12),
+        child: StylePackScope(
+          pack: sgaKanbanPack,
+          child: KanbanBoard<CommissionResumoModel>(
+            cardHeight: 104,
+            columns: [
+              for (final coluna in colunas)
+                KanbanColumnData<CommissionResumoModel>(
+                  id: coluna.id,
+                  title: coluna.titulo,
+                  items: coluna.commissions,
+                ),
+            ],
+            itemId: (commission) => commission.id,
+            itemBuilder: (context, commission) =>
+                CommissionCard(commission: commission),
+            onMove: _mover,
+            onItemTap: _abrir,
+            emptyLabel: 'Nenhum pedido aqui',
+          ),
+        ),
       ),
     );
   }

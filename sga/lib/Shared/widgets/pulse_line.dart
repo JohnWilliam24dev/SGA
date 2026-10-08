@@ -1,7 +1,6 @@
 import 'dart:ui' show PathMetric;
 
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
 /// Linha de batimento (ECG) que se desenha sozinha e termina numa onda suave:
@@ -73,7 +72,10 @@ class _PulsePainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final metrics = _path(size).computeMetrics().toList();
-    final total = metrics.fold<double>(0, (sum, PathMetric m) => sum + m.length);
+    final total = metrics.fold<double>(
+      0,
+      (sum, PathMetric m) => sum + m.length,
+    );
     var remaining = total * progress;
 
     Offset? tip;
@@ -87,11 +89,7 @@ class _PulsePainter extends CustomPainter {
 
     // Ponto brilhante na ponta enquanto a linha ainda está se desenhando.
     if (tip != null && progress < 1) {
-      canvas.drawCircle(
-        tip,
-        7,
-        Paint()..color = color.withValues(alpha: 0.25),
-      );
+      canvas.drawCircle(tip, 7, Paint()..color = color.withValues(alpha: 0.25));
       canvas.drawCircle(tip, 3.5, Paint()..color = color);
     }
   }

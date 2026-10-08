@@ -27,7 +27,7 @@ Widget _pagina(
     Tela(
       child: CommissionsPage(
         repository: repo,
-        onOpenCommission: onOpen ?? (_, __) {},
+        onOpenCommission: onOpen ?? (_, _) {},
       ),
     ),
   );
@@ -40,7 +40,11 @@ Finder _naColuna(String colunaId, String texto) {
   );
 }
 
-Future<void> _arrastar(WidgetTester tester, Offset origem, Offset destino) async {
+Future<void> _arrastar(
+  WidgetTester tester,
+  Offset origem,
+  Offset destino,
+) async {
   final gesto = await tester.startGesture(origem);
   await tester.pump(const Duration(milliseconds: 400));
   await gesto.moveTo(origem + const Offset(12, 12));
@@ -58,14 +62,23 @@ void main() {
     addTearDown(tester.view.reset);
   }
 
-  testWidgets('mostra o carregamento e depois as colunas com os pedidos', (tester) async {
+  testWidgets('mostra o carregamento e depois as colunas com os pedidos', (
+    tester,
+  ) async {
     viewport(tester);
-    await tester.pumpWidget(_pagina(FakeCommissionRepository(latencia: Duration.zero)));
+    await tester.pumpWidget(
+      _pagina(FakeCommissionRepository(latencia: Duration.zero)),
+    );
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     await tester.pumpAndSettle();
     expect(find.byType(CircularProgressIndicator), findsNothing);
-    for (final coluna in ['Orçamento', 'Em produção', 'Em revisão', 'Entregue']) {
+    for (final coluna in [
+      'Orçamento',
+      'Em produção',
+      'Em revisão',
+      'Entregue',
+    ]) {
       expect(find.text(coluna), findsOneWidget);
     }
     expect(_naColuna('orcamento', 'Marina Costa'), findsOneWidget);
@@ -73,7 +86,9 @@ void main() {
 
   testWidgets('o card mostra cliente, tipo de produto e valor', (tester) async {
     viewport(tester);
-    await tester.pumpWidget(_pagina(FakeCommissionRepository(latencia: Duration.zero)));
+    await tester.pumpWidget(
+      _pagina(FakeCommissionRepository(latencia: Duration.zero)),
+    );
     await tester.pumpAndSettle();
 
     // c1: ainda sem orçamento final, mostra o simulado.
@@ -105,13 +120,15 @@ void main() {
     expect(status, 'Em produção');
   });
 
-  testWidgets('apertar e segurar move o card e não abre o detalhe', (tester) async {
+  testWidgets('apertar e segurar move o card e não abre o detalhe', (
+    tester,
+  ) async {
     viewport(tester);
     var aberturas = 0;
     await tester.pumpWidget(
       _pagina(
         FakeCommissionRepository(latencia: Duration.zero),
-        onOpen: (_, __) => aberturas++,
+        onOpen: (_, _) => aberturas++,
       ),
     );
     await tester.pumpAndSettle();
@@ -126,29 +143,35 @@ void main() {
     expect(aberturas, 0);
   });
 
-  testWidgets('segurar sem soltar na hora e largar no mesmo lugar não abre o detalhe',
-      (tester) async {
-    viewport(tester);
-    var aberturas = 0;
-    await tester.pumpWidget(
-      _pagina(
-        FakeCommissionRepository(latencia: Duration.zero),
-        onOpen: (_, __) => aberturas++,
-      ),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'segurar sem soltar na hora e largar no mesmo lugar não abre o detalhe',
+    (tester) async {
+      viewport(tester);
+      var aberturas = 0;
+      await tester.pumpWidget(
+        _pagina(
+          FakeCommissionRepository(latencia: Duration.zero),
+          onOpen: (_, _) => aberturas++,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    final gesto = await tester.startGesture(tester.getCenter(find.text('Marina Costa')));
-    await tester.pump(const Duration(milliseconds: 400));
-    await gesto.up();
-    await tester.pumpAndSettle();
+      final gesto = await tester.startGesture(
+        tester.getCenter(find.text('Marina Costa')),
+      );
+      await tester.pump(const Duration(milliseconds: 400));
+      await gesto.up();
+      await tester.pumpAndSettle();
 
-    expect(aberturas, 0);
-  });
+      expect(aberturas, 0);
+    },
+  );
 
   testWidgets('arrastar um pedido para outra coluna o move', (tester) async {
     viewport(tester);
-    await tester.pumpWidget(_pagina(FakeCommissionRepository(latencia: Duration.zero)));
+    await tester.pumpWidget(
+      _pagina(FakeCommissionRepository(latencia: Duration.zero)),
+    );
     await tester.pumpAndSettle();
 
     await _arrastar(
@@ -161,7 +184,9 @@ void main() {
     expect(_naColuna('orcamento', 'Marina Costa'), findsNothing);
   });
 
-  testWidgets('se o repositório falhar, o pedido volta e um aviso aparece', (tester) async {
+  testWidgets('se o repositório falhar, o pedido volta e um aviso aparece', (
+    tester,
+  ) async {
     viewport(tester);
     await tester.pumpWidget(_pagina(_RepositorioQueFalha()));
     await tester.pumpAndSettle();

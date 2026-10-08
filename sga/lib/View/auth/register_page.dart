@@ -1,4 +1,5 @@
 import 'package:easy_ui/easy_ui.dart';
+import 'package:flutter/material.dart' show TextButton;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
@@ -53,20 +54,23 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Button(
-              text: 'Voltar',
-              variant: ButtonVariant.ghost,
+            child: TextButton(
               onPressed: widget.onBack,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF063C68),
+              ),
+              child: const Text('Voltar'),
             ),
           ),
-          const FadeIn(child: SgaLogo(size: 60)),
+          const FadeIn(child: SgaLogo(size: 54)),
           FadeIn(
             delay: const Duration(milliseconds: 150),
-            child: Card(
+            child: GlassPanel(
+              padding: const EdgeInsets.all(24),
               child: Div(
                 width: 100.pct,
                 children: [
-                  const Label(type: LabelType.title, text: 'Cadastre-se'),
+                  const Label(type: LabelType.title, text: 'Crie sua conta'),
                   const Label(
                     type: LabelType.caption,
                     text: 'Crie sua conta para organizar a sua arte.',
@@ -92,7 +96,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         name: 'senha',
                         hint: 'Senha',
                         type: InputType.password,
-                        validation: [isRequired(), isPassword(min: 8, requireDigit: true)],
+                        validation: [
+                          isRequired(),
+                          isPassword(min: 8, requireDigit: true),
+                        ],
                       ),
                       InputField(
                         name: 'confirmar',
@@ -104,7 +111,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
                       ),
                       _termos(),
-                      Button(text: 'Criar conta', expanded: true, onSubmit: _enviar),
+                      Button(
+                        text: 'Criar conta',
+                        expanded: true,
+                        onSubmit: _enviar,
+                      ),
                     ],
                   ),
                 ],
@@ -118,10 +129,12 @@ class _RegisterPageState extends State<RegisterPage> {
               gap: 0.px,
               children: [
                 const Label(type: LabelType.caption, text: 'Já tem conta?'),
-                Button(
-                  text: 'Entrar',
-                  variant: ButtonVariant.ghost,
+                TextButton(
                   onPressed: widget.onGoToLogin,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF053A68),
+                  ),
+                  child: const Text('Entrar'),
                 ),
               ],
             ),

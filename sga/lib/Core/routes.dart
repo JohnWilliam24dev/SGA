@@ -1,5 +1,6 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/material.dart' show MaterialPageRoute;
+import 'package:flutter/material.dart'
+    show Dialog, MaterialPageRoute, showDialog;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../Domain/domain.dart';
@@ -23,10 +24,8 @@ Route<void> _route(WidgetBuilder builder) {
 /// Entra no app (ainda sem autenticação de verdade) e limpa o histórico, para
 /// o botão voltar não retornar ao login.
 void _enterApp(BuildContext context) {
-  Navigator.of(context).pushAndRemoveUntil(
-    _route(buildMainScreen),
-    (route) => false,
-  );
+  Navigator.of(context)
+      .pushAndRemoveUntil(_route(buildMainScreen), (route) => false);
 }
 
 Widget buildWelcomeScreen(BuildContext context) {
@@ -51,10 +50,8 @@ Widget buildLoginScreen(BuildContext context) {
   return LoginPage(
     // Sem autenticação ainda: qualquer login válido entra.
     onLogin: (credenciais) => _enterApp(context),
-    onForgotPassword: () => Toast.show(
-      context,
-      text: 'Recuperação de senha em breve.',
-    ),
+    onForgotPassword: () =>
+        Toast.show(context, text: 'Recuperação de senha em breve.'),
     onGoToRegister: () =>
         Navigator.of(context).pushReplacement(_route(buildRegisterScreen)),
     onBack: () => Navigator.of(context).pop(),
@@ -64,17 +61,49 @@ Widget buildLoginScreen(BuildContext context) {
 Widget buildMainScreen(BuildContext context) {
   return MainShell(
     commissionRepository: _commissionRepository,
-    onOpenCommission: (commission, statusNome) => Navigator.of(context).push(
+    onOpenCommission: (commission, statusNome) => _openCommissionDetail(
+      context,
+      commission: commission,
+      statusNome: statusNome,
+    ),
+    onLogout: () =>
+        Navigator.of(context)
+            .pushAndRemoveUntil(_route(buildWelcomeScreen), (route) => false),
+  );
+}
+
+/// No desktop o pedido é uma nota sobre o quadro; no celular, onde não há
+/// espaço para as duas coisas, continua sendo uma página própria.
+void _openCommissionDetail(
+  BuildContext context, {
+  required CommissionResumoModel commission,
+  required String statusNome,
+}) {
+  final mobile = MediaQuery.sizeOf(context).width < 760;
+  if (mobile) {
+    Navigator.of(context).push(
       _route(
         (_) => buildCommissionDetailScreen(
           commission: commission,
           statusNome: statusNome,
         ),
       ),
-    ),
-    onLogout: () => Navigator.of(context).pushAndRemoveUntil(
-      _route(buildWelcomeScreen),
-      (route) => false,
+    );
+    return;
+  }
+
+  showDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    builder: (dialogContext) => Dialog(
+      backgroundColor: const Color(0x00000000),
+      insetPadding: const EdgeInsets.all(24),
+      child: buildCommissionDetailScreen(
+        commission: commission,
+        statusNome: statusNome,
+        compact: true,
+        onBack: () => Navigator.of(dialogContext).pop(),
+      ),
     ),
   );
 }
@@ -82,13 +111,16 @@ Widget buildMainScreen(BuildContext context) {
 Widget buildCommissionDetailScreen({
   required CommissionResumoModel commission,
   required String statusNome,
+  bool compact = false,
+  VoidCallback? onBack,
 }) {
   return Builder(
     builder: (context) => CommissionDetailPage(
       repository: _commissionRepository,
       commission: commission,
       statusNome: statusNome,
-      onBack: () => Navigator.of(context).pop(),
+      compact: compact,
+      onBack: onBack ?? () => Navigator.of(context).pop(),
     ),
   );
 }

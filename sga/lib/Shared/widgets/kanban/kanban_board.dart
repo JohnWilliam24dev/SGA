@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart' show Scrollbar;
-import 'package:flutter/rendering.dart' show RenderBox;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import 'kanban_column_view.dart';
@@ -74,8 +72,9 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
   static const Duration _pageCooldown = Duration(milliseconds: 700);
 
   final ScrollController _horizontalController = ScrollController();
-  final PageController _pageController =
-      PageController(viewportFraction: _pageFraction);
+  final PageController _pageController = PageController(
+    viewportFraction: _pageFraction,
+  );
   final Map<String, ScrollController> _listControllers =
       <String, ScrollController>{};
   final Map<String, GlobalKey> _columnKeys = <String, GlobalKey>{};
@@ -209,8 +208,9 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
   /// Posição (entre os itens, sem contar o arrastado) sobre a qual o ponteiro
   /// está. Os cards têm altura fixa, então cada "vaga" tem o mesmo tamanho.
   int _indexAt(KanbanColumnData<T> column, Offset pointer) {
-    final count =
-        column.items.where((i) => widget.itemId(i) != _draggingId).length;
+    final count = column.items
+        .where((i) => widget.itemId(i) != _draggingId)
+        .length;
     final listBox = _boxOf(_listKeys[column.id]);
     if (listBox == null) return count;
 
@@ -240,7 +240,12 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     _updateHover();
   }
 
-  double _edgeDelta(double value, double start, double end, [double edge = _edge]) {
+  double _edgeDelta(
+    double value,
+    double start,
+    double end, [
+    double edge = _edge,
+  ]) {
     if (value < start + edge) {
       final t = ((start + edge - value) / edge).clamp(0.0, 1.0).toDouble();
       return -_maxSpeed * t;
@@ -302,7 +307,10 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     if (!waited || !cooled) return;
 
     final current = (_pageController.page ?? 0).round();
-    final target = math.max(0, math.min(widget.columns.length - 1, current + direction));
+    final target = math.max(
+      0,
+      math.min(widget.columns.length - 1, current + direction),
+    );
     if (target == current) return;
     _lastFlip = now;
     _goToPage(target);
@@ -324,7 +332,9 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final height = constraints.hasBoundedHeight ? constraints.maxHeight : 480.0;
+        final height = constraints.hasBoundedHeight
+            ? constraints.maxHeight
+            : 480.0;
         // Largura de celular: uma coluna por vez, em páginas que encaixam.
         // Vale pela largura (e não pela plataforma) para funcionar também
         // numa janela de navegador estreita.
@@ -333,9 +343,8 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
 
         // Por padrão o Flutter não deixa o mouse arrastar áreas roláveis;
         // aqui deixamos (arrastar o fundo do quadro rola, como no Trello).
-        final behavior = ScrollConfiguration.of(context).copyWith(
-          dragDevices: PointerDeviceKind.values.toSet(),
-        );
+        final behavior = ScrollConfiguration.of(context)
+            .copyWith(dragDevices: PointerDeviceKind.values.toSet());
 
         return ScrollConfiguration(
           behavior: behavior,
@@ -446,8 +455,8 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     return AnimatedBuilder(
       animation: _pageController,
       builder: (context, _) {
-        final position = _pageController.hasClients &&
-                _pageController.position.hasPixels
+        final position =
+            _pageController.hasClients && _pageController.position.hasPixels
             ? (_pageController.page ?? 0.0)
             : 0.0;
         final current = position.round();
@@ -462,7 +471,10 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
                   behavior: HitTestBehavior.opaque,
                   onTap: () => _goToPage(i),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 8,
+                    ),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: i == current ? 22 : 8,

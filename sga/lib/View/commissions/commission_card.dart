@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart' hide Icon;
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart';
 
-/// Pack do quadro de commissions: card com padding enxuto e uma tipografia
+/// Pack do quadro de pedidos: card com padding enxuto e uma tipografia
 /// um pouco menor que a do resto do app (nome e título de coluna em ~15px,
 /// textos de apoio em ~13px), para caber tudo na altura padrão do card.
 ///
@@ -14,9 +14,9 @@ import '../../Shared/shared.dart';
 final StylePack sgaKanbanPack = StylePack.define(
   name: 'sga_kanban',
   card: const CardStyleSpec(
-    radius: 12,
+    radius: 10,
     elevation: ElevationLevel.subtle,
-    paddingSteps: 1.5,
+    paddingSteps: 1,
   ),
   label: const LabelStyleSpec(subtitleScale: 1.05, captionScale: 0.93),
 );

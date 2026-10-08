@@ -1,4 +1,3 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Faz o filho aparecer subindo suavemente. Use [delay] para escalonar

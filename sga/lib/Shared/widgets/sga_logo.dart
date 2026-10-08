@@ -12,8 +12,6 @@ class SgaLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = AppThemeScope.tokensOf(context);
-    final lighter = Color.alphaBlend(const Color(0x40FFFFFF), tokens.primaryColor);
-
     return SizedBox(
       width: size,
       height: size,
@@ -23,11 +21,8 @@ class SgaLogo extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(size * 0.3),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [lighter, tokens.primaryColor],
-              ),
+              color: const Color(0xFFF8FCFF),
+              border: Border.all(color: const Color(0xE6FFFFFF)),
               boxShadow: [
                 BoxShadow(
                   color: tokens.primaryColor.withValues(alpha: 0.35),
@@ -41,7 +36,7 @@ class SgaLogo extends StatelessWidget {
                 child: Icon(
                   Icons.palette_rounded,
                   size: size * 0.5,
-                  color: (t) => t.onPrimaryColor,
+                  color: (t) => t.primaryColor,
                 ),
               ),
             ),
@@ -55,8 +50,8 @@ class SgaLogo extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: tokens.secondaryColor,
-                  border: Border.all(color: tokens.backgroundColor, width: 3),
+                  color: tokens.primaryColor,
+                  border: Border.all(color: const Color(0xFFF8FCFF), width: 3),
                 ),
                 child: Center(
                   child: Icon(

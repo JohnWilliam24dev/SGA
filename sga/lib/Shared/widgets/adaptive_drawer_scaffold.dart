@@ -1,8 +1,6 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart'
     show AppBar, Drawer, Icons, InkWell, Material, Scaffold, Tooltip;
-import 'package:flutter/services.dart' show SystemMouseCursors;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import 'sga_logo.dart';
@@ -72,7 +70,8 @@ class _AdaptiveDrawerScaffoldState extends State<AdaptiveDrawerScaffold> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final mobile =
-            Breakpoints.standard.sizeFor(constraints.maxWidth) == ScreenSize.mobile;
+            Breakpoints.standard.sizeFor(constraints.maxWidth) ==
+            ScreenSize.mobile;
 
         if (mobile) {
           return Scaffold(
@@ -121,7 +120,9 @@ class _AdaptiveDrawerScaffoldState extends State<AdaptiveDrawerScaffold> {
                       : AdaptiveDrawerScaffold.sidebarWidth,
                   decoration: BoxDecoration(
                     color: tokens.surfaceColor,
-                    border: Border(right: BorderSide(color: tokens.borderColor)),
+                    border: Border(
+                      right: BorderSide(color: tokens.borderColor),
+                    ),
                   ),
                   // Escolhe o desenho pela largura real (e não pelo estado),
                   // para nada estourar enquanto a barra anima.

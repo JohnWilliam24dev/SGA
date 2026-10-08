@@ -13,6 +13,7 @@ dependencies:
     git:
       url: https://github.com/JohnWilliam24dev/Easy_UI_Framework.git
       ref: main
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

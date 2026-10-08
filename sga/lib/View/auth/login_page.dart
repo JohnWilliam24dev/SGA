@@ -1,4 +1,5 @@
 import 'package:easy_ui/easy_ui.dart';
+import 'package:flutter/material.dart' show TextButton;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
@@ -30,16 +31,23 @@ class LoginPage extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Button(text: 'Voltar', variant: ButtonVariant.ghost, onPressed: onBack),
+            child: TextButton(
+              onPressed: onBack,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF063C68),
+              ),
+              child: const Text('Voltar'),
+            ),
           ),
-          const FadeIn(child: SgaLogo(size: 60)),
+          const FadeIn(child: SgaLogo(size: 54)),
           FadeIn(
             delay: const Duration(milliseconds: 150),
-            child: Card(
+            child: GlassPanel(
+              padding: const EdgeInsets.all(24),
               child: Div(
                 width: 100.pct,
                 children: [
-                  const Label(type: LabelType.title, text: 'Login'),
+                  const Label(type: LabelType.title, text: 'Acesse sua conta'),
                   const Label(
                     type: LabelType.caption,
                     text: 'Acesse sua conta para continuar.',
@@ -61,10 +69,12 @@ class LoginPage extends StatelessWidget {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Button(
-                          text: 'Esqueci a senha',
-                          variant: ButtonVariant.ghost,
+                        child: TextButton(
                           onPressed: onForgotPassword,
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF075A9F),
+                          ),
+                          child: const Text('Esqueci a senha'),
                         ),
                       ),
                       Button(
@@ -89,11 +99,16 @@ class LoginPage extends StatelessWidget {
               align: Alignment.center,
               gap: 0.px,
               children: [
-                const Label(type: LabelType.caption, text: 'Ainda não tem conta?'),
-                Button(
-                  text: 'Cadastre-se',
-                  variant: ButtonVariant.ghost,
+                const Label(
+                  type: LabelType.caption,
+                  text: 'Ainda não tem conta?',
+                ),
+                TextButton(
                   onPressed: onGoToRegister,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF053A68),
+                  ),
+                  child: const Text('Cadastre-se'),
                 ),
               ],
             ),

@@ -7,7 +7,11 @@ import 'package:sga/Shared/shared.dart';
 import '../support/helpers.dart';
 
 const _colunas = [
-  KanbanColumnData<String>(id: 'a', title: 'Coluna A', items: ['a1', 'a2', 'a3']),
+  KanbanColumnData<String>(
+    id: 'a',
+    title: 'Coluna A',
+    items: ['a1', 'a2', 'a3'],
+  ),
   KanbanColumnData<String>(id: 'b', title: 'Coluna B', items: ['b1']),
   KanbanColumnData<String>(id: 'c', title: 'Coluna C', items: []),
 ];
@@ -35,7 +39,11 @@ void _viewport(WidgetTester tester, Size size) {
 }
 
 /// Segura o card (toque longo) e o leva até [destino], passo a passo.
-Future<void> _arrastar(WidgetTester tester, Offset origem, Offset destino) async {
+Future<void> _arrastar(
+  WidgetTester tester,
+  Offset origem,
+  Offset destino,
+) async {
   final gesto = await tester.startGesture(origem);
   await tester.pump(const Duration(milliseconds: 400));
   await gesto.moveTo(origem + const Offset(12, 12));
@@ -48,7 +56,9 @@ Future<void> _arrastar(WidgetTester tester, Offset origem, Offset destino) async
 
 void main() {
   group('desktop', () {
-    testWidgets('mostra todas as colunas lado a lado, com os cards', (tester) async {
+    testWidgets('mostra todas as colunas lado a lado, com os cards', (
+      tester,
+    ) async {
       _viewport(tester, const Size(1200, 800));
       await tester.pumpWidget(_board());
       await tester.pumpAndSettle();
@@ -63,7 +73,9 @@ void main() {
       expect(find.text('Nenhum item aqui'), findsOneWidget); // coluna C vazia
     });
 
-    testWidgets('arrastar um card para outra coluna avisa o movimento', (tester) async {
+    testWidgets('arrastar um card para outra coluna avisa o movimento', (
+      tester,
+    ) async {
       _viewport(tester, const Size(1200, 800));
       KanbanMove? movimento;
       await tester.pumpWidget(_board(onMove: (m) => movimento = m));
@@ -77,7 +89,12 @@ void main() {
 
       expect(
         movimento,
-        const KanbanMove(itemId: 'a1', fromColumnId: 'a', toColumnId: 'b', toIndex: 0),
+        const KanbanMove(
+          itemId: 'a1',
+          fromColumnId: 'a',
+          toColumnId: 'b',
+          toIndex: 0,
+        ),
       );
     });
 
@@ -87,7 +104,9 @@ void main() {
       await tester.pumpWidget(_board(onMove: (m) => movimento = m));
       await tester.pumpAndSettle();
 
-      final colunaC = tester.getCenter(find.byKey(const ValueKey('kanban-column-c')));
+      final colunaC = tester.getCenter(
+        find.byKey(const ValueKey('kanban-column-c')),
+      );
       await _arrastar(tester, tester.getCenter(find.text('b1')), colunaC);
 
       expect(movimento?.toColumnId, 'c');
@@ -108,7 +127,12 @@ void main() {
 
       expect(
         movimento,
-        const KanbanMove(itemId: 'a1', fromColumnId: 'a', toColumnId: 'a', toIndex: 2),
+        const KanbanMove(
+          itemId: 'a1',
+          fromColumnId: 'a',
+          toColumnId: 'a',
+          toIndex: 2,
+        ),
       );
     });
 
@@ -145,7 +169,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final pageView = tester.widget<PageView>(find.byType(PageView));
-      final pagina = pageView.controller.page!;
+      final pagina = pageView.controller?.page ?? 0;
       expect(pagina, closeTo(pagina.roundToDouble(), 0.001)); // nunca no meio
       expect(pagina.round(), 1);
     });
@@ -160,7 +184,10 @@ void main() {
 
       final origem = tester.getCenter(find.text('a1'));
       final destino = tester.getCenter(find.text('b1'));
-      final gesto = await tester.startGesture(origem, kind: PointerDeviceKind.mouse);
+      final gesto = await tester.startGesture(
+        origem,
+        kind: PointerDeviceKind.mouse,
+      );
       await tester.pump(const Duration(milliseconds: 400)); // segurou
       await gesto.moveTo(origem + const Offset(12, 12));
       await tester.pump();
@@ -171,11 +198,18 @@ void main() {
 
       expect(
         movimento,
-        const KanbanMove(itemId: 'a1', fromColumnId: 'a', toColumnId: 'b', toIndex: 0),
+        const KanbanMove(
+          itemId: 'a1',
+          fromColumnId: 'a',
+          toColumnId: 'b',
+          toIndex: 0,
+        ),
       );
     });
 
-    testWidgets('mover logo de cara, sem segurar, não pega o card', (tester) async {
+    testWidgets('mover logo de cara, sem segurar, não pega o card', (
+      tester,
+    ) async {
       _viewport(tester, const Size(1200, 800));
       var chamadas = 0;
       await tester.pumpWidget(_board(onMove: (_) => chamadas++));
@@ -194,7 +228,9 @@ void main() {
       expect(chamadas, 0);
     });
 
-    testWidgets('um clique simples não move nem esconde o card', (tester) async {
+    testWidgets('um clique simples não move nem esconde o card', (
+      tester,
+    ) async {
       _viewport(tester, const Size(1200, 800));
       var chamadas = 0;
       await tester.pumpWidget(_board(onMove: (_) => chamadas++));
@@ -207,8 +243,9 @@ void main() {
       expect(find.text('a1'), findsOneWidget);
     });
 
-    testWidgets('arrastar o fundo com o mouse rola o quadro na horizontal',
-        (tester) async {
+    testWidgets('arrastar o fundo com o mouse rola o quadro na horizontal', (
+      tester,
+    ) async {
       // Largura de tablet/desktop (colunas lado a lado), mas estreita o
       // bastante para as colunas não caberem.
       _viewport(tester, const Size(700, 800));
@@ -230,7 +267,9 @@ void main() {
 
       final rolagem = tester.widget<SingleChildScrollView>(
         find.byWidgetPredicate(
-          (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
+          (w) =>
+              w is SingleChildScrollView &&
+              w.scrollDirection == Axis.horizontal,
         ),
       );
       expect(rolagem.controller!.offset, greaterThan(50));
@@ -238,35 +277,41 @@ void main() {
   });
 
   group('largura de celular', () {
-    testWidgets('janela estreita usa páginas mesmo com mouse (sem depender da plataforma)',
-        (tester) async {
-      _viewport(tester, const Size(400, 800));
-      await tester.pumpWidget(_board());
-      await tester.pumpAndSettle();
+    testWidgets(
+      'janela estreita usa páginas mesmo com mouse (sem depender da plataforma)',
+      (tester) async {
+        _viewport(tester, const Size(400, 800));
+        await tester.pumpWidget(_board());
+        await tester.pumpAndSettle();
 
-      expect(find.byType(PageView), findsOneWidget);
-    });
+        expect(find.byType(PageView), findsOneWidget);
+      },
+    );
 
-    testWidgets('deslizar com o mouse na coluna também troca de página e encaixa',
-        (tester) async {
-      _viewport(tester, const Size(400, 800));
-      await tester.pumpWidget(_board());
-      await tester.pumpAndSettle();
+    testWidgets(
+      'deslizar com o mouse na coluna também troca de página e encaixa',
+      (tester) async {
+        _viewport(tester, const Size(400, 800));
+        await tester.pumpWidget(_board());
+        await tester.pumpAndSettle();
 
-      final gesto = await tester.startGesture(
-        tester.getCenter(find.text('a1')),
-        kind: PointerDeviceKind.mouse,
-      );
-      await gesto.moveBy(const Offset(-60, 0));
-      await tester.pump();
-      await gesto.moveBy(const Offset(-60, 0));
-      await tester.pump();
-      await gesto.up();
-      await tester.pumpAndSettle();
+        final gesto = await tester.startGesture(
+          tester.getCenter(find.text('a1')),
+          kind: PointerDeviceKind.mouse,
+        );
+        await gesto.moveBy(const Offset(-60, 0));
+        await tester.pump();
+        await gesto.moveBy(const Offset(-60, 0));
+        await tester.pump();
+        await gesto.up();
+        await tester.pumpAndSettle();
 
-      final pagina = tester.widget<PageView>(find.byType(PageView)).controller.page!;
-      expect(pagina, closeTo(pagina.roundToDouble(), 0.001));
-      expect(pagina.round(), 1);
-    });
+        final pagina =
+            tester.widget<PageView>(find.byType(PageView)).controller?.page ??
+            0;
+        expect(pagina, closeTo(pagina.roundToDouble(), 0.001));
+        expect(pagina.round(), 1);
+      },
+    );
   });
 }

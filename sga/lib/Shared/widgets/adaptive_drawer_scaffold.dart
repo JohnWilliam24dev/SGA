@@ -292,8 +292,8 @@ class _NavPanel extends StatelessWidget {
                 child: InkWell(
                   onTap: onToggleCollapse,
                   child: const Padding(
-                    padding: EdgeInsets.all(7),
-                    child: SidebarToggleIcon(size: 17),
+                    padding: EdgeInsets.all(8),
+                    child: SidebarToggleIcon(size: 20),
                   ),
                 ),
               ),
@@ -341,15 +341,15 @@ class _CollapsedLogoButtonState extends State<_CollapsedLogoButton> {
                 child: _hover
                     ? SizedBox(
                         key: const ValueKey<String>('expandir'),
-                        width: 36,
-                        height: 36,
+                        width: 40,
+                        height: 40,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: tokens.primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Center(
-                            child: SidebarToggleIcon(size: 19, showArrow: true),
+                            child: SidebarToggleIcon(size: 24, showArrow: true),
                           ),
                         ),
                       )

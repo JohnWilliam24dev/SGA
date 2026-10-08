@@ -7,3 +7,4 @@ export 'commission_column.dart';
 export 'commission_repository.dart';
 export 'credenciais.dart';
 export 'maker.dart';
+export 'models/models.dart';

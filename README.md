@@ -16,19 +16,24 @@ lib/
   main.dart              ponto de entrada
   Core/                  tema (tokens + StylePack), rotas e a raiz SgaApp
   Domain/                Maker, Credenciais, CommissionColumn, regra de mover
-                         (moverCommission) e o repositório (interface + versão
-                         simulada em memória)
+                         commission (commission_board) e o repositório
+                         (interface + versão simulada em memória)
     models/              modelos da API (fromJson/toJson): Status, TipoProduto,
-                         Adicional, Produto, CommissionResumo e
-                         CommissionDetalhada
+                         Adicional, Produto, CommissionAdicional,
+                         CommissionResumo e CommissionDetalhada
   Shared/                widgets reutilizáveis (KanbanBoard, AdaptiveDrawerScaffold,
-                         SgaLogo, PulseLine, FadeIn, AuthShell) e formatadores
-                         (moeda e data)
+                         GlassAppShell, SidebarToggleIcon, SgaLogo, PulseLine,
+                         FadeIn, AuthShell) e formatadores (moeda e data)
   View/                  telas
     welcome/             tela inicial (Cadastre-se / Login)
     auth/                login e cadastro
     main/                área autenticada (navegação lateral responsiva)
     commissions/         quadro kanban e detalhe da commission
+    dashboard/           Financeiro, Relatório de pedidos e Produtos
+    catalog/             tipos de produtos e adicionais
+    profile/             perfil do artista
+    settings/            configurações
+    support/             suporte
 test/                    espelha a estrutura de lib/
 ```
 
@@ -58,6 +63,12 @@ test/                    espelha a estrutura de lib/
   (simulado e final), descrição e imagem de referência, adicionais (quantidade,
   valor unitário e subtotal), contato, e-mail (quando houver), código de
   acompanhamento e data de criação.
+- **Seções da área autenticada** (menu lateral): *Pedidos* (o kanban de
+  commissions), *Financeiro*, *Relatório de pedidos*, *Produtos* e *Tipos de
+  produtos* (catálogo de tipos e adicionais, editável em memória). *Perfil*,
+  *Configurações* e *Suporte* ficam à parte das cinco principais. Todas leem
+  os dados por repositório (nunca direto dos mocks), então a troca pela API
+  não mexe nas telas.
 - **Navegação:** tablet/desktop com barra lateral fixa, recolhida pelo ícone
   de painel no topo dela (vira uma faixa só de ícones; recolhida, a logo do
   sistema vira o ícone de "mostrar a barra" ao passar o mouse); celular com

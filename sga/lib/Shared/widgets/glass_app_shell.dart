@@ -2,7 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'sga_logo.dart';
+import '../../Domain/maker.dart';
+import '../../Core/theme/sga_theme.dart';
 
 /// Moldura compartilhada das telas internas. Mantém a navegação e o conteúdo
 /// separados para que cada área possa continuar recebendo seu próprio
@@ -17,6 +18,10 @@ class GlassAppShell extends StatefulWidget {
     required this.subtitle,
     required this.body,
     required this.onLogout,
+    required this.maker,
+    required this.onOpenProfile,
+    required this.onOpenSettings,
+    required this.onOpenSupport,
   });
 
   final List<GlassDestination> destinations;
@@ -26,6 +31,10 @@ class GlassAppShell extends StatefulWidget {
   final String subtitle;
   final Widget body;
   final VoidCallback onLogout;
+  final Maker maker;
+  final VoidCallback onOpenProfile;
+  final VoidCallback onOpenSettings;
+  final VoidCallback onOpenSupport;
 
   @override
   State<GlassAppShell> createState() => _GlassAppShellState();
@@ -36,8 +45,9 @@ class _GlassAppShellState extends State<GlassAppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF249EF5),
+      backgroundColor: colors.background,
       body: Stack(
         children: [
           const Positioned.fill(child: _BlueBackdrop()),
@@ -48,7 +58,13 @@ class _GlassAppShellState extends State<GlassAppShell> {
                 if (compact) {
                   return Column(
                     children: [
-                      _MobileHeader(title: widget.title),
+                      _MobileHeader(
+                        title: widget.title,
+                        maker: widget.maker,
+                        onOpenProfile: widget.onOpenProfile,
+                        onOpenSettings: widget.onOpenSettings,
+                        onOpenSupport: widget.onOpenSupport,
+                      ),
                       Expanded(child: widget.body),
                     ],
                   );
@@ -86,6 +102,10 @@ class _GlassAppShellState extends State<GlassAppShell> {
                             _DesktopHeader(
                               title: widget.title,
                               subtitle: widget.subtitle,
+                              maker: widget.maker,
+                              onOpenProfile: widget.onOpenProfile,
+                              onOpenSettings: widget.onOpenSettings,
+                              onOpenSupport: widget.onOpenSupport,
                             ),
                             const SizedBox(height: 14),
                             Expanded(child: widget.body),
@@ -134,15 +154,18 @@ class GlassPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: .84),
+            color: colors.panel.withValues(alpha: .90),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: .70)),
+            border: Border.all(
+              color: colors.panelBorder.withValues(alpha: .70),
+            ),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x240058A8),
@@ -151,7 +174,10 @@ class GlassPanel extends StatelessWidget {
               ),
             ],
           ),
-          child: Padding(padding: padding, child: child),
+          child: Material(
+            type: MaterialType.transparency,
+            child: Padding(padding: padding, child: child),
+          ),
         ),
       ),
     );
@@ -188,21 +214,21 @@ class _GlassSidebar extends StatelessWidget {
                 ? IconButton(
                     tooltip: 'Expandir menu',
                     onPressed: onToggle,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.menu_open_rounded,
-                      color: Color(0xFF16354C),
+                      color: SgaColors.of(context).text,
                     ),
                   )
                 : Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'MENU',
                           style: TextStyle(
                             fontSize: 10,
                             letterSpacing: 1,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF31526B),
+                            color: sgaMuted,
                           ),
                         ),
                       ),
@@ -210,9 +236,9 @@ class _GlassSidebar extends StatelessWidget {
                         IconButton(
                           tooltip: 'Recolher menu',
                           onPressed: onToggle,
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.menu_open_rounded,
-                            color: Color(0xFF16354C),
+                            color: sgaOnSurface,
                           ),
                         ),
                     ],
@@ -259,7 +285,9 @@ class _SideItem extends StatelessWidget {
     child: Tooltip(
       message: compact ? item.label : '',
       child: Material(
-        color: selected ? Colors.white : Colors.transparent,
+        color: selected
+            ? SgaColors.of(context).selectedNavigation
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(9),
         child: InkWell(
           borderRadius: BorderRadius.circular(9),
@@ -268,16 +296,16 @@ class _SideItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
             child: Row(
               children: [
-                Icon(item.icon, size: 18, color: const Color(0xFF16354C)),
+                Icon(item.icon, size: 18, color: sgaOnSurface),
                 if (!compact) ...[
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       item.label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF16354C),
+                        color: sgaOnSurface,
                       ),
                     ),
                   ),
@@ -292,9 +320,20 @@ class _SideItem extends StatelessWidget {
 }
 
 class _DesktopHeader extends StatelessWidget {
-  const _DesktopHeader({required this.title, required this.subtitle});
+  const _DesktopHeader({
+    required this.title,
+    required this.subtitle,
+    required this.maker,
+    required this.onOpenProfile,
+    required this.onOpenSettings,
+    required this.onOpenSupport,
+  });
   final String title;
   final String subtitle;
+  final Maker maker;
+  final VoidCallback onOpenProfile;
+  final VoidCallback onOpenSettings;
+  final VoidCallback onOpenSupport;
   @override
   Widget build(BuildContext context) => Row(
     children: [
@@ -304,55 +343,92 @@ class _DesktopHeader extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 25,
                 height: 1,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF09243A),
+                color: sgaHeading,
               ),
             ),
             const SizedBox(height: 5),
-            Text(
-              subtitle,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF164765)),
-            ),
+            Text(subtitle, style: TextStyle(fontSize: 12, color: sgaMuted)),
           ],
         ),
       ),
-      GlassPanel(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            SgaLogo(size: 30),
-            SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Sistema de',
-                  style: TextStyle(fontSize: 9, color: Color(0xFF16354C)),
-                ),
-                Text(
-                  'Gerenciamento Artístico',
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF16354C),
+      PopupMenuButton<_MakerMenuAction>(
+        tooltip: 'Menu do perfil',
+        offset: const Offset(0, 48),
+        constraints: const BoxConstraints(minWidth: 150, maxWidth: 170),
+        menuPadding: const EdgeInsets.symmetric(vertical: 4),
+        onSelected: (action) {
+          if (action == _MakerMenuAction.profile) onOpenProfile();
+          if (action == _MakerMenuAction.settings) onOpenSettings();
+          if (action == _MakerMenuAction.support) onOpenSupport();
+        },
+        itemBuilder: (context) => const [
+          PopupMenuItem(value: _MakerMenuAction.profile, child: Text('Perfil')),
+          PopupMenuItem(
+            value: _MakerMenuAction.settings,
+            child: Text('Configurações'),
+          ),
+          PopupMenuItem(
+            value: _MakerMenuAction.support,
+            child: Text('Suporte'),
+          ),
+        ],
+        child: GlassPanel(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _MakerAvatar(maker: maker, size: 30),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    maker.nomeExibicao,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: sgaOnSurface,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Text(
+                    'Meu perfil',
+                    style: TextStyle(fontSize: 9, color: sgaMuted),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 2),
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 18,
+                color: sgaMuted,
+              ),
+            ],
+          ),
         ),
       ),
     ],
   );
 }
 
+enum _MakerMenuAction { profile, settings, support }
+
 class _MobileHeader extends StatelessWidget {
-  const _MobileHeader({required this.title});
+  const _MobileHeader({
+    required this.title,
+    required this.maker,
+    required this.onOpenProfile,
+    required this.onOpenSettings,
+    required this.onOpenSupport,
+  });
   final String title;
+  final Maker maker;
+  final VoidCallback onOpenProfile;
+  final VoidCallback onOpenSettings;
+  final VoidCallback onOpenSupport;
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
@@ -361,21 +437,71 @@ class _MobileHeader extends StatelessWidget {
         Builder(
           builder: (innerContext) => IconButton(
             onPressed: () => Scaffold.of(innerContext).openDrawer(),
-            icon: const Icon(Icons.menu_rounded, color: Color(0xFF09243A)),
+            icon: Icon(Icons.menu_rounded, color: sgaHeading),
           ),
         ),
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF09243A),
+              color: sgaHeading,
             ),
           ),
         ),
-        const SgaLogo(size: 34),
+        PopupMenuButton<_MakerMenuAction>(
+          tooltip: 'Menu do perfil',
+          offset: const Offset(0, 44),
+          constraints: const BoxConstraints(minWidth: 150, maxWidth: 170),
+          menuPadding: const EdgeInsets.symmetric(vertical: 4),
+          onSelected: (action) {
+            if (action == _MakerMenuAction.profile) onOpenProfile();
+            if (action == _MakerMenuAction.settings) onOpenSettings();
+            if (action == _MakerMenuAction.support) onOpenSupport();
+          },
+          itemBuilder: (context) => const [
+            PopupMenuItem(
+              value: _MakerMenuAction.profile,
+              child: Text('Perfil'),
+            ),
+            PopupMenuItem(
+              value: _MakerMenuAction.settings,
+              child: Text('Configurações'),
+            ),
+            PopupMenuItem(
+              value: _MakerMenuAction.support,
+              child: Text('Suporte'),
+            ),
+          ],
+          child: _MakerAvatar(maker: maker, size: 34),
+        ),
       ],
+    ),
+  );
+}
+
+class _MakerAvatar extends StatelessWidget {
+  const _MakerAvatar({required this.maker, required this.size});
+  final Maker maker;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: size,
+    height: size,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: SgaColors.of(context).avatar,
+      shape: BoxShape.circle,
+    ),
+    child: Text(
+      maker.inicial,
+      style: TextStyle(
+        fontSize: size * .42,
+        fontWeight: FontWeight.w800,
+        color: SgaColors.of(context).onPrimary,
+      ),
     ),
   );
 }
@@ -383,14 +509,24 @@ class _MobileHeader extends StatelessWidget {
 class _BlueBackdrop extends StatelessWidget {
   const _BlueBackdrop();
   @override
-  Widget build(BuildContext context) =>
-      CustomPaint(painter: _BlueBackdropPainter());
+  Widget build(BuildContext context) => CustomPaint(
+    painter: _BlueBackdropPainter(
+      dark: Theme.of(context).brightness == Brightness.dark,
+    ),
+  );
 }
 
 class _BlueBackdropPainter extends CustomPainter {
+  const _BlueBackdropPainter({required this.dark});
+
+  final bool dark;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: .20);
+    final paint = Paint()
+      ..color = (dark ? const Color(0xFF168DEE) : Colors.white).withValues(
+        alpha: .20,
+      );
     canvas.drawCircle(Offset(-20, size.height * .96), size.width * .23, paint);
     canvas.drawCircle(
       Offset(size.width * .89, size.height * .44),

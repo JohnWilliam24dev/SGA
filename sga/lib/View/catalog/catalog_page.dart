@@ -3,6 +3,7 @@ import 'package:easy_ui/easy_ui.dart' show Breakpoints, ScreenSize;
 
 import '../../Domain/models/adicional_model.dart';
 import '../../Domain/models/tipo_produto_model.dart';
+import '../../Core/theme/sga_theme.dart';
 import '../../Shared/formatters.dart';
 import '../../Shared/widgets/glass_app_shell.dart';
 
@@ -225,69 +226,73 @@ class _CatalogPageState extends State<CatalogPage>
   );
 
   @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      Align(
-        alignment: Alignment.centerLeft,
-        child: TabBar(
-          controller: _tabs,
-          isScrollable: true,
-          labelColor: const Color(0xFF0F2A43),
-          unselectedLabelColor: const Color(0xFFEAF6FF),
-          indicatorColor: const Color(0xFF0F2A43),
-          indicatorWeight: 3,
-          tabs: const [
-            Tab(text: 'Tipos de produtos'),
-            Tab(text: 'Adicionais'),
-          ],
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TabBar(
+            controller: _tabs,
+            isScrollable: true,
+            labelColor: colors.text,
+            unselectedLabelColor: colors.muted,
+            indicatorColor: colors.primary,
+            indicatorWeight: 3,
+            tabs: const [
+              Tab(text: 'Tipos de produtos'),
+              Tab(text: 'Adicionais'),
+            ],
+          ),
         ),
-      ),
-      const SizedBox(height: 12),
-      Expanded(
-        child: TabBarView(
-          controller: _tabs,
-          children: [
-            _CatalogList<_CatalogType>(
-              title: 'Tipos de produtos',
-              description: 'Defina o preço base e os adicionais que cada tipo pode oferecer.',
-              addLabel: 'Novo tipo',
-              items: _types,
-              emptyTitle: 'Nenhum tipo de produto cadastrado',
-              emptyDescription:
-                  'Comece criando o primeiro tipo que você oferece.',
-              onAdd: () => _editType(),
-              onEdit: _editType,
-              onRemove: _removeType,
-              rowBuilder: (item) => _TypeRow(
-                item: item,
-                onEnabled: (value) => setState(
-                  () => item.model = _typeWithEnabled(item.model, value),
+        const SizedBox(height: 12),
+        Expanded(
+          child: TabBarView(
+            controller: _tabs,
+            children: [
+              _CatalogList<_CatalogType>(
+                title: 'Tipos de produtos',
+                description: 'Defina o preço base e os adicionais que cada tipo pode oferecer.',
+                addLabel: 'Novo tipo',
+                items: _types,
+                emptyTitle: 'Nenhum tipo de produto cadastrado',
+                emptyDescription:
+                    'Comece criando o primeiro tipo que você oferece.',
+                onAdd: () => _editType(),
+                onEdit: _editType,
+                onRemove: _removeType,
+                rowBuilder: (item) => _TypeRow(
+                  item: item,
+                  onEnabled: (value) => setState(
+                    () => item.model = _typeWithEnabled(item.model, value),
+                  ),
                 ),
               ),
-            ),
-            _CatalogList<_CatalogAdditional>(
-              title: 'Adicionais',
-              description: 'Crie extras cobrados por valor fixo ou porcentagem do preço base.',
-              addLabel: 'Novo adicional',
-              items: _additionals,
-              emptyTitle: 'Nenhum adicional cadastrado',
-              emptyDescription:
-                  'Cadastre extras para vinculá-los aos tipos de produto.',
-              onAdd: () => _editAdditional(),
-              onEdit: _editAdditional,
-              onRemove: _removeAdditional,
-              rowBuilder: (item) => _AdditionalRow(
-                item: item,
-                onEnabled: (value) => setState(
-                  () => item.model = _additionalWithEnabled(item.model, value),
+              _CatalogList<_CatalogAdditional>(
+                title: 'Adicionais',
+                description: 'Crie extras cobrados por valor fixo ou porcentagem do preço base.',
+                addLabel: 'Novo adicional',
+                items: _additionals,
+                emptyTitle: 'Nenhum adicional cadastrado',
+                emptyDescription:
+                    'Cadastre extras para vinculá-los aos tipos de produto.',
+                onAdd: () => _editAdditional(),
+                onEdit: _editAdditional,
+                onRemove: _removeAdditional,
+                rowBuilder: (item) => _AdditionalRow(
+                  item: item,
+                  onEnabled: (value) => setState(
+                    () =>
+                        item.model = _additionalWithEnabled(item.model, value),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
 
 TipoProdutoModel _typeWithEnabled(TipoProdutoModel model, bool value) =>
@@ -343,75 +348,75 @@ class _CatalogList<T> extends StatelessWidget {
   final void Function(T) onEdit, onRemove;
   final Widget Function(T) rowBuilder;
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    padding: const EdgeInsets.only(bottom: 16),
-    child: GlassPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final mobile =
-                  Breakpoints.standard.sizeFor(constraints.maxWidth) ==
-                  ScreenSize.mobile;
-              final action = FilledButton.icon(
-                onPressed: onAdd,
-                icon: const Icon(Icons.add_rounded),
-                label: Text(addLabel),
-              );
-              final info = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF16354C),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: GlassPanel(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final mobile =
+                    Breakpoints.standard.sizeFor(constraints.maxWidth) ==
+                    ScreenSize.mobile;
+                final action = FilledButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add_rounded),
+                  label: Text(addLabel),
+                );
+                final info = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: colors.heading,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF456078),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: TextStyle(fontSize: 13, color: colors.muted),
                     ),
-                  ),
-                ],
-              );
-              return mobile
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [info, const SizedBox(height: 14), action],
-                    )
-                  : Row(
-                      children: [
-                        Expanded(child: info),
-                        action,
-                      ],
-                    );
-            },
-          ),
-          const SizedBox(height: 18),
-          if (items.isEmpty)
-            _EmptyCatalog(
-              title: emptyTitle,
-              description: emptyDescription,
-              onCreate: onAdd,
-            )
-          else
-            ...items.map(
-              (item) => _CatalogItem(
-                content: rowBuilder(item),
-                onEdit: () => onEdit(item),
-                onRemove: () => onRemove(item),
-              ),
+                  ],
+                );
+                return mobile
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [info, const SizedBox(height: 14), action],
+                      )
+                    : Row(
+                        children: [
+                          Expanded(child: info),
+                          action,
+                        ],
+                      );
+              },
             ),
-        ],
+            const SizedBox(height: 18),
+            if (items.isEmpty)
+              _EmptyCatalog(
+                title: emptyTitle,
+                description: emptyDescription,
+                onCreate: onAdd,
+              )
+            else
+              ...items.map(
+                (item) => _CatalogItem(
+                  content: rowBuilder(item),
+                  onEdit: () => onEdit(item),
+                  onRemove: () => onRemove(item),
+                ),
+              ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _CatalogItem extends StatelessWidget {
@@ -423,53 +428,56 @@ class _CatalogItem extends StatelessWidget {
   final Widget content;
   final VoidCallback onEdit, onRemove;
   @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(bottom: 10),
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: const Color(0xFFF7FBFE),
-      border: Border.all(color: const Color(0xFFD6E7F3)),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        final mobile =
-            Breakpoints.standard.sizeFor(constraints.maxWidth) ==
-            ScreenSize.mobile;
-        final actions = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              tooltip: 'Editar',
-              onPressed: onEdit,
-              icon: const Icon(Icons.edit_outlined),
-            ),
-            IconButton(
-              tooltip: 'Excluir',
-              onPressed: onRemove,
-              color: const Color(0xFFB42318),
-              icon: const Icon(Icons.delete_outline),
-            ),
-          ],
-        );
-        return mobile
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  content,
-                  const SizedBox(height: 8),
-                  Align(alignment: Alignment.centerRight, child: actions),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(child: content),
-                  actions,
-                ],
-              );
-      },
-    ),
-  );
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.input,
+        border: Border.all(color: colors.border),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final mobile =
+              Breakpoints.standard.sizeFor(constraints.maxWidth) ==
+              ScreenSize.mobile;
+          final actions = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: 'Editar',
+                onPressed: onEdit,
+                icon: const Icon(Icons.edit_outlined),
+              ),
+              IconButton(
+                tooltip: 'Excluir',
+                onPressed: onRemove,
+                color: colors.error,
+                icon: const Icon(Icons.delete_outline),
+              ),
+            ],
+          );
+          return mobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    content,
+                    const SizedBox(height: 8),
+                    Align(alignment: Alignment.centerRight, child: actions),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: content),
+                    actions,
+                  ],
+                );
+        },
+      ),
+    );
+  }
 }
 
 class _TypeRow extends StatelessWidget {
@@ -521,33 +529,36 @@ class _RowField extends StatelessWidget {
   const _RowField(this.label, this.value);
   final String label, value;
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(
-        label,
-        style: const TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          color: Color(0xFF627D92),
-        ),
-      ),
-      const SizedBox(height: 2),
-      SizedBox(
-        width: 135,
-        child: Text(
-          value,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF16354C),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: colors.disabled,
           ),
         ),
-      ),
-    ],
-  );
+        const SizedBox(height: 2),
+        SizedBox(
+          width: 135,
+          child: Text(
+            value,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: colors.text,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _StatusSwitch extends StatelessWidget {
@@ -564,7 +575,9 @@ class _StatusSwitch extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: value ? const Color(0xFF087443) : const Color(0xFF627D92),
+          color: value
+              ? SgaColors.of(context).success
+              : SgaColors.of(context).disabled,
         ),
       ),
     ],
@@ -580,40 +593,36 @@ class _EmptyCatalog extends StatelessWidget {
   final String title, description;
   final VoidCallback onCreate;
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 46, horizontal: 20),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.inventory_2_outlined,
-            size: 42,
-            color: Color(0xFF5C8DB1),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF16354C),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 46, horizontal: 20),
+        child: Column(
+          children: [
+            Icon(Icons.inventory_2_outlined, size: 42, color: colors.icon),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.w800, color: colors.text),
             ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF456078)),
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: onCreate,
-            icon: const Icon(Icons.add),
-            label: const Text('Cadastrar agora'),
-          ),
-        ],
+            const SizedBox(height: 5),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: colors.muted),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: onCreate,
+              icon: const Icon(Icons.add),
+              label: const Text('Cadastrar agora'),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _TypeDraft {

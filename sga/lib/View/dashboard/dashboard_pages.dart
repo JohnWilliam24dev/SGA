@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:image_picker/image_picker.dart';
 
 import '../../Domain/domain.dart';
+import '../../Core/theme/sga_theme.dart';
 import '../../Shared/shared.dart';
 
 /// Páginas de visão operacional. Elas recebem o mesmo contrato de pedidos da
@@ -358,9 +359,9 @@ class _MobileProductsMenu extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
+        Text(
           'O que você gostaria de fazer?',
-          style: TextStyle(fontSize: 13, color: Color(0xFF456078)),
+          style: TextStyle(fontSize: 13, color: sgaMuted),
         ),
         const SizedBox(height: 16),
         _MobileProductsActionCard(
@@ -421,19 +422,16 @@ class _MobileProductsActionCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF16354C),
+                      color: sgaOnSurface,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     description,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF456078),
-                    ),
+                    style: TextStyle(fontSize: 12, color: sgaMuted),
                   ),
                 ],
               ),
@@ -474,10 +472,10 @@ class _MobileProductsSection extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF16354C),
+                color: sgaOnSurface,
               ),
             ),
           ),
@@ -536,87 +534,90 @@ class _MetricGrid extends StatelessWidget {
   const _MetricGrid({required this.items});
   final List<_Metric> items;
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final mobile =
-          Breakpoints.standard.sizeFor(constraints.maxWidth) ==
-          ScreenSize.mobile;
-      final columns = mobile ? 2 : 4;
-      final itemWidth = (constraints.maxWidth - (columns - 1) * 12) / columns;
-      return Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: [
-          for (final item in items)
-            SizedBox(
-              width: itemWidth,
-              child: GlassPanel(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(item.icon, size: 17, color: const Color(0xFF17659A)),
-                    const SizedBox(height: 10),
-                    Text(
-                      item.label,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF31526B),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final mobile =
+            Breakpoints.standard.sizeFor(constraints.maxWidth) ==
+            ScreenSize.mobile;
+        final columns = mobile ? 2 : 4;
+        final itemWidth = (constraints.maxWidth - (columns - 1) * 12) / columns;
+        return Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            for (final item in items)
+              SizedBox(
+                width: itemWidth,
+                child: GlassPanel(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(item.icon, size: 17, color: colors.icon),
+                      const SizedBox(height: 10),
+                      Text(
+                        item.label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: colors.muted),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF09243A),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: colors.heading,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
-      );
-    },
-  );
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _RevenueChart extends StatelessWidget {
   const _RevenueChart({required this.total});
   final double total;
   @override
-  Widget build(BuildContext context) => GlassPanel(
-    child: SizedBox(
-      height: 230,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Receita dos últimos 6 meses (R\$)',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF16354C),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return GlassPanel(
+      child: SizedBox(
+        height: 230,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Receita dos últimos 6 meses (R\$)',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: colors.text,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: CustomPaint(
-              painter: _BarsPainter(total: total),
-              child: const SizedBox.expand(),
+            const SizedBox(height: 16),
+            Expanded(
+              child: CustomPaint(
+                painter: _BarsPainter(total: total),
+                child: const SizedBox.expand(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _BarsPainter extends CustomPainter {
@@ -669,115 +670,118 @@ class _MovementList extends StatelessWidget {
   const _MovementList({required this.orders});
   final List<CommissionResumoModel> orders;
   @override
-  Widget build(BuildContext context) => GlassPanel(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Últimas movimentações',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF16354C),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return GlassPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Últimas movimentações',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: colors.text,
+            ),
           ),
-        ),
-        const SizedBox(height: 7),
-        for (final order in orders) ...[
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      order.nomeCliente,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
+          const SizedBox(height: 7),
+          for (final order in orders) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.nomeCliente,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                    Text(
-                      order.token,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: Color(0xFF456078),
+                      Text(
+                        order.token,
+                        style: TextStyle(fontSize: 10, color: colors.muted),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                formatarMoeda(order.orcamentoFinal ?? order.precoSimulado),
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+                Text(
+                  formatarMoeda(order.orcamentoFinal ?? order.precoSimulado),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const Divider(height: 16),
+              ],
+            ),
+            const Divider(height: 16),
+          ],
+          OutlinedButton(onPressed: () {}, child: const Text('Ver tudo')),
         ],
-        OutlinedButton(onPressed: () {}, child: const Text('Ver tudo')),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 class _TypeChart extends StatelessWidget {
   const _TypeChart();
   @override
-  Widget build(BuildContext context) => GlassPanel(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Pedidos por tipo de arte',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF16354C),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return GlassPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Pedidos por tipo de arte',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: colors.text,
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final narrow = constraints.maxWidth < 340;
-            final legend = const Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Legend('Modelos 3D · 45%', Color(0xFF168BF1)),
-                _Legend('Ilustrações 2D · 30%', Color(0xFF55B6FA)),
-                _Legend('Emotes · 15%', Color(0xFF8BCBFA)),
-                _Legend('Outros · 10%', Color(0xFFCEECFF)),
-              ],
-            );
-            return narrow
-                ? Column(
-                    children: [
-                      CustomPaint(
-                        size: const Size(150, 150),
-                        painter: _DonutPainter(),
-                      ),
-                      const SizedBox(height: 8),
-                      legend,
-                    ],
-                  )
-                : Row(
-                    children: [
-                      CustomPaint(
-                        size: const Size(150, 150),
-                        painter: _DonutPainter(),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(child: legend),
-                    ],
-                  );
-          },
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 10),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final narrow = constraints.maxWidth < 340;
+              final legend = Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Legend('Modelos 3D · 45%', colors.chartPrimary),
+                  _Legend('Ilustrações 2D · 30%', colors.chartSecondary),
+                  _Legend('Emotes · 15%', colors.chartTertiary),
+                  _Legend('Outros · 10%', colors.chartQuaternary),
+                ],
+              );
+              return narrow
+                  ? Column(
+                      children: [
+                        CustomPaint(
+                          size: const Size(150, 150),
+                          painter: _DonutPainter(),
+                        ),
+                        const SizedBox(height: 8),
+                        legend,
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        CustomPaint(
+                          size: const Size(150, 150),
+                          painter: _DonutPainter(),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(child: legend),
+                      ],
+                    );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Legend extends StatelessWidget {
@@ -801,7 +805,7 @@ class _Legend extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 11, color: Color(0xFF16354C)),
+            style: TextStyle(fontSize: 11, color: SgaColors.of(context).text),
           ),
         ),
       ],
@@ -845,6 +849,7 @@ class _StatusChart extends StatelessWidget {
   final List<CommissionResumoModel> orders;
   @override
   Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
     const data = <(String, double)>[
       ('Novos', .30),
       ('Em andamento', .55),
@@ -855,12 +860,12 @@ class _StatusChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Pedidos por status',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF16354C),
+              color: colors.text,
             ),
           ),
           const SizedBox(height: 13),
@@ -872,10 +877,7 @@ class _StatusChart extends StatelessWidget {
                 children: [
                   Text(
                     item.$1,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF16354C),
-                    ),
+                    style: TextStyle(fontSize: 11, color: colors.text),
                   ),
                   const SizedBox(height: 5),
                   LinearProgressIndicator(
@@ -923,146 +925,146 @@ class _ProductForm extends StatelessWidget {
   final Future<void> Function() onPickImage;
   final VoidCallback onSave;
   @override
-  Widget build(BuildContext context) => GlassPanel(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Adicionar produto',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF16354C),
-          ),
-        ),
-        const SizedBox(height: 13),
-        const Text(
-          'Nome do produto',
-          style: TextStyle(fontSize: 11, color: Color(0xFF16354C)),
-        ),
-        const SizedBox(height: 4),
-        TextField(controller: name, decoration: _input('Ex.: Modelo 3D Vroid')),
-        const SizedBox(height: 10),
-        const Text(
-          'Tipo do produto',
-          style: TextStyle(fontSize: 11, color: Color(0xFF16354C)),
-        ),
-        const SizedBox(height: 4),
-        DropdownButtonFormField<String>(
-          initialValue: selectedTypeId,
-          items: [
-            for (final type in types.where((type) => type.habilitado))
-              DropdownMenuItem(value: type.id, child: Text(type.nome)),
-          ],
-          onChanged: onTypeChanged,
-          decoration: _input('Escolha um tipo'),
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'Descrição',
-          style: TextStyle(fontSize: 11, color: Color(0xFF16354C)),
-        ),
-        const SizedBox(height: 4),
-        TextField(
-          controller: description,
-          maxLines: 3,
-          decoration: _input('Descrição opcional para o portfólio'),
-        ),
-        const SizedBox(height: 12),
-        const Text(
-          'Imagem do produto',
-          style: TextStyle(fontSize: 11, color: Color(0xFF16354C)),
-        ),
-        const SizedBox(height: 4),
-        InkWell(
-          borderRadius: BorderRadius.circular(10),
-          onTap: onPickImage,
-          child: Container(
-            height: 105,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .72),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: const Color(0xFF168BF1),
-                style: BorderStyle.solid,
-              ),
+  Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
+    return GlassPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Adicionar produto',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: colors.text,
             ),
-            child: imageBytes == null
-                ? const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.cloud_upload_outlined,
-                        color: Color(0xFF168BF1),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Selecionar imagem',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF075A9F),
-                        ),
-                      ),
-                      Text(
-                        'PNG, JPG ou WebP · até 5 MB',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF456078),
-                        ),
-                      ),
-                    ],
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(9),
-                    child: Stack(
-                      fit: StackFit.expand,
+          ),
+          const SizedBox(height: 13),
+          Text(
+            'Nome do produto',
+            style: TextStyle(fontSize: 11, color: colors.text),
+          ),
+          const SizedBox(height: 4),
+          TextField(
+            controller: name,
+            decoration: _input('Ex.: Modelo 3D Vroid', colors),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Tipo do produto',
+            style: TextStyle(fontSize: 11, color: colors.text),
+          ),
+          const SizedBox(height: 4),
+          DropdownButtonFormField<String>(
+            initialValue: selectedTypeId,
+            items: [
+              for (final type in types.where((type) => type.habilitado))
+                DropdownMenuItem(value: type.id, child: Text(type.nome)),
+            ],
+            onChanged: onTypeChanged,
+            decoration: _input('Escolha um tipo', colors),
+          ),
+          const SizedBox(height: 10),
+          Text('Descrição', style: TextStyle(fontSize: 11, color: colors.text)),
+          const SizedBox(height: 4),
+          TextField(
+            controller: description,
+            maxLines: 3,
+            decoration: _input('Descrição opcional para o portfólio', colors),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Imagem do produto',
+            style: TextStyle(fontSize: 11, color: colors.text),
+          ),
+          const SizedBox(height: 4),
+          InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: onPickImage,
+            child: Container(
+              height: 105,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: colors.input,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: colors.chartPrimary,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: imageBytes == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.memory(imageBytes!, fit: BoxFit.cover),
-                        const Align(
-                          alignment: Alignment.bottomCenter,
-                          child: ColoredBox(
-                            color: Color(0x99063C68),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              child: Text(
-                                'Toque para trocar a imagem',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.white,
+                        Icon(
+                          Icons.cloud_upload_outlined,
+                          color: colors.chartPrimary,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Selecionar imagem',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: colors.primary,
+                          ),
+                        ),
+                        Text(
+                          'PNG, JPG ou WebP · até 5 MB',
+                          style: TextStyle(fontSize: 10, color: colors.muted),
+                        ),
+                      ],
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(9),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.memory(imageBytes!, fit: BoxFit.cover),
+                          const Align(
+                            alignment: Alignment.bottomCenter,
+                            child: ColoredBox(
+                              color: Color(0x99063C68),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                child: Text(
+                                  'Toque para trocar a imagem',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: onSave,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF168BF1),
-              foregroundColor: Colors.white,
             ),
-            child: const Text('Salvar produto'),
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onSave,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colors.chartPrimary,
+                foregroundColor: colors.onPrimary,
+              ),
+              child: const Text('Salvar produto'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-InputDecoration _input(String hint) => InputDecoration(
+InputDecoration _input(String hint, SgaColors colors) => InputDecoration(
   hintText: hint,
   isDense: true,
   filled: true,
-  fillColor: Colors.white,
+  fillColor: colors.input,
   border: const OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(9)),
     borderSide: BorderSide.none,
@@ -1080,16 +1082,17 @@ class _ProductCatalog extends StatelessWidget {
   final Map<String, Uint8List> imagePreviews;
   @override
   Widget build(BuildContext context) {
+    final colors = SgaColors.of(context);
     return GlassPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Meus produtos',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF16354C),
+              color: colors.text,
             ),
           ),
           const SizedBox(height: 10),
@@ -1118,7 +1121,7 @@ class _ProductCatalog extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: .82),
+                  color: colors.input,
                   borderRadius: BorderRadius.circular(11),
                 ),
                 child: Column(
@@ -1131,18 +1134,18 @@ class _ProductCatalog extends StatelessWidget {
                         width: double.infinity,
                         child: image == null
                             ? DecoratedBox(
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      Color(0xFFBEE6FF),
-                                      Color(0xFF5DBAFF),
+                                      colors.chartTertiary,
+                                      colors.chartSecondary,
                                     ],
                                   ),
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
                                     Icons.inventory_2_outlined,
-                                    color: Color(0xFF16354C),
+                                    color: colors.text,
                                   ),
                                 ),
                               )
@@ -1154,10 +1157,10 @@ class _ProductCatalog extends StatelessWidget {
                       product.nome,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF16354C),
+                        color: colors.text,
                       ),
                     ),
                     const Spacer(),
@@ -1168,10 +1171,10 @@ class _ProductCatalog extends StatelessWidget {
                             type.nome,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF075A9F),
+                              color: colors.primary,
                             ),
                           ),
                         ),

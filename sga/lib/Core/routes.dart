@@ -23,9 +23,11 @@ Route<void> _route(WidgetBuilder builder) {
 
 /// Entra no app (ainda sem autenticação de verdade) e limpa o histórico, para
 /// o botão voltar não retornar ao login.
-void _enterApp(BuildContext context) {
-  Navigator.of(context)
-      .pushAndRemoveUntil(_route(buildMainScreen), (route) => false);
+void _enterApp(BuildContext context, Maker maker) {
+  Navigator.of(context).pushAndRemoveUntil(
+    _route((routeContext) => buildMainScreen(routeContext, maker)),
+    (route) => false,
+  );
 }
 
 Widget buildWelcomeScreen(BuildContext context) {
@@ -39,7 +41,7 @@ Widget buildRegisterScreen(BuildContext context) {
   return RegisterPage(
     // Só front por enquanto: o Maker nasce na tela e o envio ao servidor
     // entra numa próxima etapa; por ora o cadastro já abre o app.
-    onRegister: (maker) => _enterApp(context),
+    onRegister: (maker) => _enterApp(context, maker),
     onGoToLogin: () =>
         Navigator.of(context).pushReplacement(_route(buildLoginScreen)),
     onBack: () => Navigator.of(context).pop(),
@@ -49,7 +51,15 @@ Widget buildRegisterScreen(BuildContext context) {
 Widget buildLoginScreen(BuildContext context) {
   return LoginPage(
     // Sem autenticação ainda: qualquer login válido entra.
-    onLogin: (credenciais) => _enterApp(context),
+    onLogin: (credenciais) => _enterApp(
+      context,
+      Maker(
+        nome: credenciais.email.split('@').first,
+        email: credenciais.email,
+        senha: credenciais.senha,
+        aceitouTermos: true,
+      ),
+    ),
     onForgotPassword: () =>
         Toast.show(context, text: 'Recuperação de senha em breve.'),
     onGoToRegister: () =>
@@ -58,7 +68,7 @@ Widget buildLoginScreen(BuildContext context) {
   );
 }
 
-Widget buildMainScreen(BuildContext context) {
+Widget buildMainScreen(BuildContext context, [Maker? maker]) {
   return MainShell(
     commissionRepository: _commissionRepository,
     onOpenCommission: (commission, statusNome) => _openCommissionDetail(
@@ -69,6 +79,14 @@ Widget buildMainScreen(BuildContext context) {
     onLogout: () =>
         Navigator.of(context)
             .pushAndRemoveUntil(_route(buildWelcomeScreen), (route) => false),
+    maker:
+        maker ??
+        const Maker(
+          nome: 'Maker',
+          email: 'maker@sga.app',
+          senha: '',
+          aceitouTermos: true,
+        ),
   );
 }
 

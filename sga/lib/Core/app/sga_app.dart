@@ -5,16 +5,24 @@ import '../routes.dart';
 import '../theme/sga_theme.dart';
 
 /// Raiz do SGA: tema azul explícito, pack próprio e a tela inicial.
-class SgaApp extends StatelessWidget {
+class SgaApp extends StatefulWidget {
   const SgaApp({super.key});
 
   @override
+  State<SgaApp> createState() => _SgaAppState();
+}
+
+class _SgaAppState extends State<SgaApp> {
+  @override
   Widget build(BuildContext context) {
-    return EasyApp(
-      title: 'SGA',
-      theme: sgaTheme,
-      stylePack: sgaPack,
-      home: Builder(builder: buildWelcomeScreen),
+    return ValueListenableBuilder<AppThemeMode>(
+      valueListenable: sgaThemeMode,
+      builder: (context, mode, child) => EasyApp(
+        title: 'SGA',
+        theme: AppTheme(mode: mode, light: sgaTheme.light, dark: sgaTheme.dark),
+        stylePack: sgaPack,
+        home: Builder(builder: buildWelcomeScreen),
+      ),
     );
   }
 }

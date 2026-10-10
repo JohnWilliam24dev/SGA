@@ -1,6 +1,7 @@
 import 'commission_board.dart';
 import 'commission_column.dart';
 import 'models/models.dart';
+import 'status_repository.dart';
 
 /// De onde vem o quadro de commissions. Hoje é simulado em memória; quando o
 /// banco entrar, basta uma nova implementação desta interface.
@@ -19,29 +20,46 @@ abstract interface class CommissionRepository {
     required String paraColunaId,
     required int paraIndice,
   });
+
+  /// Quantas commissions estão no status [statusId]. Serve à regra de que uma
+  /// coluna com commissions não pode ser excluída.
+  Future<int> contarPorStatus(String statusId);
 }
 
 /// Repositório de teste: dados fixos em memória, com uma latência simulada.
 ///
-/// O quadro e o detalhe vêm da mesma fonte: o detalhe de uma commission
-/// sempre reflete a coluna e a posição em que ela está no quadro.
+/// As colunas do quadro vêm do [StatusRepository] (os status do Maker); aqui
+/// ficam só as commissions de cada status. O quadro e o detalhe vêm da mesma
+/// fonte: o detalhe de uma commission sempre reflete a coluna e a posição em
+/// que ela está no quadro.
 class FakeCommissionRepository implements CommissionRepository {
   FakeCommissionRepository({
     this.latencia = const Duration(milliseconds: 400),
-    List<CommissionColumn>? colunas,
+    StatusRepository? statusRepository,
     Map<String, CommissionDetalhadaModel>? detalhes,
-  })  : _colunas = colunas ?? dadosDeExemplo(),
-        _detalhes = detalhes ??
-            {for (final d in detalhesDeExemplo()) d.id: d};
+  }) : _detalhes = detalhes ?? {for (final d in detalhesDeExemplo()) d.id: d} {
+    _status = statusRepository ??
+        FakeStatusRepository(
+          latencia: latencia,
+          contarCommissions: contarPorStatus,
+        );
+    _porStatus = _agrupar(_detalhes.values);
+  }
 
   final Duration latencia;
-  List<CommissionColumn> _colunas;
   final Map<String, CommissionDetalhadaModel> _detalhes;
+  late final StatusRepository _status;
+  late Map<String, List<CommissionResumoModel>> _porStatus;
+
+  /// Os status que montam as colunas deste quadro.
+  StatusRepository get statusRepository => _status;
 
   @override
   Future<List<CommissionColumn>> carregarQuadro() async {
     await Future<void>.delayed(latencia);
-    return List<CommissionColumn>.unmodifiable(_colunas);
+    return List<CommissionColumn>.unmodifiable(
+      _montarQuadro(await _status.listar()),
+    );
   }
 
   @override
@@ -51,7 +69,7 @@ class FakeCommissionRepository implements CommissionRepository {
     if (base == null) {
       throw StateError('Commission $commissionId não encontrada');
     }
-    for (final coluna in _colunas) {
+    for (final coluna in _montarQuadro(await _status.listar())) {
       final indice = coluna.commissions.indexWhere((c) => c.id == commissionId);
       if (indice != -1) {
         return base.copyWith(statusId: coluna.id, posicao: indice);
@@ -67,42 +85,61 @@ class FakeCommissionRepository implements CommissionRepository {
     required int paraIndice,
   }) async {
     await Future<void>.delayed(latencia);
-    _colunas = moverCommission(
-      _colunas,
+    final colunas = moverCommission(
+      _montarQuadro(await _status.listar()),
       commissionId: commissionId,
       paraColunaId: paraColunaId,
       paraIndice: paraIndice,
     );
+    _porStatus = {
+      for (final coluna in colunas) coluna.id: [...coluna.commissions],
+    };
   }
 
-  /// Quatro colunas e onze commissions para ver o quadro funcionando.
-  static List<CommissionColumn> dadosDeExemplo() {
-    const titulos = {
-      'orcamento': 'Orçamento',
-      'producao': 'Em produção',
-      'revisao': 'Em revisão',
-      'entregue': 'Entregue',
-    };
-    final detalhes = detalhesDeExemplo();
+  @override
+  Future<int> contarPorStatus(String statusId) async {
+    return _porStatus[statusId]?.length ?? 0;
+  }
+
+  List<CommissionColumn> _montarQuadro(List<StatusModel> status) {
     return [
-      for (final entrada in titulos.entries)
+      for (final s in status)
         CommissionColumn(
-          id: entrada.key,
-          titulo: entrada.value,
-          commissions: [
-            for (final d in detalhes)
-              if (d.statusId == entrada.key) d.resumo,
-          ],
+          id: s.id,
+          titulo: s.nome,
+          tipo: s.tipo,
+          ordem: s.ordem,
+          commissions: [...?_porStatus[s.id]],
         ),
     ];
   }
 
-  /// Os dados completos das onze commissions de exemplo.
+  /// Agrupa por status e ordena cada grupo por `posicao`; `criadoEm` e o id
+  /// desempatam (a posição pode repetir).
+  static Map<String, List<CommissionResumoModel>> _agrupar(
+    Iterable<CommissionDetalhadaModel> detalhes,
+  ) {
+    final ordenados = detalhes.toList()
+      ..sort((a, b) {
+        final porPosicao = a.posicao.compareTo(b.posicao);
+        if (porPosicao != 0) return porPosicao;
+        final porData = a.criadoEm.compareTo(b.criadoEm);
+        return porData != 0 ? porData : a.id.compareTo(b.id);
+      });
+    final mapa = <String, List<CommissionResumoModel>>{};
+    for (final d in ordenados) {
+      mapa.putIfAbsent(d.statusId, () => <CommissionResumoModel>[]).add(d.resumo);
+    }
+    return mapa;
+  }
+
+  /// Os dados completos das onze commissions de exemplo, nos status padrão
+  /// (Fila, Em andamento e Concluído; Cancelado começa vazio).
   static List<CommissionDetalhadaModel> detalhesDeExemplo() {
     return [
       _exemplo(
         id: 'c1',
-        status: 'orcamento',
+        status: 'fila',
         posicao: 0,
         cliente: 'Marina Costa',
         tipo: 'Ilustração',
@@ -124,7 +161,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c2',
-        status: 'orcamento',
+        status: 'fila',
         posicao: 1,
         cliente: 'Estúdio Aurora',
         tipo: 'Identidade visual',
@@ -146,7 +183,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c3',
-        status: 'orcamento',
+        status: 'fila',
         posicao: 2,
         cliente: 'Rafael Mendes',
         tipo: 'Modelo VTuber',
@@ -167,7 +204,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c4',
-        status: 'producao',
+        status: 'em-andamento',
         posicao: 0,
         cliente: 'Beatriz Lima',
         tipo: 'Capa de livro',
@@ -190,7 +227,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c5',
-        status: 'producao',
+        status: 'em-andamento',
         posicao: 1,
         cliente: 'João Pedro Santos',
         tipo: 'Pintura a óleo',
@@ -212,7 +249,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c6',
-        status: 'producao',
+        status: 'em-andamento',
         posicao: 2,
         cliente: 'Camila Duarte',
         tipo: 'Emotes',
@@ -227,7 +264,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c7',
-        status: 'producao',
+        status: 'em-andamento',
         posicao: 3,
         cliente: 'Loja Entre Linhas',
         tipo: 'Ilustração',
@@ -249,8 +286,8 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c8',
-        status: 'revisao',
-        posicao: 0,
+        status: 'em-andamento',
+        posicao: 4,
         cliente: 'Thiago Alves',
         tipo: 'Capa de álbum',
         precoSimulado: 420,
@@ -272,8 +309,8 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c9',
-        status: 'revisao',
-        posicao: 1,
+        status: 'em-andamento',
+        posicao: 5,
         cliente: 'Helena Prado',
         tipo: 'Ilustração',
         precoSimulado: 250,
@@ -285,7 +322,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c10',
-        status: 'entregue',
+        status: 'concluido',
         posicao: 0,
         cliente: 'Diego Martins',
         tipo: 'Concept art',
@@ -308,7 +345,7 @@ class FakeCommissionRepository implements CommissionRepository {
       ),
       _exemplo(
         id: 'c11',
-        status: 'entregue',
+        status: 'concluido',
         posicao: 1,
         cliente: 'Aline Ferreira',
         tipo: 'Mascote',

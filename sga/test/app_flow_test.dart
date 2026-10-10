@@ -57,7 +57,7 @@ void main() {
 
     expect(find.byType(CommissionsPage), findsOneWidget);
     expect(find.byType(LoginPage), findsNothing);
-    expect(find.text('Orçamento'), findsOneWidget);
+    expect(find.text('Fila'), findsOneWidget);
 
     await tester.tap(find.text('Sair'));
     await tester.pumpAndSettle();

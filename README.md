@@ -16,8 +16,9 @@ lib/
   main.dart              ponto de entrada
   Core/                  tema (tokens + StylePack), rotas e a raiz SgaApp
   Domain/                Maker, Credenciais, CommissionColumn, regra de mover
-                         commission (commission_board) e o repositório
-                         (interface + versão simulada em memória)
+                         commission (commission_board), o repositório de
+                         commissions e o de status, com as regras do quadro
+                         (status_rules): interface + versão simulada em memória
     models/              modelos da API (fromJson/toJson): Status, TipoProduto,
                          Adicional, Produto, CommissionAdicional,
                          CommissionResumo e CommissionDetalhada
@@ -32,7 +33,7 @@ lib/
     dashboard/           Financeiro, Relatório de pedidos e Produtos
     catalog/             tipos de produtos e adicionais
     profile/             perfil do artista
-    settings/            configurações
+    settings/            configurações (aparência e colunas do quadro)
     support/             suporte
 test/                    espelha a estrutura de lib/
 ```
@@ -45,7 +46,8 @@ test/                    espelha a estrutura de lib/
 - **Login:** e-mail, senha e o link "Esqueci a senha" (ainda sem função).
   Qualquer login válido entra, enquanto não há autenticação.
 - **Commissions (página principal):** quadro kanban no estilo Trello/Jira.
-  As colunas vêm de uma lista (não são fixas) e os cards são o resumo da
+  As colunas são os status do Maker (padrão: Fila, Em andamento, Concluído e
+  Cancelado) e os cards são o resumo da
   commission (cliente, tipo de produto e valor: o orçamento final, ou o
   simulado enquanto não fechou), em altura padrão.
   - *Abrir o detalhe:* um clique/toque simples no card.
@@ -69,12 +71,18 @@ test/                    espelha a estrutura de lib/
   *Configurações* e *Suporte* ficam à parte das cinco principais. Todas leem
   os dados por repositório (nunca direto dos mocks), então a troca pela API
   não mexe nas telas.
+- **Colunas do quadro** (Configurações): criar, renomear, reordenar, trocar o
+  tipo e excluir colunas. O nome é livre; o tipo (Inicial, Em andamento,
+  Concluído, Cancelado) dá o significado. Regras: exatamente uma coluna Inicial,
+  pelo menos uma Concluído e uma Cancelado, e coluna com pedidos não pode ser
+  excluída. Marcar outra coluna como Inicial passa a antiga para Em andamento.
 - **Navegação:** tablet/desktop com barra lateral fixa, recolhida pelo ícone
   de painel no topo dela (vira uma faixa só de ícones; recolhida, a logo do
   sistema vira o ícone de "mostrar a barra" ao passar o mouse); celular com
   drawer (fundo escurece ao abrir).
 
-Os dados de commissions são simulados em
+As colunas vêm de `lib/Domain/status_repository.dart` (`FakeStatusRepository`)
+e os dados de commissions são simulados em
 `lib/Domain/commission_repository.dart` (`FakeCommissionRepository`): o quadro
 usa `CommissionResumoModel` e o detalhe usa `CommissionDetalhadaModel`, os
 mesmos modelos que a API vai devolver. A integração com o servidor entra

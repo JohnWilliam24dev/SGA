@@ -13,7 +13,15 @@ import '../View/welcome/welcome_page.dart';
 /// Dados de commissions simulados em memória (até a integração com o banco).
 /// Um só repositório para o app todo, para o quadro lembrar as mudanças
 /// enquanto o app estiver aberto.
-final CommissionRepository _commissionRepository = FakeCommissionRepository();
+final CommissionRepository _commissionRepository =
+    FakeCommissionRepository(statusRepository: _statusRepository);
+
+/// As colunas do quadro (status do Maker). Pergunta ao repositório de
+/// commissions quantos cartões há em cada uma, para não excluir coluna cheia.
+final StatusRepository _statusRepository = FakeStatusRepository(
+  contarCommissions: (statusId) =>
+      _commissionRepository.contarPorStatus(statusId),
+);
 
 /// Navegação do SGA. As telas não se conhecem: cada uma recebe daqui os
 /// callbacks para ir à próxima.
@@ -71,6 +79,7 @@ Widget buildLoginScreen(BuildContext context) {
 Widget buildMainScreen(BuildContext context, [Maker? maker]) {
   return MainShell(
     commissionRepository: _commissionRepository,
+    statusRepository: _statusRepository,
     onOpenCommission: (commission, statusNome) => _openCommissionDetail(
       context,
       commission: commission,

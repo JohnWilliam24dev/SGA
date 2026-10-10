@@ -54,6 +54,16 @@ class StatusModel {
         'tipo': tipo.valorApi,
       };
 
+  /// Cópia com outro nome, outra posição e/ou outro tipo.
+  StatusModel copyWith({String? nome, int? ordem, StatusTipo? tipo}) {
+    return StatusModel(
+      id: id,
+      nome: nome ?? this.nome,
+      ordem: ordem ?? this.ordem,
+      tipo: tipo ?? this.tipo,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     return other is StatusModel &&

@@ -16,12 +16,14 @@ class MainShell extends StatefulWidget {
   const MainShell({
     super.key,
     required this.commissionRepository,
+    required this.statusRepository,
     required this.onOpenCommission,
     required this.onLogout,
     required this.maker,
   });
 
   final CommissionRepository commissionRepository;
+  final StatusRepository statusRepository;
   final void Function(CommissionResumoModel commission, String statusNome)
   onOpenCommission;
   final VoidCallback onLogout;
@@ -86,7 +88,7 @@ class _MainShellState extends State<MainShell> {
           onMakerChanged: (maker) => setState(() => _maker = maker),
         );
       case _settings:
-        return const SettingsPage();
+        return SettingsPage(statusRepository: widget.statusRepository);
       case _support:
         return const SupportPage();
       case _orders:
@@ -127,7 +129,7 @@ class _MainShellState extends State<MainShell> {
       _productTypes =>
         'Defina os tipos de produto e os adicionais disponíveis para pedidos.',
       _profile => 'Mantenha sua apresentação, regras de trabalho e termos sempre atualizados.',
-      _settings => 'Personalize a aparência do seu espaço de trabalho.',
+      _settings => 'Personalize a aparência e as colunas do seu quadro de pedidos.',
       _support => 'Encontre ajuda sempre que precisar.',
       _ => '',
     };

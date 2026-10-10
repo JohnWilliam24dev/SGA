@@ -12,9 +12,26 @@ CommissionResumoModel _c(String id) => CommissionResumoModel(
     );
 
 List<CommissionColumn> _quadro() => [
-      CommissionColumn(id: 'a', titulo: 'A', commissions: [_c('1'), _c('2'), _c('3')]),
-      CommissionColumn(id: 'b', titulo: 'B', commissions: [_c('4')]),
-      const CommissionColumn(id: 'c', titulo: 'C'),
+      CommissionColumn(
+        id: 'a',
+        titulo: 'A',
+        tipo: StatusTipo.inicial,
+        ordem: 1,
+        commissions: [_c('1'), _c('2'), _c('3')],
+      ),
+      CommissionColumn(
+        id: 'b',
+        titulo: 'B',
+        tipo: StatusTipo.emAndamento,
+        ordem: 2,
+        commissions: [_c('4')],
+      ),
+      const CommissionColumn(
+        id: 'c',
+        titulo: 'C',
+        tipo: StatusTipo.concluido,
+        ordem: 3,
+      ),
     ];
 
 List<String> _ids(List<CommissionColumn> q, String coluna) {
@@ -69,10 +86,10 @@ void main() {
     final colunas = await repo.carregarQuadro();
     expect(colunas.length, greaterThanOrEqualTo(3));
 
-    await repo.mover(commissionId: 'c1', paraColunaId: 'producao', paraIndice: 0);
+    await repo.mover(commissionId: 'c1', paraColunaId: 'em-andamento', paraIndice: 0);
     final depois = await repo.carregarQuadro();
-    expect(_ids(depois, 'producao').first, 'c1');
-    expect(_ids(depois, 'orcamento'), isNot(contains('c1')));
+    expect(_ids(depois, 'em-andamento').first, 'c1');
+    expect(_ids(depois, 'fila'), isNot(contains('c1')));
   });
 
   group('detalhe no repositório simulado', () {
@@ -81,13 +98,13 @@ void main() {
 
       final antes = await repo.carregarDetalhe('c1');
       expect(antes.nomeCliente, 'Marina Costa');
-      expect(antes.statusId, 'orcamento');
+      expect(antes.statusId, 'fila');
       expect(antes.posicao, 0);
       expect(antes.adicionais, isNotEmpty);
 
-      await repo.mover(commissionId: 'c1', paraColunaId: 'producao', paraIndice: 1);
+      await repo.mover(commissionId: 'c1', paraColunaId: 'em-andamento', paraIndice: 1);
       final depois = await repo.carregarDetalhe('c1');
-      expect(depois.statusId, 'producao');
+      expect(depois.statusId, 'em-andamento');
       expect(depois.posicao, 1);
     });
 

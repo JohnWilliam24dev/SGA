@@ -84,7 +84,12 @@ class _CommissionsPageState extends State<CommissionsPage> {
     final colunas = _colunas ?? const <CommissionColumn>[];
     final coluna = colunas.firstWhere(
       (c) => c.commissions.any((item) => item.id == commission.id),
-      orElse: () => CommissionColumn(id: '', titulo: ''),
+      orElse: () => const CommissionColumn(
+        id: '',
+        titulo: '',
+        tipo: StatusTipo.emAndamento,
+        ordem: 0,
+      ),
     );
     widget.onOpenCommission(commission, coluna.titulo);
   }

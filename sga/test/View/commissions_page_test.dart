@@ -74,14 +74,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(CircularProgressIndicator), findsNothing);
     for (final coluna in [
-      'Orçamento',
-      'Em produção',
-      'Em revisão',
-      'Entregue',
+      'Fila',
+      'Em andamento',
+      'Concluído',
+      'Cancelado',
     ]) {
       expect(find.text(coluna), findsOneWidget);
     }
-    expect(_naColuna('orcamento', 'Marina Costa'), findsOneWidget);
+    expect(_naColuna('fila', 'Marina Costa'), findsOneWidget);
   });
 
   testWidgets('o card mostra cliente, tipo de produto e valor', (tester) async {
@@ -92,10 +92,10 @@ void main() {
     await tester.pumpAndSettle();
 
     // c1: ainda sem orçamento final, mostra o simulado.
-    expect(_naColuna('orcamento', 'Ilustração'), findsWidgets);
-    expect(_naColuna('orcamento', 'R\$ 280,00 (simulado)'), findsOneWidget);
+    expect(_naColuna('fila', 'Ilustração'), findsWidgets);
+    expect(_naColuna('fila', 'R\$ 280,00 (simulado)'), findsOneWidget);
     // c4: orçamento final fechado, mostra só ele.
-    expect(_naColuna('producao', 'R\$ 560,00'), findsOneWidget);
+    expect(_naColuna('em-andamento', 'R\$ 560,00'), findsOneWidget);
   });
 
   testWidgets('tocar no card abre o detalhe com a coluna dele', (tester) async {
@@ -117,7 +117,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(aberta?.id, 'c4');
-    expect(status, 'Em produção');
+    expect(status, 'Em andamento');
   });
 
   testWidgets('apertar e segurar move o card e não abre o detalhe', (
@@ -139,7 +139,7 @@ void main() {
       tester.getCenter(find.text('Beatriz Lima')),
     );
 
-    expect(_naColuna('producao', 'Marina Costa'), findsOneWidget);
+    expect(_naColuna('em-andamento', 'Marina Costa'), findsOneWidget);
     expect(aberturas, 0);
   });
 
@@ -180,8 +180,8 @@ void main() {
       tester.getCenter(find.text('Beatriz Lima')),
     );
 
-    expect(_naColuna('producao', 'Marina Costa'), findsOneWidget);
-    expect(_naColuna('orcamento', 'Marina Costa'), findsNothing);
+    expect(_naColuna('em-andamento', 'Marina Costa'), findsOneWidget);
+    expect(_naColuna('fila', 'Marina Costa'), findsNothing);
   });
 
   testWidgets('se o repositório falhar, o pedido volta e um aviso aparece', (
@@ -197,7 +197,7 @@ void main() {
       tester.getCenter(find.text('Beatriz Lima')),
     );
 
-    expect(_naColuna('orcamento', 'Marina Costa'), findsOneWidget);
+    expect(_naColuna('fila', 'Marina Costa'), findsOneWidget);
     expect(find.text('Não foi possível mover a commission.'), findsOneWidget);
   });
 }

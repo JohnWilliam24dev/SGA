@@ -218,11 +218,11 @@ class KanbanColumnView<T> extends StatelessWidget {
               color: tokens.primaryColor.withValues(alpha: 0.5),
               width: 1.5,
             ),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x33000000),
+                color: tokens.textColor.withValues(alpha: 0.2),
                 blurRadius: 16,
-                offset: Offset(0, 6),
+                offset: const Offset(0, 6),
               ),
             ],
           ),

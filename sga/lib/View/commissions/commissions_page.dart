@@ -1,5 +1,7 @@
 import 'package:easy_ui/easy_ui.dart';
+import 'package:flutter/material.dart' show FilledButton, Icons;
 import 'package:flutter/widgets.dart' hide Icon;
+import 'package:flutter/widgets.dart' as widgets show Icon;
 
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart';
@@ -236,10 +238,12 @@ class _CommissionsPageState extends State<CommissionsPage> {
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Button(
-                text: 'Nova coluna',
-                variant: ButtonVariant.outline,
+              // Mesmo botão de ação das outras páginas sobre o fundo azul
+              // (ex.: Catálogo): o contorno do Button do Easy UI some nele.
+              child: FilledButton.icon(
                 onPressed: _novaColuna,
+                icon: const widgets.Icon(Icons.add_rounded),
+                label: const Text('Nova coluna'),
               ),
             ),
           ),

@@ -25,12 +25,15 @@ class CommissionColumn {
   final int ordem;
   final List<CommissionResumoModel> commissions;
 
-  CommissionColumn copyWith({List<CommissionResumoModel>? commissions}) {
+  CommissionColumn copyWith({
+    List<CommissionResumoModel>? commissions,
+    int? ordem,
+  }) {
     return CommissionColumn(
       id: id,
       titulo: titulo,
       tipo: tipo,
-      ordem: ordem,
+      ordem: ordem ?? this.ordem,
       commissions: commissions ?? this.commissions,
     );
   }

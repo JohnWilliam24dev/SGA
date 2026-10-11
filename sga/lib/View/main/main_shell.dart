@@ -88,13 +88,14 @@ class _MainShellState extends State<MainShell> {
           onMakerChanged: (maker) => setState(() => _maker = maker),
         );
       case _settings:
-        return SettingsPage(statusRepository: widget.statusRepository);
+        return const SettingsPage();
       case _support:
         return const SupportPage();
       case _orders:
       default:
         return CommissionsPage(
           repository: widget.commissionRepository,
+          statusRepository: widget.statusRepository,
           onOpenCommission: widget.onOpenCommission,
         );
     }
@@ -129,7 +130,7 @@ class _MainShellState extends State<MainShell> {
       _productTypes =>
         'Defina os tipos de produto e os adicionais disponíveis para pedidos.',
       _profile => 'Mantenha sua apresentação, regras de trabalho e termos sempre atualizados.',
-      _settings => 'Personalize a aparência e as colunas do seu quadro de pedidos.',
+      _settings => 'Personalize a aparência do seu espaço de trabalho.',
       _support => 'Encontre ajuda sempre que precisar.',
       _ => '',
     };

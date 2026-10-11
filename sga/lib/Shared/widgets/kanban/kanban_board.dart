@@ -36,6 +36,8 @@ class KanbanBoard<T> extends StatefulWidget {
     required this.itemBuilder,
     required this.onMove,
     this.onItemTap,
+    this.onColumnMove,
+    this.columnActionsBuilder,
     this.cardHeight = 112,
     this.emptyLabel = 'Nenhum item aqui',
   }) : assert(cardHeight > 0, 'cardHeight deve ser > 0.');
@@ -48,6 +50,21 @@ class KanbanBoard<T> extends StatefulWidget {
   /// Chamado num clique/toque simples no card. Apertar e segurar (mover) e
   /// deslizar (rolar) não disparam esse callback.
   final ValueChanged<T>? onItemTap;
+
+  /// Quando informado, cada coluna ganha à direita do cabeçalho um ícone de
+  /// arrastar: levá-lo para outro ponto do quadro reordena as colunas e este
+  /// callback avisa o resultado. Só na largura de tablet/desktop; no celular
+  /// (uma coluna por página) a ordem muda pelas ações da coluna.
+  final ValueChanged<KanbanColumnMove>? onColumnMove;
+
+  /// Botão de ações de cada coluna (ex.: um menu de três pontinhos), colocado
+  /// no cabeçalho, depois da contagem de itens. Recebe o índice da coluna.
+  final Widget Function(
+    BuildContext context,
+    KanbanColumnData<T> column,
+    int index,
+  )?
+  columnActionsBuilder;
   final double cardHeight;
   final String emptyLabel;
 
@@ -60,6 +77,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
   static const double _listPadding = 8;
   static const double _desktopColumnWidth = 300;
   static const double _desktopSpacing = 16;
+  static const double _desktopPadding = 16;
   static const double _pageFraction = 0.86;
   static const double _pageMargin = 6;
 
@@ -92,6 +110,11 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
   DateTime? _edgeSince;
   DateTime? _lastFlip;
   bool _mobileLayout = false;
+
+  // Arrasto de uma coluna (só no layout largo).
+  String? _draggingColumnId;
+  int _columnFromIndex = 0;
+  int _columnHoverIndex = 0;
 
   @override
   void dispose() {
@@ -181,6 +204,64 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     );
   }
 
+  // ---- ciclo do arrasto de coluna ------------------------------------------
+
+  void _onColumnDragStarted(String columnId) {
+    final index = widget.columns.indexWhere((c) => c.id == columnId);
+    setState(() {
+      _draggingColumnId = columnId;
+      _columnFromIndex = index;
+      // O espaço reservado nasce onde a coluna estava.
+      _columnHoverIndex = index;
+    });
+    _ticker?.cancel();
+    _ticker = Timer.periodic(const Duration(milliseconds: 16), (_) => _tick());
+  }
+
+  void _onColumnDragUpdate(Offset pointer) {
+    _pointer = pointer;
+    _updateColumnHover();
+  }
+
+  void _onColumnDragEnd() {
+    final columnId = _draggingColumnId;
+    final from = _columnFromIndex;
+    final to = _columnHoverIndex;
+
+    _ticker?.cancel();
+    _ticker = null;
+    _pointer = null;
+
+    if (!mounted) return;
+    setState(() => _draggingColumnId = null);
+
+    if (columnId == null || to == from) return; // soltou onde estava
+    widget.onColumnMove?.call(
+      KanbanColumnMove(columnId: columnId, fromIndex: from, toIndex: to),
+    );
+  }
+
+  /// Posição (entre as colunas, sem contar a arrastada) sobre a qual o
+  /// ponteiro está. Com a coluna arrastada fora do caminho e o espaço
+  /// reservado no lugar, todas as "vagas" têm a mesma largura, então a conta
+  /// não depende do que está desenhado e o espaço não fica pulando.
+  void _updateColumnHover() {
+    final pointer = _pointer;
+    if (_draggingColumnId == null || pointer == null) return;
+    final rect = _rectOf(_boardKey);
+    if (rect == null) return;
+
+    final scroll = _horizontalController.hasClients
+        ? _horizontalController.offset
+        : 0.0;
+    final x = pointer.dx - rect.left + scroll - _desktopPadding;
+    final slot = (x / (_desktopColumnWidth + _desktopSpacing)).floor();
+    final index = math.max(0, math.min(widget.columns.length - 1, slot));
+    if (index != _columnHoverIndex) {
+      setState(() => _columnHoverIndex = index);
+    }
+  }
+
   // ---- onde o card cairia -------------------------------------------------------
 
   /// Descobre a coluna sob o ponteiro e a posição dentro dela. Se o ponteiro
@@ -228,7 +309,13 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
 
   void _tick() {
     final pointer = _pointer;
-    if (_draggingId == null || pointer == null) return;
+    if (pointer == null) return;
+    if (_draggingColumnId != null) {
+      _autoScrollBoard(pointer);
+      _updateColumnHover();
+      return;
+    }
+    if (_draggingId == null) return;
 
     _autoScrollList(pointer);
     if (_mobileLayout) {
@@ -379,39 +466,93 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       onDragStarted: (id) => _onDragStarted(id, column.id),
       onDragUpdate: _onDragUpdate,
       onDragEnd: _onDragEnd,
+      columnWidth: _desktopColumnWidth,
+      actions: widget.columnActionsBuilder?.call(
+        context,
+        column,
+        widget.columns.indexWhere((c) => c.id == column.id),
+      ),
+      showDragHandle: widget.onColumnMove != null && !_mobileLayout,
+      onColumnDragStarted: () => _onColumnDragStarted(column.id),
+      onColumnDragUpdate: _onColumnDragUpdate,
+      onColumnDragEnd: _onColumnDragEnd,
+    );
+  }
+
+  Widget _columnPlaceholder() {
+    final tokens = AppThemeScope.tokensOf(context);
+    return SizedBox(
+      key: const ValueKey<String>('kanban-column-placeholder'),
+      width: _desktopColumnWidth,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: tokens.primaryColor.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: tokens.primaryColor.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildDesktop(double height) {
-    final columns = widget.columns;
+    final children = _desktopChildren();
     return Scrollbar(
       controller: _horizontalController,
       thumbVisibility: true,
       child: SingleChildScrollView(
         controller: _horizontalController,
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(_desktopPadding),
         child: SizedBox(
-          height: math.max(0.0, height - 32),
+          height: math.max(0.0, height - 2 * _desktopPadding),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var i = 0; i < columns.length; i++) ...[
-                if (i > 0) const SizedBox(width: _desktopSpacing),
-                SizedBox(
-                  width: _desktopColumnWidth,
-                  child: _buildColumn(
-                    columns[i],
-                    _desktopColumnWidth - 2 * _listPadding,
-                  ),
-                ),
-              ],
-            ],
+            children: children,
           ),
         ),
       ),
     );
+  }
+
+  /// As colunas lado a lado. Durante o arrasto de uma coluna, ela continua na
+  /// árvore (para o fim do arrasto ser avisado) mas sem ocupar espaço, e um
+  /// espaço reservado marca onde ela cairia.
+  List<Widget> _desktopChildren() {
+    final children = <Widget>[];
+    final dragging = _draggingColumnId != null;
+    var placed = 0;
+    var slot = 0;
+
+    void add(Widget child) {
+      if (placed > 0) children.add(const SizedBox(width: _desktopSpacing));
+      children.add(child);
+      placed++;
+    }
+
+    for (final column in widget.columns) {
+      final hidden = column.id == _draggingColumnId;
+      if (!hidden) {
+        if (dragging && _columnHoverIndex == slot) add(_columnPlaceholder());
+        slot++;
+      }
+      final view = _ColumnSlot(
+        key: ValueKey<String>('kanban-slot-${column.id}'),
+        hidden: hidden,
+        width: _desktopColumnWidth,
+        child: _buildColumn(column, _desktopColumnWidth - 2 * _listPadding),
+      );
+      if (hidden) {
+        children.add(view);
+      } else {
+        add(view);
+      }
+    }
+    if (dragging && _columnHoverIndex == slot) add(_columnPlaceholder());
+    return children;
   }
 
   Widget _buildMobile(double width) {
@@ -492,6 +633,30 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Uma coluna do layout largo. Escondida (durante o arrasto dela), não ocupa
+/// espaço mas segue montada; ter sempre o mesmo tipo de widget aqui evita que
+/// o Flutter recrie a coluna (e perca o arrasto) ao esconder.
+class _ColumnSlot extends StatelessWidget {
+  const _ColumnSlot({
+    super.key,
+    required this.hidden,
+    required this.width,
+    required this.child,
+  });
+
+  final bool hidden;
+  final double width;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Offstage(
+      offstage: hidden,
+      child: SizedBox(width: width, child: child),
     );
   }
 }

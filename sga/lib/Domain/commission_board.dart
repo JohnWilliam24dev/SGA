@@ -44,3 +44,24 @@ List<CommissionColumn> moverCommission(
         coluna,
   ];
 }
+
+/// Move a coluna [columnId] para a posição [paraIndice] do quadro e renumera
+/// a `ordem` de todas de 1 em diante.
+///
+/// [paraIndice] conta a partir da lista **já sem** a coluna movida (0 é o
+/// início). Se a coluna não existir, devolve [colunas] sem alterações.
+List<CommissionColumn> moverColuna(
+  List<CommissionColumn> colunas, {
+  required String columnId,
+  required int paraIndice,
+}) {
+  final de = colunas.indexWhere((c) => c.id == columnId);
+  if (de == -1) return colunas;
+
+  final novas = [...colunas];
+  final coluna = novas.removeAt(de);
+  novas.insert(paraIndice.clamp(0, novas.length).toInt(), coluna);
+  return [
+    for (var i = 0; i < novas.length; i++) novas[i].copyWith(ordem: i + 1),
+  ];
+}

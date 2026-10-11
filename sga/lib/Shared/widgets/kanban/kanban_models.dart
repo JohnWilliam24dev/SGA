@@ -49,3 +49,36 @@ class KanbanMove {
   String toString() =>
       'KanbanMove($itemId: $fromColumnId -> $toColumnId @ $toIndex)';
 }
+
+/// Pedido de movimentação de uma **coluna**, feito ao soltar o ícone de
+/// arrastar dela.
+///
+/// [toIndex] conta a partir da lista de colunas **já sem** a coluna movida
+/// (mesma convenção de [KanbanMove]): 0 é o início e `colunas.length - 1`, o
+/// fim.
+@immutable
+class KanbanColumnMove {
+  const KanbanColumnMove({
+    required this.columnId,
+    required this.fromIndex,
+    required this.toIndex,
+  });
+
+  final String columnId;
+  final int fromIndex;
+  final int toIndex;
+
+  @override
+  bool operator ==(Object other) {
+    return other is KanbanColumnMove &&
+        other.columnId == columnId &&
+        other.fromIndex == fromIndex &&
+        other.toIndex == toIndex;
+  }
+
+  @override
+  int get hashCode => Object.hash(columnId, fromIndex, toIndex);
+
+  @override
+  String toString() => 'KanbanColumnMove($columnId: $fromIndex -> $toIndex)';
+}

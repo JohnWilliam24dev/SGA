@@ -1,11 +1,18 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/material.dart' show Material, MaterialType;
+import 'package:flutter/material.dart' show Icons, Material, MaterialType;
+import 'package:flutter/services.dart' show SystemMouseCursors;
 import 'package:flutter/widgets.dart' hide Icon;
+import 'package:flutter/widgets.dart' as widgets show Icon;
 
 import 'kanban_models.dart';
 
-/// Uma coluna do quadro: cabeçalho (título e contagem) e a lista rolável de
-/// cards arrastáveis. Quem decide *para onde* o card vai é o `KanbanBoard`;
+/// Uma coluna do quadro: cabeçalho e a lista rolável de cards arrastáveis.
+///
+/// O cabeçalho tem, da esquerda para a direita: a contagem de itens e o botão
+/// de ações da coluna ([actions], opcional); o título, centralizado; e o ícone
+/// de arrastar a coluna ([showDragHandle]).
+///
+/// Quem decide *para onde* o card vai é o `KanbanBoard`;
 /// a coluna só desenha o estado que recebe (inclusive o espaço reservado
 /// onde o card será solto) e repassa os eventos de arrasto.
 class KanbanColumnView<T> extends StatelessWidget {
@@ -28,6 +35,12 @@ class KanbanColumnView<T> extends StatelessWidget {
     required this.onDragStarted,
     required this.onDragUpdate,
     required this.onDragEnd,
+    this.actions,
+    this.showDragHandle = false,
+    this.columnWidth = 300,
+    this.onColumnDragStarted,
+    this.onColumnDragUpdate,
+    this.onColumnDragEnd,
   });
 
   final KanbanColumnData<T> column;
@@ -61,6 +74,19 @@ class KanbanColumnView<T> extends StatelessWidget {
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
 
+  /// Botão de ações da coluna (ex.: o menu de três pontinhos), à esquerda
+  /// do título, logo depois da contagem.
+  final Widget? actions;
+
+  /// Mostra, à direita, o ícone que arrasta a coluna inteira.
+  final bool showDragHandle;
+
+  /// Largura da coluna, usada para o "fantasma" que acompanha o ponteiro.
+  final double columnWidth;
+  final VoidCallback? onColumnDragStarted;
+  final ValueChanged<Offset>? onColumnDragUpdate;
+  final VoidCallback? onColumnDragEnd;
+
   @override
   Widget build(BuildContext context) {
     final tokens = AppThemeScope.tokensOf(context);
@@ -82,22 +108,7 @@ class KanbanColumnView<T> extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Label(
-                      type: LabelType.subtitle,
-                      text: column.title,
-                      maxLines: 1,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Badge(text: '${column.items.length}'),
-                ],
-              ),
-            ),
+            _header(tokens),
             Expanded(
               child: SingleChildScrollView(
                 key: listKey,
@@ -121,6 +132,116 @@ class KanbanColumnView<T> extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Largura reservada a cada lado do título, para ele ficar no centro mesmo
+  /// com a contagem e o menu de um lado e o ícone de arrastar do outro.
+  static const double _headerSide = 76;
+
+  Widget _header(ThemeTokens tokens) {
+    final menu = actions;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: _headerSide,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Badge(text: '${column.items.length}'),
+                  if (menu != null) ...[const SizedBox(width: 2), menu],
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Label(
+              type: LabelType.subtitle,
+              text: column.title,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            width: _headerSide,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: showDragHandle ? _handle(tokens) : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _handle(ThemeTokens tokens) {
+    final icon = widgets.Icon(
+      Icons.drag_indicator_rounded,
+      size: 22,
+      color: tokens.mutedTextColor,
+    );
+    return Draggable<String>(
+      key: ValueKey<String>('kanban-column-handle-${column.id}'),
+      data: column.id,
+      // O fantasma da coluna fica centrado no ponteiro, não ao lado do ícone.
+      dragAnchorStrategy: (draggable, context, position) =>
+          Offset(columnWidth / 2, 22),
+      feedback: _ghost(tokens),
+      childWhenDragging: Opacity(opacity: 0.3, child: icon),
+      onDragStarted: onColumnDragStarted,
+      onDragUpdate: (details) => onColumnDragUpdate?.call(details.globalPosition),
+      onDragEnd: (_) => onColumnDragEnd?.call(),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.grab,
+        child: Padding(padding: const EdgeInsets.all(6), child: icon),
+      ),
+    );
+  }
+
+  Widget _ghost(ThemeTokens tokens) {
+    return Material(
+      type: MaterialType.transparency,
+      child: SizedBox(
+        width: columnWidth,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: tokens.surfaceColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: tokens.primaryColor.withValues(alpha: 0.5),
+              width: 1.5,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 16,
+                offset: Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Label(
+                    type: LabelType.subtitle,
+                    text: column.title,
+                    maxLines: 1,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Badge(text: '${column.items.length}'),
+              ],
+            ),
+          ),
         ),
       ),
     );

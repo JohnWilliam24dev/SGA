@@ -33,7 +33,7 @@ lib/
     dashboard/           Financeiro, Relatório de pedidos e Produtos
     catalog/             tipos de produtos e adicionais
     profile/             perfil do artista
-    settings/            configurações (aparência e colunas do quadro)
+    settings/            configurações
     support/             suporte
 test/                    espelha a estrutura de lib/
 ```
@@ -71,11 +71,15 @@ test/                    espelha a estrutura de lib/
   *Configurações* e *Suporte* ficam à parte das cinco principais. Todas leem
   os dados por repositório (nunca direto dos mocks), então a troca pela API
   não mexe nas telas.
-- **Colunas do quadro** (Configurações): criar, renomear, reordenar, trocar o
-  tipo e excluir colunas. O nome é livre; o tipo (Inicial, Em andamento,
-  Concluído, Cancelado) dá o significado. Regras: exatamente uma coluna Inicial,
-  pelo menos uma Concluído e uma Cancelado, e coluna com pedidos não pode ser
-  excluída. Marcar outra coluna como Inicial passa a antiga para Em andamento.
+- **Colunas do quadro** (no próprio quadro de Pedidos): cada coluna tem, no
+  cabeçalho, a contagem e os três pontinhos à esquerda (renomear, alterar tipo,
+  mover para a esquerda/direita, excluir), o título no centro e, à direita, o
+  ícone para arrastar a coluna para onde quiser (só em tela larga; no celular a
+  ordem muda pelo menu). O botão "Nova coluna" cria uma. O nome é livre; o tipo
+  (Inicial, Em andamento, Concluído, Cancelado) dá o significado. Regras:
+  exatamente uma coluna Inicial, pelo menos uma Concluído e uma Cancelado, e
+  coluna com pedidos não pode ser excluída. Marcar outra coluna como Inicial
+  passa a antiga para Em andamento.
 - **Navegação:** tablet/desktop com barra lateral fixa, recolhida pelo ícone
   de painel no topo dela (vira uma faixa só de ícones; recolhida, a logo do
   sistema vira o ícone de "mostrar a barra" ao passar o mouse); celular com

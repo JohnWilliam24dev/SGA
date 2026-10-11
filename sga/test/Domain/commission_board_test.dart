@@ -122,4 +122,49 @@ void main() {
       expect(repo.carregarDetalhe('nao-existe'), throwsStateError);
     });
   });
+
+  group('moverColuna', () {
+    List<CommissionColumn> quadro() => [
+      for (var i = 0; i < 4; i++)
+        CommissionColumn(
+          id: 'col$i',
+          titulo: 'Coluna $i',
+          tipo: StatusTipo.emAndamento,
+          ordem: i + 1,
+        ),
+    ];
+
+    List<String> ids(List<CommissionColumn> colunas) => [
+      for (final c in colunas) c.id,
+    ];
+
+    test('leva a coluna para o índice (contado sem ela) e renumera a ordem', () {
+      final depois = moverColuna(quadro(), columnId: 'col0', paraIndice: 2);
+      expect(ids(depois), ['col1', 'col2', 'col0', 'col3']);
+      expect([for (final c in depois) c.ordem], [1, 2, 3, 4]);
+    });
+
+    test('para o início e para o fim', () {
+      expect(
+        ids(moverColuna(quadro(), columnId: 'col3', paraIndice: 0)),
+        ['col3', 'col0', 'col1', 'col2'],
+      );
+      expect(
+        ids(moverColuna(quadro(), columnId: 'col0', paraIndice: 3)),
+        ['col1', 'col2', 'col3', 'col0'],
+      );
+    });
+
+    test('índice fora do quadro é ajustado e coluna desconhecida não muda nada', () {
+      expect(
+        ids(moverColuna(quadro(), columnId: 'col0', paraIndice: 99)),
+        ['col1', 'col2', 'col3', 'col0'],
+      );
+      final original = quadro();
+      expect(
+        identical(moverColuna(original, columnId: 'x', paraIndice: 1), original),
+        isTrue,
+      );
+    });
+  });
 }

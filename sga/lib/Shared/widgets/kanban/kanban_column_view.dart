@@ -185,7 +185,9 @@ class KanbanColumnView<T> extends StatelessWidget {
     final icon = widgets.Icon(
       Icons.drag_indicator_rounded,
       size: 22,
-      color: tokens.mutedTextColor,
+      // Mesma cor do título: o cinza "apagado" some sobre o fundo azul das
+      // colunas no tema claro.
+      color: tokens.textColor,
     );
     return Draggable<String>(
       key: ValueKey<String>('kanban-column-handle-${column.id}'),

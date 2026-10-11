@@ -20,8 +20,12 @@ class ColumnMenuButton extends StatelessWidget {
     required this.onMoveLeft,
     required this.onMoveRight,
     required this.onDelete,
+    this.iconColor,
   });
 
+  /// Cor dos três pontinhos. Sem ela, o Material usa a dele, que some sobre o
+  /// fundo das colunas no tema claro; a página passa a cor de texto do tema.
+  final Color? iconColor;
   final String columnId;
   final bool canMoveLeft;
   final bool canMoveRight;
@@ -38,6 +42,7 @@ class ColumnMenuButton extends StatelessWidget {
       tooltip: 'Opções da coluna',
       padding: EdgeInsets.zero,
       iconSize: 20,
+      icon: Icon(Icons.more_vert, color: iconColor),
       onSelected: (acao) {
         switch (acao) {
           case _Acao.renomear:

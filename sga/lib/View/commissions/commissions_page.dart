@@ -165,9 +165,15 @@ class _CommissionsPageState extends State<CommissionsPage> {
     );
   }
 
-  Widget _menuDaColuna(CommissionColumn coluna, int indice, int total) {
+  Widget _menuDaColuna(
+    BuildContext context,
+    CommissionColumn coluna,
+    int indice,
+    int total,
+  ) {
     return ColumnMenuButton(
       columnId: coluna.id,
+      iconColor: AppThemeScope.tokensOf(context).textColor,
       canMoveLeft: indice > 0,
       canMoveRight: indice < total - 1,
       onRename: () => _renomear(coluna),
@@ -269,7 +275,12 @@ class _CommissionsPageState extends State<CommissionsPage> {
                   onItemTap: _abrir,
                   onColumnMove: _moverColuna,
                   columnActionsBuilder: (context, column, indice) =>
-                      _menuDaColuna(colunas[indice], indice, colunas.length),
+                      _menuDaColuna(
+                        context,
+                        colunas[indice],
+                        indice,
+                        colunas.length,
+                      ),
                   emptyLabel: 'Nenhum pedido aqui',
                 ),
               ),

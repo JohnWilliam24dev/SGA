@@ -21,8 +21,15 @@ class _RepositorioQueFalhaNoDetalhe extends FakeCommissionRepository {
   }
 }
 
-Future<CommissionResumoModel> _resumo(CommissionRepository repo, String id) async {
-  final colunas = await repo.carregarQuadro();
+/// Busca o resumo no repositório. O fake usa Future.delayed, que dentro do
+/// testWidgets (relógio falso) nunca completa sozinho e trava o teste: por
+/// isso roda no relógio real, com runAsync.
+Future<CommissionResumoModel> _resumo(
+  WidgetTester tester,
+  CommissionRepository repo,
+  String id,
+) async {
+  final colunas = (await tester.runAsync(() => repo.carregarQuadro()))!;
   return colunas.expand((c) => c.commissions).firstWhere((c) => c.id == id);
 }
 
@@ -54,7 +61,11 @@ void main() {
   ) async {
     useTallViewport(tester);
     final repo = FakeCommissionRepository(latencia: const Duration(milliseconds: 50));
-    final resumo = await _resumo(FakeCommissionRepository(latencia: Duration.zero), 'c1');
+    final resumo = await _resumo(
+      tester,
+      FakeCommissionRepository(latencia: Duration.zero),
+      'c1',
+    );
 
     await tester.pumpWidget(_pagina(repo, resumo));
     expect(find.text('Detalhes da Commission'), findsOneWidget);
@@ -78,7 +89,7 @@ void main() {
   ) async {
     useTallViewport(tester);
     final repo = FakeCommissionRepository(latencia: Duration.zero);
-    final resumo = await _resumo(repo, 'c6');
+    final resumo = await _resumo(tester, repo, 'c6');
 
     await tester.pumpWidget(_pagina(repo, resumo));
     await _aguardar(tester);
@@ -90,7 +101,7 @@ void main() {
   testWidgets('sem e-mail, mostra "Não informado"', (tester) async {
     useTallViewport(tester);
     final repo = FakeCommissionRepository(latencia: Duration.zero);
-    final resumo = await _resumo(repo, 'c9');
+    final resumo = await _resumo(tester, repo, 'c9');
 
     await tester.pumpWidget(_pagina(repo, resumo));
     await _aguardar(tester);
@@ -102,7 +113,7 @@ void main() {
   testWidgets('se falhar, mostra o erro e tentar de novo recarrega', (tester) async {
     useTallViewport(tester);
     final repo = _RepositorioQueFalhaNoDetalhe();
-    final resumo = await _resumo(repo, 'c1');
+    final resumo = await _resumo(tester, repo, 'c1');
 
     await tester.pumpWidget(_pagina(repo, resumo));
     await _aguardar(tester);
@@ -122,7 +133,7 @@ void main() {
     useTallViewport(tester);
     var voltou = false;
     final repo = FakeCommissionRepository(latencia: Duration.zero);
-    final resumo = await _resumo(repo, 'c1');
+    final resumo = await _resumo(tester, repo, 'c1');
 
     await tester.pumpWidget(_pagina(repo, resumo, onBack: () => voltou = true));
     await _aguardar(tester);

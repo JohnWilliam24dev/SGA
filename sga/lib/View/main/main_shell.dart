@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart' show Icons;
+import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart';
 import '../commissions/commissions_page.dart';
 import '../catalog/catalog_page.dart';
-import '../dashboard/dashboard_pages.dart';
 import '../profile/maker_profile_page.dart';
+import '../products/products_page.dart';
+import '../reports/reports_page.dart';
 import '../settings/settings_page.dart';
 import '../support/support_page.dart';
 
-/// Área autenticada do SGA. As seções consomem contratos de dados, nunca os
-/// mocks diretamente: a troca por API poderá acontecer por repositório.
 class MainShell extends StatefulWidget {
   const MainShell({
     super.key,
@@ -35,33 +34,12 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   static const String _orders = 'orders';
-  static const String _finance = 'finance';
   static const String _reports = 'reports';
   static const String _products = 'products';
   static const String _productTypes = 'product-types';
   static const String _profile = 'profile';
   static const String _settings = 'settings';
   static const String _support = 'support';
-
-  static const List<GlassDestination> _destinos = [
-    GlassDestination(_orders, 'Pedidos', Icons.view_kanban_outlined),
-    GlassDestination(
-      _finance,
-      'Financeiro',
-      Icons.account_balance_wallet_outlined,
-    ),
-    GlassDestination(
-      _reports,
-      'Relatório de pedidos',
-      Icons.pie_chart_outline_rounded,
-    ),
-    GlassDestination(_products, 'Produtos', Icons.inventory_2_outlined),
-    GlassDestination(
-      _productTypes,
-      'Tipos de produtos',
-      Icons.category_outlined,
-    ),
-  ];
 
   String _selecionado = _orders;
   late Maker _maker;
@@ -74,12 +52,10 @@ class _MainShellState extends State<MainShell> {
 
   Widget _pagina() {
     switch (_selecionado) {
-      case _finance:
-        return FinanceiroPage(repository: widget.commissionRepository);
       case _reports:
-        return RelatoriosPage(repository: widget.commissionRepository);
+        return ReportsPage(repository: widget.commissionRepository);
       case _products:
-        return const ProdutosPage();
+        return const ProductsPage();
       case _productTypes:
         return const CatalogPage();
       case _profile:
@@ -103,50 +79,70 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final destino = switch (_selecionado) {
-      _profile => const GlassDestination(
-        _profile,
-        'Perfil',
-        Icons.person_outline,
-      ),
-      _settings => const GlassDestination(
-        _settings,
-        'Configurações',
-        Icons.settings_outlined,
-      ),
-      _support => const GlassDestination(
-        _support,
-        'Suporte',
-        Icons.support_agent_outlined,
-      ),
-      _ => _destinos.firstWhere((d) => d.id == _selecionado),
-    };
-    final subtitle = switch (_selecionado) {
-      _orders => 'Acompanhe cada pedido por etapa, do orçamento até a entrega.',
-      _finance => 'Receitas, valores a receber e movimentações do mês.',
-      _reports => 'Veja como seus pedidos se distribuem por tipo e status.',
-      _products =>
-        'Cadastre o que você vende e mantenha o catálogo atualizado.',
-      _productTypes =>
-        'Defina os tipos de produto e os adicionais disponíveis para pedidos.',
-      _profile => 'Mantenha sua apresentação, regras de trabalho e termos sempre atualizados.',
-      _settings => 'Personalize a aparência do seu espaço de trabalho.',
-      _support => 'Encontre ajuda sempre que precisar.',
-      _ => '',
-    };
-
-    return GlassAppShell(
-      destinations: _destinos,
+    return AppShell(
+      brand: const SgaLogo(size: 32),
+      destinations: [
+        const NavDestination(
+          id: _orders,
+          label: 'Pedidos',
+          icon: Icons.view_kanban_outlined,
+          description: 'Acompanhe cada pedido por etapa.',
+        ),
+        const NavDestination(
+          id: _reports,
+          label: 'Relatório',
+          icon: Icons.pie_chart_outline_rounded,
+          description: 'Veja a distribuição dos seus pedidos.',
+        ),
+        const NavDestination(
+          id: _products,
+          label: 'Produtos',
+          icon: Icons.inventory_2_outlined,
+          description: 'Cadastre o que você vende.',
+        ),
+        const NavDestination(
+          id: _productTypes,
+          label: 'Catálogo',
+          icon: Icons.category_outlined,
+          description: 'Defina tipos e adicionais.',
+        ),
+      ],
       selectedId: _selecionado,
       onSelect: (id) => setState(() => _selecionado = id),
-      title: destino.label,
-      subtitle: subtitle,
-      body: _pagina(),
-      onLogout: widget.onLogout,
-      maker: _maker,
-      onOpenProfile: () => setState(() => _selecionado = _profile),
-      onOpenSettings: () => setState(() => _selecionado = _settings),
-      onOpenSupport: () => setState(() => _selecionado = _support),
+      profileMenu: Menu(
+        onSelected: (id) {
+          if (id == 'logout') {
+            widget.onLogout();
+          } else {
+            setState(() => _selecionado = id);
+          }
+        },
+        child: Avatar(initials: _maker.inicial, diameter: 32),
+        items: [
+          const MenuItem(
+            id: _profile,
+            text: 'Meu Perfil',
+            icon: Icons.person_outline,
+          ),
+          const MenuItem(
+            id: _settings,
+            text: 'Configurações',
+            icon: Icons.settings_outlined,
+          ),
+          const MenuItem(
+            id: _support,
+            text: 'Suporte',
+            icon: Icons.support_agent_outlined,
+          ),
+          const MenuDivider(),
+          const MenuItem(
+            id: 'logout',
+            text: 'Sair',
+            icon: Icons.logout_rounded,
+          ),
+        ],
+      ),
+      child: _pagina(),
     );
   }
 }

@@ -69,7 +69,7 @@ Widget buildLoginScreen(BuildContext context) {
       ),
     ),
     onForgotPassword: () =>
-        Toast.show(context, text: 'Recuperação de senha em breve.'),
+        Toast.show(text: 'Recuperação de senha em breve.'),
     onGoToRegister: () =>
         Navigator.of(context).pushReplacement(_route(buildRegisterScreen)),
     onBack: () => Navigator.of(context).pop(),

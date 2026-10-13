@@ -1,14 +1,9 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/material.dart' show TextButton;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart';
 
-/// Tela de cadastro: nome, e-mail, senha, confirmação e aceite dos termos.
-/// Quando tudo está válido, entrega um [Maker] por [onRegister].
-///
-/// Só front por enquanto: nada é enviado a servidor.
 class RegisterPage extends StatefulWidget {
   const RegisterPage({
     super.key,
@@ -30,7 +25,6 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _termosPendentes = false;
 
   void _enviar(FormValues values) {
-    // O FormGroup só valida os campos de texto; o aceite dos termos é daqui.
     if (!_aceitouTermos) {
       setState(() => _termosPendentes = true);
       return;
@@ -54,19 +48,16 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: TextButton(
+            child: Button.link(
               onPressed: widget.onBack,
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF063C68),
-              ),
-              child: const Text('Voltar'),
+              child: const Label(text: 'Voltar'),
             ),
           ),
-          const FadeIn(child: SgaLogo(size: 54)),
-          FadeIn(
+          const Reveal(child: SgaLogo(size: 54)),
+          Reveal(
             delay: const Duration(milliseconds: 150),
-            child: GlassPanel(
-              padding: const EdgeInsets.all(24),
+            child: Card(
+              variant: CardVariant.glass,
               child: Div(
                 width: 100.pct,
                 children: [
@@ -78,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   FormGroup(
                     width: 100.pct,
                     children: [
-                      InputField(
+                      const InputField(
                         name: 'nome',
                         hint: 'Nome',
                         validation: [
@@ -86,13 +77,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           minLength(3, message: 'Informe seu nome completo'),
                         ],
                       ),
-                      InputField(
+                      const InputField(
                         name: 'email',
                         hint: 'E-mail',
                         type: InputType.email,
                         validation: [isRequired(), isEmail()],
                       ),
-                      InputField(
+                      const InputField(
                         name: 'senha',
                         hint: 'Senha',
                         type: InputType.password,
@@ -101,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           isPassword(min: 8, requireDigit: true),
                         ],
                       ),
-                      InputField(
+                      const InputField(
                         name: 'confirmar',
                         hint: 'Confirmar senha',
                         type: InputType.password,
@@ -112,9 +103,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       _termos(),
                       Button(
-                        text: 'Criar conta',
                         expanded: true,
                         onSubmit: _enviar,
+                        child: const Label(text: 'Criar conta'),
                       ),
                     ],
                   ),
@@ -122,19 +113,16 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          FadeIn(
+          Reveal(
             delay: const Duration(milliseconds: 300),
             child: Div(
               align: Alignment.center,
               gap: 0.px,
               children: [
                 const Label(type: LabelType.caption, text: 'Já tem conta?'),
-                TextButton(
+                Button.link(
                   onPressed: widget.onGoToLogin,
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF053A68),
-                  ),
-                  child: const Text('Entrar'),
+                  child: const Label(text: 'Entrar'),
                 ),
               ],
             ),

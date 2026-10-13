@@ -1,44 +1,49 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
-import '../../Shared/widgets/glass_app_shell.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => GlassPanel(
+  Widget build(BuildContext context) => Card(
     child: ValueListenableBuilder<AppThemeMode>(
       valueListenable: sgaThemeMode,
-      builder: (context, mode, child) {
+      builder: (context, mode, _) {
         final dark = mode == AppThemeMode.dark;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return Div(
+          width: 100.pct,
           children: [
-            Text(
-              'Aparência',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: sgaOnSurface,
-              ),
+            const Label(type: LabelType.title, text: 'Aparência'),
+            const Label(
+              type: LabelType.caption,
+              text: 'Escolha como prefere visualizar o SGA.',
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Escolha como prefere visualizar o SGA.',
-              style: TextStyle(color: sgaMuted),
-            ),
-            const SizedBox(height: 12),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Modo escuro'),
-              subtitle: Text(dark ? 'Ativado' : 'Desativado'),
-              value: dark,
-              onChanged: (enabled) => sgaThemeMode.value = enabled
-                  ? AppThemeMode.dark
-                  : AppThemeMode.light,
+            Div(
+              direction: ResponsiveDirection(mobile: LayoutDirection.horizontal),
+              align: Alignment.centerLeft,
+              children: [
+                LayoutItem(
+                  size: 1.fr,
+                  child: Div(
+                    gap: 0.px,
+                    children: [
+                      const Label(text: 'Modo escuro'),
+                      Label(
+                        type: LabelType.caption,
+                        text: dark ? 'Ativado' : 'Desativado',
+                      ),
+                    ],
+                  ),
+                ),
+                Toggle(
+                  value: dark,
+                  onChanged: (enabled) => sgaThemeMode.value = enabled
+                      ? AppThemeMode.dark
+                      : AppThemeMode.light,
+                ),
+              ],
             ),
           ],
         );

@@ -62,8 +62,10 @@ class CommissionDetailPage extends StatelessWidget {
               gap: 4.px,
               children: [
                 Label(type: LabelType.title, text: commission.nomeCliente),
+                // Wrap: em tela estreita o "Criado em" desce para a linha de baixo
+                // em vez de estourar a linha.
                 Div(
-                  direction: LayoutDirection.horizontal,
+                  direction: LayoutDirection.wrap,
                   gap: 8.px,
                   children: [
                     Badge(text: statusNome, variant: BadgeVariant.soft),
@@ -73,12 +75,16 @@ class CommissionDetailPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                // O valor fica na coluna do nome (e não solto no fim da linha),
+                // para não espremer o nome em telas estreitas.
+                Label(
+                  type: LabelType.heading,
+                  text: formatMoney(
+                    commission.orcamentoFinal ?? commission.precoSimulado,
+                  ),
+                ),
               ],
             ),
-          ),
-          Label(
-            type: LabelType.title,
-            text: formatMoney(commission.orcamentoFinal ?? commission.precoSimulado),
           ),
         ],
       ),

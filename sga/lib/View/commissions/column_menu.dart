@@ -46,22 +46,18 @@ class ColumnMenuButton extends StatelessWidget {
             onDelete();
         }
       },
-      child: const Icon(Icons.more_vert),
+      // O Menu do Easy UI não desabilita itens: os movimentos que não cabem
+      // (primeira/última coluna) simplesmente não aparecem.
       items: [
-        const MenuItem(id: _Acao.renomear, text: 'Renomear'),
-        const MenuItem(id: _Acao.tipo, text: 'Alterar tipo'),
-        MenuItem(
-          id: _Acao.esquerda,
-          enabled: canMoveLeft,
-          text: 'Mover para a esquerda',
-        ),
-        MenuItem(
-          id: _Acao.direita,
-          enabled: canMoveRight,
-          text: 'Mover para a direita',
-        ),
-        const MenuItem(id: _Acao.excluir, text: 'Excluir coluna'),
+        const SelectOption(_Acao.renomear, 'Renomear'),
+        const SelectOption(_Acao.tipo, 'Alterar tipo'),
+        if (canMoveLeft)
+          const SelectOption(_Acao.esquerda, 'Mover para a esquerda'),
+        if (canMoveRight)
+          const SelectOption(_Acao.direita, 'Mover para a direita'),
+        const SelectOption(_Acao.excluir, 'Excluir coluna'),
       ],
+      child: const Icon(Icons.more_vert),
     );
   }
 }
@@ -74,8 +70,11 @@ Future<String?> pedirNomeDaColuna(
   String inicial = '',
 }) {
   return Modal.prompt(
-    titulo,
+    context,
+    title: titulo,
+    label: 'Nome da coluna',
     initialValue: inicial,
+    confirmText: confirmar,
     validation: [isRequired()],
   );
 }
@@ -86,21 +85,24 @@ Future<StatusTipo?> pedirTipoDaColuna(
   required StatusTipo atual,
 }) {
   return Modal.choice<StatusTipo>(
-    choices: StatusTipo.values
-        .map((t) => Choice(
-              id: t,
-              label: t.rotulo,
-              description: t.descricao,
-            ))
-        .toList(),
-    selectedId: atual,
+    context,
+    title: 'Tipo da coluna',
+    selected: atual,
+    choices: [
+      for (final tipo in StatusTipo.values)
+        ModalChoice(tipo, tipo.rotulo, description: tipo.descricao),
+    ],
   );
 }
 
 /// Confirma a exclusão de uma coluna.
 Future<bool> confirmarExclusaoDaColuna(BuildContext context, String nome) async {
-  return await Modal.confirm(
-    'Excluir coluna',
-    description: 'A coluna "$nome" será removida do quadro.',
-  ) ?? false;
+  final confirmou = await Modal.confirm(
+    context,
+    title: 'Excluir coluna',
+    message: 'A coluna "$nome" será removida do quadro.',
+    confirmText: 'Excluir',
+    destructive: true,
+  );
+  return confirmou == true;
 }

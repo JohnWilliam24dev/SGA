@@ -48,9 +48,10 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Button.link(
+            child: Button(
+              text: 'Voltar',
+              variant: ButtonVariant.link,
               onPressed: widget.onBack,
-              child: const Label(text: 'Voltar'),
             ),
           ),
           const Reveal(child: SgaLogo(size: 54)),
@@ -69,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   FormGroup(
                     width: 100.pct,
                     children: [
-                      const InputField(
+                      InputField(
                         name: 'nome',
                         hint: 'Nome',
                         validation: [
@@ -77,13 +78,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           minLength(3, message: 'Informe seu nome completo'),
                         ],
                       ),
-                      const InputField(
+                      InputField(
                         name: 'email',
                         hint: 'E-mail',
                         type: InputType.email,
                         validation: [isRequired(), isEmail()],
                       ),
-                      const InputField(
+                      InputField(
                         name: 'senha',
                         hint: 'Senha',
                         type: InputType.password,
@@ -92,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           isPassword(min: 8, requireDigit: true),
                         ],
                       ),
-                      const InputField(
+                      InputField(
                         name: 'confirmar',
                         hint: 'Confirmar senha',
                         type: InputType.password,
@@ -103,9 +104,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       _termos(),
                       Button(
+                        text: 'Criar conta',
                         expanded: true,
                         onSubmit: _enviar,
-                        child: const Label(text: 'Criar conta'),
                       ),
                     ],
                   ),
@@ -120,10 +121,11 @@ class _RegisterPageState extends State<RegisterPage> {
               gap: 0.px,
               children: [
                 const Label(type: LabelType.caption, text: 'Já tem conta?'),
-                Button.link(
-                  onPressed: widget.onGoToLogin,
-                  child: const Label(text: 'Entrar'),
-                ),
+                Button(
+              text: 'Entrar',
+              variant: ButtonVariant.link,
+              onPressed: widget.onGoToLogin,
+            ),
               ],
             ),
           ),

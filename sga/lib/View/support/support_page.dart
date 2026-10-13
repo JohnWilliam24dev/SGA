@@ -28,7 +28,7 @@ class SupportPage extends StatelessWidget {
                   type: LabelType.caption,
                   text:
                       'Se você tiver qualquer problema com a plataforma, fale com a gente pelo WhatsApp ou peça ajuda no grupo do Discord. Vamos te orientar por lá.',
-                  align: TextAlign.center,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),

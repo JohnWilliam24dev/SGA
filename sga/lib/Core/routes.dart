@@ -69,7 +69,7 @@ Widget buildLoginScreen(BuildContext context) {
       ),
     ),
     onForgotPassword: () =>
-        Toast.show(text: 'Recuperação de senha em breve.'),
+        Toast.show(context, text: 'Recuperação de senha em breve.'),
     onGoToRegister: () =>
         Navigator.of(context).pushReplacement(_route(buildRegisterScreen)),
     onBack: () => Navigator.of(context).pop(),
@@ -125,11 +125,18 @@ void _openCommissionDetail(
     builder: (dialogContext) => Dialog(
       backgroundColor: const Color(0x00000000),
       insetPadding: const EdgeInsets.all(24),
-      child: buildCommissionDetailScreen(
-        commission: commission,
-        statusNome: statusNome,
-        compact: true,
-        onBack: () => Navigator.of(dialogContext).pop(),
+      // A Tela do Easy UI ocupa todo o espaço que recebe; limitamos o tamanho
+      // para o detalhe aparecer como um cartão, e não em tela cheia.
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
+          child: buildCommissionDetailScreen(
+            commission: commission,
+            statusNome: statusNome,
+            onBack: () => Navigator.of(dialogContext).pop(),
+          ),
+        ),
       ),
     ),
   );
@@ -138,7 +145,6 @@ void _openCommissionDetail(
 Widget buildCommissionDetailScreen({
   required CommissionResumoModel commission,
   required String statusNome,
-  bool compact = false,
   VoidCallback? onBack,
 }) {
   return Builder(
@@ -146,7 +152,6 @@ Widget buildCommissionDetailScreen({
       repository: _commissionRepository,
       commission: commission,
       statusNome: statusNome,
-      compact: compact,
       onBack: onBack ?? () => Navigator.of(context).pop(),
     ),
   );

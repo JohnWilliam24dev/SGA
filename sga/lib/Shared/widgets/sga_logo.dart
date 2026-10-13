@@ -1,5 +1,4 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart' hide Icon;
 
 /// Marca do SGA: paleta de artista num quadrado azul, com a cruz de "cuidado"

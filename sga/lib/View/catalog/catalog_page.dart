@@ -66,7 +66,11 @@ class _CatalogPageState extends State<CatalogPage> {
             items: _types,
             onSave: (m) => setState(() {
               final idx = _types.indexWhere((t) => t.id == m.id);
-              if (idx >= 0) _types[idx] = m; else _types.add(m);
+              if (idx >= 0) {
+                _types[idx] = m;
+              } else {
+                _types.add(m);
+              }
             }),
             onDelete: (m) => setState(() => _types.remove(m)),
           ),
@@ -77,7 +81,11 @@ class _CatalogPageState extends State<CatalogPage> {
             items: _additionals,
             onSave: (m) => setState(() {
               final idx = _additionals.indexWhere((a) => a.id == m.id);
-              if (idx >= 0) _additionals[idx] = m; else _additionals.add(m);
+              if (idx >= 0) {
+                _additionals[idx] = m;
+              } else {
+                _additionals.add(m);
+              }
             }),
             onDelete: (m) => setState(() => _additionals.remove(m)),
           ),
@@ -104,15 +112,20 @@ class _TypesList extends StatelessWidget {
       title: 'Tipos',
       items: items,
       fields: [
-        (t) => Label(text: t.nome),
-        (t) => Label(text: formatMoney(t.precoBase)),
-        (t) => t.habilitado
-            ? const Badge(text: 'Ativo', variant: BadgeVariant.soft)
-            : const Badge(text: 'Pausado'),
+        Field<TipoProdutoModel>('Nome', (t) => t.nome),
+        Field<TipoProdutoModel>('Preço base', (t) => formatMoney(t.precoBase)),
+        Field<TipoProdutoModel>(
+          'Situação',
+          (t) => t.habilitado ? 'Ativo' : 'Pausado',
+        ),
       ],
-      editor: (context) => [
-        const InputField(name: 'nome', hint: 'Nome do tipo', validation: [isRequired()]),
-        const InputField(
+      editor: (item) => [
+        InputField(
+          name: 'nome',
+          hint: 'Nome do tipo',
+          validation: [isRequired()],
+        ),
+        InputField(
           name: 'preco',
           hint: 'Preço base',
           type: InputType.currency,
@@ -122,21 +135,23 @@ class _TypesList extends StatelessWidget {
           name: 'habilitado',
           label: 'Habilitado para novos pedidos',
           value: true,
-          onChanged: (v) {},
+          onChanged: (_) {},
         ),
       ],
       initialValuesFor: (t) => {
-        'nome': t?.nome ?? '',
-        'preco': t?.precoBase.toString() ?? '0',
-        'habilitado': t?.habilitado ?? true,
+        'nome': t.nome,
+        'preco': formatMoney(t.precoBase, symbol: ''),
+        'habilitado': t.habilitado,
       },
       onSave: (values, original) {
-        onSave(TipoProdutoModel(
-          id: original?.id ?? DateTime.now().toString(),
-          nome: values['nome'],
-          precoBase: parseDecimal(values['preco']),
-          habilitado: values['habilitado'],
-        ));
+        onSave(
+          TipoProdutoModel(
+            id: original?.id ?? DateTime.now().toString(),
+            nome: values['nome']!.trim(),
+            precoBase: parseDecimal(values['preco'] ?? '') ?? 0,
+            habilitado: values.boolean('habilitado') ?? true,
+          ),
+        );
       },
       onDelete: onDelete,
     );
@@ -160,59 +175,64 @@ class _AdditionalsList extends StatelessWidget {
       title: 'Adicionais',
       items: items,
       fields: [
-        (a) => Div(
-              gap: 2.px,
-              children: [
-                Label(text: a.nome),
-                Label(type: LabelType.caption, text: a.descricao),
-              ],
-            ),
-        (a) => Label(
-              text: a.porcentagem != null
-                  ? '+${a.porcentagem}%'
-                  : formatMoney(a.precoFixo ?? 0),
-            ),
+        Field<AdicionalModel>('Nome', (a) => a.nome),
+        Field<AdicionalModel>(
+          'Valor',
+          (a) => a.porcentagem != null
+              ? '+${formatPercent(a.porcentagem!)}'
+              : formatMoney(a.precoFixo ?? 0),
+        ),
+        Field<AdicionalModel>(
+          'Situação',
+          (a) => a.habilitado ? 'Ativo' : 'Pausado',
+        ),
       ],
-      editor: (context) => [
-        const InputField(name: 'nome', hint: 'Nome', validation: [isRequired()]),
-        const InputField(name: 'descricao', hint: 'Descrição', validation: [isRequired()]),
-        const InputField(
+      editor: (item) => [
+        InputField(name: 'nome', hint: 'Nome', validation: [isRequired()]),
+        InputField(name: 'descricao', hint: 'Descrição (opcional)'),
+        InputField(
           name: 'preco',
-          hint: 'Preço ou Porcentagem',
-          type: InputType.currency,
+          hint: 'Valor ou porcentagem',
+          type: InputType.decimal,
           validation: [isRequired()],
         ),
         Toggle(
           name: 'is_percent',
           label: 'Usar porcentagem em vez de valor fixo',
           value: false,
-          onChanged: (v) {},
+          onChanged: (_) {},
         ),
         Toggle(
           name: 'habilitado',
           label: 'Habilitado',
           value: true,
-          onChanged: (v) {},
+          onChanged: (_) {},
         ),
       ],
       initialValuesFor: (a) => {
-        'nome': a?.nome ?? '',
-        'descricao': a?.descricao ?? '',
-        'preco': a?.porcentagem?.toString() ?? a?.precoFixo?.toString() ?? '0',
-        'is_percent': a?.porcentagem != null,
-        'habilitado': a?.habilitado ?? true,
+        'nome': a.nome,
+        'descricao': a.descricao ?? '',
+        'preco': formatMoney(
+          a.porcentagem ?? a.precoFixo ?? 0,
+          symbol: '',
+        ),
+        'is_percent': a.porcentagem != null,
+        'habilitado': a.habilitado,
       },
       onSave: (values, original) {
-        final val = parseDecimal(values['preco']);
-        final isPercent = values['is_percent'] as bool;
-        onSave(AdicionalModel(
-          id: original?.id ?? DateTime.now().toString(),
-          nome: values['nome'],
-          descricao: values['descricao'],
-          precoFixo: isPercent ? null : val,
-          porcentagem: isPercent ? val.toInt() : null,
-          habilitado: values['habilitado'],
-        ));
+        final valor = parseDecimal(values['preco'] ?? '') ?? 0;
+        final isPercent = values.boolean('is_percent') ?? false;
+        final descricao = values['descricao']?.trim() ?? '';
+        onSave(
+          AdicionalModel(
+            id: original?.id ?? DateTime.now().toString(),
+            nome: values['nome']!.trim(),
+            descricao: descricao.isEmpty ? null : descricao,
+            precoFixo: isPercent ? null : valor,
+            porcentagem: isPercent ? valor : null,
+            habilitado: values.boolean('habilitado') ?? true,
+          ),
+        );
       },
       onDelete: onDelete,
     );

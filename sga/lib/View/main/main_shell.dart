@@ -2,7 +2,9 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../Domain/domain.dart';
-import '../../Shared/shared.dart';
+// O AppShell do Easy UI substitui o AdaptiveDrawerScaffold do SGA; os dois
+// definem NavDestination, então escondemos o do SGA aqui.
+import '../../Shared/shared.dart' hide NavDestination;
 import '../commissions/commissions_page.dart';
 import '../catalog/catalog_page.dart';
 import '../profile/maker_profile_page.dart';
@@ -86,30 +88,26 @@ class _MainShellState extends State<MainShell> {
           id: _orders,
           label: 'Pedidos',
           icon: Icons.view_kanban_outlined,
-          description: 'Acompanhe cada pedido por etapa.',
         ),
         const NavDestination(
           id: _reports,
           label: 'Relatório',
           icon: Icons.pie_chart_outline_rounded,
-          description: 'Veja a distribuição dos seus pedidos.',
         ),
         const NavDestination(
           id: _products,
           label: 'Produtos',
           icon: Icons.inventory_2_outlined,
-          description: 'Cadastre o que você vende.',
         ),
         const NavDestination(
           id: _productTypes,
           label: 'Catálogo',
           icon: Icons.category_outlined,
-          description: 'Defina tipos e adicionais.',
         ),
       ],
       selectedId: _selecionado,
       onSelect: (id) => setState(() => _selecionado = id),
-      profileMenu: Menu(
+      profileMenu: Menu<String>(
         onSelected: (id) {
           if (id == 'logout') {
             widget.onLogout();
@@ -117,30 +115,13 @@ class _MainShellState extends State<MainShell> {
             setState(() => _selecionado = id);
           }
         },
-        child: Avatar(initials: _maker.inicial, diameter: 32),
-        items: [
-          const MenuItem(
-            id: _profile,
-            text: 'Meu Perfil',
-            icon: Icons.person_outline,
-          ),
-          const MenuItem(
-            id: _settings,
-            text: 'Configurações',
-            icon: Icons.settings_outlined,
-          ),
-          const MenuItem(
-            id: _support,
-            text: 'Suporte',
-            icon: Icons.support_agent_outlined,
-          ),
-          const MenuDivider(),
-          const MenuItem(
-            id: 'logout',
-            text: 'Sair',
-            icon: Icons.logout_rounded,
-          ),
+        items: const [
+          SelectOption(_profile, 'Meu Perfil'),
+          SelectOption(_settings, 'Configurações'),
+          SelectOption(_support, 'Suporte'),
+          SelectOption('logout', 'Sair'),
         ],
+        child: Avatar(initials: _maker.inicial, diameter: 32),
       ),
       child: _pagina(),
     );

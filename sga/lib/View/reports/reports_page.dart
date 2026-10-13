@@ -82,7 +82,7 @@ class _TypeChart extends StatelessWidget {
         children: [
           const Label(type: LabelType.title, text: 'Pedidos por tipo'),
           if (orders.isEmpty)
-            const EmptyState(label: 'Ainda não há pedidos.')
+            const EmptyState(title: 'Ainda não há pedidos.')
           else
             for (final entry in types.entries)
               _ProgressRow(
@@ -110,7 +110,7 @@ class _StatusChart extends StatelessWidget {
         children: [
           const Label(type: LabelType.title, text: 'Pedidos por status'),
           if (orders.isEmpty)
-            const EmptyState(label: 'Ainda não há pedidos.')
+            const EmptyState(title: 'Ainda não há pedidos.')
           else ...[
             _ProgressRow(
               label: 'Em aberto',

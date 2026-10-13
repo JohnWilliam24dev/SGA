@@ -59,12 +59,12 @@ class WelcomePage extends StatelessWidget {
               gap: 12.px,
               children: [
                 Button(
-                  'Cadastre-se',
+                  text: 'Cadastre-se',
                   expanded: true,
                   onPressed: onRegister,
                 ),
                 Button(
-                  'Login',
+                  text: 'Login',
                   variant: ButtonVariant.link,
                   onPressed: onLogin,
                 ),

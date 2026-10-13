@@ -27,9 +27,10 @@ class LoginPage extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Button.link(
+            child: Button(
+              text: 'Voltar',
+              variant: ButtonVariant.link,
               onPressed: onBack,
-              child: const Label(text: 'Voltar'),
             ),
           ),
           const Reveal(child: SgaLogo(size: 54)),
@@ -48,13 +49,13 @@ class LoginPage extends StatelessWidget {
                   FormGroup(
                     width: 100.pct,
                     children: [
-                      const InputField(
+                      InputField(
                         name: 'email',
                         hint: 'E-mail',
                         type: InputType.email,
                         validation: [isRequired(), isEmail()],
                       ),
-                      const InputField(
+                      InputField(
                         name: 'senha',
                         hint: 'Senha',
                         type: InputType.password,
@@ -62,12 +63,14 @@ class LoginPage extends StatelessWidget {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Button.link(
-                          onPressed: onForgotPassword,
-                          child: const Label(text: 'Esqueci a senha'),
-                        ),
+                        child: Button(
+              text: 'Esqueci a senha',
+              variant: ButtonVariant.link,
+              onPressed: onForgotPassword,
+            ),
                       ),
                       Button(
+                        text: 'Entrar',
                         expanded: true,
                         onSubmit: (values) => onLogin(
                           Credenciais(
@@ -75,7 +78,6 @@ class LoginPage extends StatelessWidget {
                             senha: values['senha']!,
                           ),
                         ),
-                        child: const Label(text: 'Entrar'),
                       ),
                     ],
                   ),
@@ -93,10 +95,11 @@ class LoginPage extends StatelessWidget {
                   type: LabelType.caption,
                   text: 'Ainda não tem conta?',
                 ),
-                Button.link(
-                  onPressed: onGoToRegister,
-                  child: const Label(text: 'Cadastre-se'),
-                ),
+                Button(
+              text: 'Cadastre-se',
+              variant: ButtonVariant.link,
+              onPressed: onGoToRegister,
+            ),
               ],
             ),
           ),

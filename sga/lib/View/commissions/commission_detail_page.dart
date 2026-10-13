@@ -42,8 +42,9 @@ class _CommissionDetailPageState extends State<CommissionDetailPage> {
     return Tela(
       title: 'Detalhes da Commission',
       onBack: widget.onBack,
-      background: Backdrop.bubbles(),
-      child: (context) => Div(
+      scrollable: true,
+      background: const Backdrop.bubbles(child: SizedBox.shrink()),
+      child: Div(
         maxWidth: 720.px,
         align: Alignment.topCenter,
         children: [
@@ -55,7 +56,6 @@ class _CommissionDetailPageState extends State<CommissionDetailPage> {
               children: [
                 _secaoCliente(detalhe),
                 _secaoPedido(detalhe),
-                if (detalhe.termosServico.isNotEmpty) _secaoTermos(),
               ],
             ),
           ),
@@ -137,23 +137,11 @@ class _CommissionDetailPageState extends State<CommissionDetailPage> {
               Grid.fit(
                 minCellWidth: 140,
                 children: [
-                  Picture(source: detalhe.imagemRefUrl),
+                  Picture(url: detalhe.imagemRefUrl),
                 ],
               ),
             ],
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _secaoTermos() {
-    return const Section(
-      title: 'Termos de Serviço',
-      child: Card(
-        child: Label(
-          type: LabelType.caption,
-          text: 'O cliente aceitou seus termos de serviço ao realizar este pedido.',
         ),
       ),
     );

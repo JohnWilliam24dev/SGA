@@ -54,7 +54,7 @@ class _MakerProfilePageState extends State<MakerProfilePage> {
   void _saveMaker(Maker maker) {
     setState(() => _maker = maker);
     widget.onMakerChanged(maker);
-    Toast.show(text: 'Perfil atualizado.');
+    Toast.show(context, text: 'Perfil atualizado.', type: ToastType.success);
   }
 
   void _persistRules() {
@@ -68,7 +68,8 @@ class _MakerProfilePageState extends State<MakerProfilePage> {
   }
 
   Future<void> _editProfile() async {
-    await Modal.form(
+    await Modal.form<bool>(
+      context,
       title: 'Editar perfil',
       initialValues: {
         'nome': _maker.nome,
@@ -77,8 +78,13 @@ class _MakerProfilePageState extends State<MakerProfilePage> {
         'portfolio': _maker.portfolio,
       },
       fields: (context) => [
-        const InputField(name: 'nome', hint: 'Nome completo', validation: [isRequired()]),
-        const InputField(name: 'email', hint: 'E-mail', type: InputType.email, validation: [isRequired(), isEmail()]),
+        InputField(name: 'nome', hint: 'Nome completo', validation: [isRequired()]),
+        InputField(
+          name: 'email',
+          hint: 'E-mail',
+          type: InputType.email,
+          validation: [isRequired(), isEmail()],
+        ),
         const InputField(name: 'artista', hint: 'Nome artístico'),
         const InputField(name: 'portfolio', hint: 'Portfólio / site'),
       ],
@@ -91,13 +97,15 @@ class _MakerProfilePageState extends State<MakerProfilePage> {
             portfolio: values['portfolio']?.trim() ?? '',
           ),
         );
+        return true;
       },
     );
   }
 
   Future<void> _addItem(List<String> list, VoidCallback onChanged) async {
     final text = await Modal.prompt(
-      'Adicionar regra',
+      context,
+      title: 'Adicionar regra',
       hint: 'Ex: Retratos a óleo',
       validation: [isRequired(), minLength(3)],
     );
@@ -151,7 +159,7 @@ class _MakerProfilePageState extends State<MakerProfilePage> {
                   Div(
                     direction: LayoutDirection.horizontal,
                     children: [
-                      const LayoutItem(
+                      LayoutItem(
                         size: 1.fr,
                         child: Label(
                           type: LabelType.caption,
@@ -194,7 +202,7 @@ class _MakerProfilePageState extends State<MakerProfilePage> {
                   Div(
                     direction: LayoutDirection.horizontal,
                     children: [
-                      const LayoutItem(
+                      LayoutItem(
                         size: 1.fr,
                         child: Label(
                           type: LabelType.caption,

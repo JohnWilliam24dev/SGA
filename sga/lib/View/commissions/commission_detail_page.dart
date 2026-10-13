@@ -4,7 +4,10 @@ import 'package:flutter/widgets.dart' hide Icon;
 import '../../Domain/domain.dart';
 
 /// Detalhe de uma commission, aberto ao tocar no card do quadro.
-class CommissionDetailPage extends StatefulWidget {
+///
+/// O cabeçalho vem do resumo (já na mão) e o restante é carregado pelo
+/// [AsyncView], que refaz a chamada em "Tentar de novo".
+class CommissionDetailPage extends StatelessWidget {
   const CommissionDetailPage({
     super.key,
     required this.repository,
@@ -19,29 +22,10 @@ class CommissionDetailPage extends StatefulWidget {
   final VoidCallback onBack;
 
   @override
-  State<CommissionDetailPage> createState() => _CommissionDetailPageState();
-}
-
-class _CommissionDetailPageState extends State<CommissionDetailPage> {
-  Future<CommissionDetalhadaModel>? _loading;
-
-  @override
-  void initState() {
-    super.initState();
-    _carregar();
-  }
-
-  void _carregar() {
-    setState(() {
-      _loading = widget.repository.carregarDetalhe(widget.commission.id);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Tela(
       title: 'Detalhes da Commission',
-      onBack: widget.onBack,
+      onBack: onBack,
       scrollable: true,
       background: const Backdrop.bubbles(child: SizedBox.shrink()),
       child: Div(
@@ -50,7 +34,7 @@ class _CommissionDetailPageState extends State<CommissionDetailPage> {
         children: [
           _cabecalho(),
           AsyncView(
-            load: () => _loading!,
+            load: () => repository.carregarDetalhe(commission.id),
             builder: (context, detalhe) => Div(
               width: 100.pct,
               children: [
@@ -71,21 +55,21 @@ class _CommissionDetailPageState extends State<CommissionDetailPage> {
         direction: LayoutDirection.horizontal,
         align: Alignment.centerLeft,
         children: [
-          Avatar(initials: widget.commission.nomeCliente[0], diameter: 56),
+          Avatar(initials: commission.nomeCliente[0], diameter: 56),
           LayoutItem(
             size: 1.fr,
             child: Div(
               gap: 4.px,
               children: [
-                Label(type: LabelType.title, text: widget.commission.nomeCliente),
+                Label(type: LabelType.title, text: commission.nomeCliente),
                 Div(
                   direction: LayoutDirection.horizontal,
                   gap: 8.px,
                   children: [
-                    Badge(text: widget.statusNome, variant: BadgeVariant.soft),
+                    Badge(text: statusNome, variant: BadgeVariant.soft),
                     Label(
                       type: LabelType.caption,
-                      text: 'Criado em ${formatDate(widget.commission.criadoEm)}',
+                      text: 'Criado em ${formatDate(commission.criadoEm)}',
                     ),
                   ],
                 ),
@@ -94,7 +78,7 @@ class _CommissionDetailPageState extends State<CommissionDetailPage> {
           ),
           Label(
             type: LabelType.title,
-            text: formatMoney(widget.commission.orcamentoFinal ?? widget.commission.precoSimulado),
+            text: formatMoney(commission.orcamentoFinal ?? commission.precoSimulado),
           ),
         ],
       ),

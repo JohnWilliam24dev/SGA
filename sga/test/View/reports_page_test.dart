@@ -25,7 +25,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Pedidos por tipo de arte'), findsOneWidget);
+    expect(find.text('Pedidos no mês'), findsOneWidget);
+    expect(find.text('Taxa de conclusão'), findsOneWidget);
+    expect(find.text('Pedidos por tipo'), findsOneWidget);
     expect(find.text('Pedidos por status'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

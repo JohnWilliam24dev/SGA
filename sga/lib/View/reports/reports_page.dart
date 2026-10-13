@@ -20,28 +20,34 @@ class ReportsPage extends StatelessWidget {
           fill: true,
           scrollable: true,
           children: [
-            StatGrid(
-              items: [
-                Stat(
-                  label: 'Pedidos no mês',
-                  value: orders.length.toString(),
-                  icon: Icons.receipt_long_outlined,
-                ),
-                const Stat(
-                  label: 'Prazo médio',
-                  value: '6 dias',
-                  icon: Icons.schedule_outlined,
-                ),
-                Stat(
-                  label: 'Taxa de conclusão',
-                  value: formatPercent(completed, total: orders.length),
-                  icon: Icons.trending_up_rounded,
-                ),
-                const Stat(
-                  label: 'Clientes recorrentes',
-                  value: '12',
-                  icon: Icons.people_outline_rounded,
-                ),
+            // Altura natural (Wrap): o StatGrid do Easy UI tem proporção fixa e
+            // estoura quando o rótulo quebra em linhas numa tela estreita.
+            Div(
+              direction: LayoutDirection.wrap,
+              children: [
+                for (final stat in [
+                  Stat(
+                    label: 'Pedidos no mês',
+                    value: orders.length.toString(),
+                    icon: Icons.receipt_long_outlined,
+                  ),
+                  const Stat(
+                    label: 'Prazo médio',
+                    value: '6 dias',
+                    icon: Icons.schedule_outlined,
+                  ),
+                  Stat(
+                    label: 'Taxa de conclusão',
+                    value: formatPercent(completed, total: orders.length),
+                    icon: Icons.trending_up_rounded,
+                  ),
+                  const Stat(
+                    label: 'Clientes recorrentes',
+                    value: '12',
+                    icon: Icons.people_outline_rounded,
+                  ),
+                ])
+                  LayoutItem(size: 168.px, child: Card(child: stat)),
               ],
             ),
             Responsive(

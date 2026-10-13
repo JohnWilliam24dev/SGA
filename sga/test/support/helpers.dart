@@ -15,6 +15,14 @@ void useTallViewport(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
+/// Viewport de celular (largura abaixo do breakpoint de desktop) e alta o
+/// bastante para os formulários caberem sem rolar.
+void useMobileViewport(WidgetTester tester) {
+  tester.view.physicalSize = const Size(400, 1400);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+}
+
 Future<void> preencherCadastro(
   WidgetTester tester, {
   String nome = 'Maria Silva',

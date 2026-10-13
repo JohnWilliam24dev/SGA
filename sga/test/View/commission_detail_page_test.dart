@@ -5,13 +5,17 @@ import 'package:sga/View/commissions/commission_detail_page.dart';
 
 import '../support/helpers.dart';
 
+/// Falha ao carregar o detalhe enquanto [falhar] for verdadeiro. A falha é
+/// assíncrona, como seria numa chamada de rede de verdade.
 class _RepositorioQueFalhaNoDetalhe extends FakeCommissionRepository {
   _RepositorioQueFalhaNoDetalhe() : super(latencia: Duration.zero);
 
   bool falhar = true;
+  int chamadas = 0;
 
   @override
-  Future<CommissionDetalhadaModel> carregarDetalhe(String commissionId) {
+  Future<CommissionDetalhadaModel> carregarDetalhe(String commissionId) async {
+    chamadas++;
     if (falhar) throw Exception('sem conexão');
     return super.carregarDetalhe(commissionId);
   }
@@ -37,51 +41,61 @@ Widget _pagina(
   );
 }
 
+/// Avanço de tempo fixo (em vez de pumpAndSettle): se algo na tela ficar
+/// animando para sempre, o teste falha nas expectativas em vez de travar.
+Future<void> _aguardar(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 300));
+}
+
 void main() {
-  testWidgets('mostra o cabeçalho na hora e os dados completos ao carregar', (tester) async {
+  testWidgets('mostra o cabeçalho na hora e os dados completos ao carregar', (
+    tester,
+  ) async {
     useTallViewport(tester);
     final repo = FakeCommissionRepository(latencia: const Duration(milliseconds: 50));
     final resumo = await _resumo(FakeCommissionRepository(latencia: Duration.zero), 'c1');
 
     await tester.pumpWidget(_pagina(repo, resumo));
+    expect(find.text('Detalhes da Commission'), findsOneWidget);
     expect(find.text('Marina Costa'), findsOneWidget);
-    expect(find.text('Ilustração · Orçamento'), findsOneWidget);
+    expect(find.text('Orçamento'), findsOneWidget);
+    expect(find.text('R\$ 280,00'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    await tester.pumpAndSettle();
+    await _aguardar(tester);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.text('R\$ 280,00'), findsOneWidget);
-    expect(find.text('Ainda não fechado'), findsOneWidget);
-    expect(find.textContaining('Ilustração full body'), findsOneWidget);
-    expect(find.text('1x Fundo simples'), findsOneWidget);
-    expect(find.text('R\$ 40,00 cada · subtotal R\$ 40,00'), findsOneWidget);
-    expect(find.text('@marinacosta'), findsOneWidget);
+    expect(find.text('Marina Costa'), findsNWidgets(2)); // cabeçalho + campo Nome
     expect(find.text('marina.costa@exemplo.com'), findsOneWidget);
-    expect(find.text('tok-c1'), findsOneWidget);
+    expect(find.text('@marinacosta'), findsOneWidget);
+    expect(find.text('Ilustração'), findsOneWidget);
+    expect(find.text('Fundo simples'), findsOneWidget);
+    expect(find.textContaining('Ilustração full body'), findsOneWidget);
   });
 
-  testWidgets('orçamento fechado e sem adicionais', (tester) async {
+  testWidgets('orçamento fechado vale no cabeçalho e sem adicionais não lista', (
+    tester,
+  ) async {
     useTallViewport(tester);
     final repo = FakeCommissionRepository(latencia: Duration.zero);
     final resumo = await _resumo(repo, 'c6');
 
     await tester.pumpWidget(_pagina(repo, resumo));
-    await tester.pumpAndSettle();
+    await _aguardar(tester);
 
-    expect(find.text('Ainda não fechado'), findsNothing);
-    expect(find.text('R\$ 360,00'), findsNWidgets(2));
-    expect(find.text('Nenhum adicional neste pedido.'), findsOneWidget);
+    expect(find.text('R\$ 360,00'), findsOneWidget);
+    expect(find.text('Adicionais'), findsNothing);
   });
 
-  testWidgets('sem e-mail, o campo nem aparece', (tester) async {
+  testWidgets('sem e-mail, mostra "Não informado"', (tester) async {
     useTallViewport(tester);
     final repo = FakeCommissionRepository(latencia: Duration.zero);
     final resumo = await _resumo(repo, 'c9');
 
     await tester.pumpWidget(_pagina(repo, resumo));
-    await tester.pumpAndSettle();
+    await _aguardar(tester);
 
-    expect(find.text('E-mail'), findsNothing);
+    expect(find.text('Não informado'), findsOneWidget);
     expect(find.text('(71) 96666-0009'), findsOneWidget);
   });
 
@@ -91,26 +105,28 @@ void main() {
     final resumo = await _resumo(repo, 'c1');
 
     await tester.pumpWidget(_pagina(repo, resumo));
-    await tester.pumpAndSettle();
-    expect(find.text('Não foi possível carregar os detalhes'), findsOneWidget);
+    await _aguardar(tester);
+    expect(find.text('Não foi possível carregar'), findsOneWidget);
+    expect(repo.chamadas, 1);
 
     repo.falhar = false;
     await tester.tap(find.text('Tentar de novo'));
-    await tester.pumpAndSettle();
+    await _aguardar(tester);
 
-    expect(find.text('Não foi possível carregar os detalhes'), findsNothing);
+    expect(repo.chamadas, 2);
+    expect(find.text('Não foi possível carregar'), findsNothing);
     expect(find.text('@marinacosta'), findsOneWidget);
   });
 
-  testWidgets('Voltar avisa a tela que chamou', (tester) async {
+  testWidgets('a seta de voltar avisa a tela que chamou', (tester) async {
     useTallViewport(tester);
     var voltou = false;
     final repo = FakeCommissionRepository(latencia: Duration.zero);
     final resumo = await _resumo(repo, 'c1');
 
     await tester.pumpWidget(_pagina(repo, resumo, onBack: () => voltou = true));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Voltar'));
+    await _aguardar(tester);
+    await tester.tap(find.byIcon(Icons.arrow_back));
 
     expect(voltou, isTrue);
   });

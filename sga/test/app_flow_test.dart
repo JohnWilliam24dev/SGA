@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart' show ElevatedButton, TextField;
+import 'package:easy_ui/easy_ui.dart' show Avatar;
+import 'package:flutter/material.dart'
+    show CircularProgressIndicator, ElevatedButton, Icons, TextField;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Core/core.dart';
 import 'package:sga/View/auth/login_page.dart';
@@ -59,6 +61,9 @@ void main() {
     expect(find.byType(LoginPage), findsNothing);
     expect(find.text('Fila'), findsOneWidget);
 
+    // O "Sair" mora no menu do avatar, no cabeçalho do AppShell.
+    await tester.tap(find.byType(Avatar).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Sair'));
     await tester.pumpAndSettle();
     expect(find.byType(WelcomePage), findsOneWidget);
@@ -80,13 +85,18 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Marina Costa'));
-      await tester.pumpAndSettle();
+      // Tempo fixo (latência do fake = 400 ms): se o detalhe ficar animando
+      // para sempre, as expectativas abaixo falham em vez de travar.
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(CommissionDetailPage), findsOneWidget);
-      expect(find.text('Ainda não fechado'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('@marinacosta'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Fechar detalhes'));
-      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
       expect(find.byType(CommissionDetailPage), findsNothing);
       expect(find.byType(CommissionsPage), findsOneWidget);
     },

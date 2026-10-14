@@ -8,6 +8,9 @@ import 'glass_destination.dart';
 import 'glass_mobile_header.dart';
 import 'glass_sidebar.dart';
 
+/// Largura abaixo da qual o shell vira celular (cabeçalho com menu em gaveta).
+const double glassCompactWidth = 760;
+
 /// Moldura compartilhada das telas internas. Mantém a navegação e o conteúdo
 /// separados para que cada área possa continuar recebendo seu próprio
 /// repositório quando a API substituir os mocks.
@@ -57,7 +60,7 @@ class _GlassAppShellState extends State<GlassAppShell> {
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final compact = constraints.maxWidth < 760;
+                final compact = constraints.maxWidth < glassCompactWidth;
                 if (compact) {
                   return Column(
                     children: [
@@ -68,7 +71,14 @@ class _GlassAppShellState extends State<GlassAppShell> {
                         onOpenSettings: widget.onOpenSettings,
                         onOpenSupport: widget.onOpenSupport,
                       ),
-                      Expanded(child: widget.body),
+                      // Margem lateral também no celular (no desktop vem do
+                      // Padding do corpo).
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
+                          child: widget.body,
+                        ),
+                      ),
                     ],
                   );
                 }

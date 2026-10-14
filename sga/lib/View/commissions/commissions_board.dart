@@ -30,6 +30,8 @@ class CommissionsBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // No celular o painel já tem margem do shell: sem folga lateral dentro dele.
+    final compact = MediaQuery.sizeOf(context).width < glassCompactWidth;
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
@@ -48,7 +50,9 @@ class CommissionsBoard extends StatelessWidget {
           ),
           Expanded(
             child: GlassPanel(
-              padding: const EdgeInsets.all(12),
+              padding: compact
+                  ? const EdgeInsets.symmetric(vertical: 10)
+                  : const EdgeInsets.all(12),
               child: StylePackScope(
                 pack: sgaBoardPack,
                 child: KanbanBoard<CommissionResumoModel>(

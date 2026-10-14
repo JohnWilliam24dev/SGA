@@ -49,4 +49,44 @@ void main() {
     }
     expect(find.text('Marina Costa'), findsOneWidget);
   });
+
+  testWidgets('cada coluna tem pontinhos, alça de arrastar e selo de contagem', (
+    tester,
+  ) async {
+    viewport(tester);
+    await tester.pumpWidget(
+      _pagina(FakeCommissionRepository(latencia: Duration.zero)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.more_vert), findsNWidgets(4));
+    expect(find.byIcon(Icons.drag_indicator), findsNWidgets(4));
+    expect(find.text('0'), findsOneWidget); // coluna Cancelado, vazia
+  });
+
+  testWidgets('o card arrastado fica inclinado, como no Trello', (
+    tester,
+  ) async {
+    viewport(tester);
+    await tester.pumpWidget(
+      _pagina(FakeCommissionRepository(latencia: Duration.zero)),
+    );
+    await tester.pumpAndSettle();
+
+    bool inclinado(Widget w) =>
+        w is Transform && w.transform.storage[1].abs() > 0.01;
+    expect(find.byWidgetPredicate(inclinado), findsNothing);
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Marina Costa')),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    await gesture.moveBy(const Offset(0, 40));
+    await tester.pump();
+    expect(find.byWidgetPredicate(inclinado), findsOneWidget);
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(find.byWidgetPredicate(inclinado), findsNothing);
+  });
 }

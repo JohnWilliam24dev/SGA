@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart' hide NavDestination;
+import 'column_header.dart';
 import 'commission_card.dart';
 import 'kanban_style.dart';
 
@@ -66,8 +67,17 @@ class CommissionsBoard extends StatelessWidget {
                   onMove: onMove,
                   onItemTap: onItemTap,
                   onColumnMove: onColumnMove,
-                  columnActionsBuilder: (context, column, indice) =>
-                      menuDaColuna(colunas[indice], indice, colunas.length),
+                  columnHeaderBuilder: (context, column, indice, handle) =>
+                      ColumnHeader(
+                        title: column.title,
+                        count: column.items.length,
+                        menu: menuDaColuna(
+                          colunas[indice],
+                          indice,
+                          colunas.length,
+                        ),
+                        handle: handle,
+                      ),
                   emptyLabel: 'Nenhum pedido aqui',
                 ),
               ),

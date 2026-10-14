@@ -16,7 +16,8 @@ final StylePack sgaKanbanPack = StylePack.define(
 );
 
 /// Pack do quadro: colunas em azul cheio (sem moldura branca), título de
-/// coluna em ~15px e a contagem em texto de apoio.
+/// coluna em ~15px e o card inclinado (~2°) enquanto é arrastado, como no
+/// Trello.
 final StylePack sgaBoardPack = StylePack.define(
   name: 'sga_board',
   card: const CardStyleSpec(
@@ -24,7 +25,11 @@ final StylePack sgaBoardPack = StylePack.define(
     elevation: ElevationLevel.none,
     paddingSteps: 0,
   ),
-  kanban: const KanbanStyleSpec(radius: 14, columnBackgroundOpacity: 1),
+  kanban: const KanbanStyleSpec(
+    radius: 14,
+    columnBackgroundOpacity: 1,
+    dragTilt: 0.035,
+  ),
   label: const LabelStyleSpec(
     headingScale: 1.1,
     subtitleScale: 1.05,

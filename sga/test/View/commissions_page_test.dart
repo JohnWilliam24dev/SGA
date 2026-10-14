@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:easy_ui/easy_ui.dart' show Tela, Loader;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -73,8 +75,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    bool inclinado(Widget w) =>
-        w is Transform && w.transform.storage[1].abs() > 0.01;
+    // Só o ângulo exato (dragTilt do pack) identifica o card inclinado: o
+    // Flutter usa Transforms rotacionados em outros lugares.
+    bool inclinado(Widget w) {
+      if (w is! Transform) return false;
+      final m = w.transform.storage;
+      return (math.atan2(m[1], m[0]) - 0.035).abs() < 1e-6;
+    }
+
     expect(find.byWidgetPredicate(inclinado), findsNothing);
 
     final gesture = await tester.startGesture(

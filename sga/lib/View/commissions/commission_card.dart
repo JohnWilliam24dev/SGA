@@ -3,23 +3,7 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart';
-
-/// Pack do quadro de pedidos: card com padding enxuto e uma tipografia
-/// um pouco menor que a do resto do app (nome e título de coluna em ~15px,
-/// textos de apoio em ~13px), para caber tudo na altura padrão do card.
-///
-/// O card o aplica a si mesmo (assim o card "na mão" durante o arrasto, que
-/// é desenhado fora da página, fica igual) e a página o aplica ao quadro
-/// (para os títulos das colunas).
-final StylePack sgaKanbanPack = StylePack.define(
-  name: 'sga_kanban',
-  card: const CardStyleSpec(
-    radius: 10,
-    elevation: ElevationLevel.subtle,
-    paddingSteps: 1,
-  ),
-  label: const LabelStyleSpec(subtitleScale: 1.05, captionScale: 0.93),
-);
+import 'kanban_style.dart';
 
 /// Valor que o card destaca: o orçamento final, quando já foi fechado, ou o
 /// valor simulado (marcado como tal).

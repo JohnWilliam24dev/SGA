@@ -1,4 +1,3 @@
-import 'package:easy_ui/easy_ui.dart' show Avatar;
 import 'package:flutter/material.dart'
     show CircularProgressIndicator, ElevatedButton, Icons, TextField;
 import 'package:flutter_test/flutter_test.dart';
@@ -61,9 +60,6 @@ void main() {
     expect(find.byType(LoginPage), findsNothing);
     expect(find.text('Fila'), findsOneWidget);
 
-    // O "Sair" mora no menu do avatar, no cabeçalho do AppShell.
-    await tester.tap(find.byType(Avatar).first);
-    await tester.pumpAndSettle();
     await tester.tap(find.text('Sair'));
     await tester.pumpAndSettle();
     expect(find.byType(WelcomePage), findsOneWidget);

@@ -65,7 +65,7 @@ mixin ColumnActions<T extends StatefulWidget> on State<T> {
     );
   }
 
-  Future<void> moverColuna(KanbanColumnMove movimento) =>
+  Future<void> aoMoverColuna(KanbanColumnMove movimento) =>
       _resolver(controller.reordenarColuna(movimento));
 
   /// Menu dos três pontinhos da coluna [indice] (de [total] colunas).
@@ -81,8 +81,8 @@ mixin ColumnActions<T extends StatefulWidget> on State<T> {
       canMoveRight: indice < total - 1,
       onRename: () => _renomear(coluna),
       onChangeType: () => _alterarTipo(coluna),
-      onMoveLeft: () => moverColuna(passo(-1)),
-      onMoveRight: () => moverColuna(passo(1)),
+      onMoveLeft: () => aoMoverColuna(passo(-1)),
+      onMoveRight: () => aoMoverColuna(passo(1)),
       onDelete: () => _excluir(coluna),
     );
   }

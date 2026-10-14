@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BlueBackdrop extends StatelessWidget {
-  const BlueBackdrop();
+  const BlueBackdrop({super.key});
   @override
   Widget build(BuildContext context) => CustomPaint(
     painter: _BlueBackdropPainter(

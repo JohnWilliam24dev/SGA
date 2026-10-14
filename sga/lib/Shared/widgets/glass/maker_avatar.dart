@@ -4,7 +4,7 @@ import '../../../Domain/maker.dart';
 import '../../../Core/theme/sga_theme.dart';
 
 class MakerAvatar extends StatelessWidget {
-  const MakerAvatar({required this.maker, required this.size});
+  const MakerAvatar({super.key, required this.maker, required this.size});
   final Maker maker;
   final double size;
 

@@ -8,6 +8,7 @@ import 'maker_menu_action.dart';
 
 class GlassDesktopHeader extends StatelessWidget {
   const GlassDesktopHeader({
+    super.key,
     required this.title,
     required this.subtitle,
     required this.maker,

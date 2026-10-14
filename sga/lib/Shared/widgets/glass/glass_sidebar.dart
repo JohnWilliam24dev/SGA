@@ -7,6 +7,7 @@ import 'glass_side_item.dart';
 
 class GlassSidebar extends StatelessWidget {
   const GlassSidebar({
+    super.key,
     required this.destinations,
     required this.selectedId,
     required this.onSelect,

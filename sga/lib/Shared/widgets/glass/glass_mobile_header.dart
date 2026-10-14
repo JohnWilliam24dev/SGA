@@ -7,6 +7,7 @@ import 'maker_menu_action.dart';
 
 class GlassMobileHeader extends StatelessWidget {
   const GlassMobileHeader({
+    super.key,
     required this.title,
     required this.maker,
     required this.onOpenProfile,

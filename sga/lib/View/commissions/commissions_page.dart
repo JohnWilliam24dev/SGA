@@ -84,7 +84,7 @@ class _CommissionsPageState extends State<CommissionsPage>
           onNovaColuna: novaColuna,
           onMove: _mover,
           onItemTap: _abrir,
-          onColumnMove: moverColuna,
+          onColumnMove: aoMoverColuna,
           menuDaColuna: menuDaColuna,
         );
       },

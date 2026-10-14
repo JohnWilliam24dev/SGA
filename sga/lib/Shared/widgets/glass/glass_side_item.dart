@@ -5,6 +5,7 @@ import 'glass_destination.dart';
 
 class GlassSideItem extends StatelessWidget {
   const GlassSideItem({
+    super.key,
     required this.item,
     required this.selected,
     required this.onTap,

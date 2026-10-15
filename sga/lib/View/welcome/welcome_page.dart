@@ -63,11 +63,7 @@ class WelcomePage extends StatelessWidget {
                   expanded: true,
                   onPressed: onRegister,
                 ),
-                Button(
-                  text: 'Login',
-                  variant: ButtonVariant.link,
-                  onPressed: onLogin,
-                ),
+                Button(text: 'Login', expanded: true, onPressed: onLogin),
               ],
             ),
           ),

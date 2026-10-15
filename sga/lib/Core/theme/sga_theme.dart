@@ -95,7 +95,10 @@ const AppTheme sgaTheme = AppTheme(
 /// "Pele" do SGA: cantos suaves, botões altos e bastante respiro.
 final StylePack sgaPack = StylePack.define(
   name: 'sga',
-  inputText: const InputStyleSpec.rounded(radius: 11),
+  inputText: const InputStyleSpec.rounded(
+    radius: 11,
+    borderColor: Color(0xFFB4CCE8),
+  ),
   button: const ButtonStyleSpec(
     radius: 11,
     minHeight: 46,

@@ -1,5 +1,5 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/widgets.dart' show Size, Widget;
+import 'package:flutter/widgets.dart' show CustomPaint, Size, Widget;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Domain/domain.dart';
 import 'package:sga/View/reports/reports_page.dart';

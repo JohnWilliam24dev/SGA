@@ -22,15 +22,18 @@ lib/
     models/              modelos da API (fromJson/toJson): Status, TipoProduto,
                          Adicional, Produto, CommissionAdicional,
                          CommissionResumo e CommissionDetalhada
-  Shared/                widgets reutilizáveis (KanbanBoard, AdaptiveDrawerScaffold,
-                         GlassAppShell, SidebarToggleIcon, SgaLogo, PulseLine,
-                         FadeIn, AuthShell) e formatadores (moeda e data)
+  Shared/                widgets reutilizáveis (AdaptiveDrawerScaffold,
+                         GlassAppShell e peças em glass/, SidebarToggleIcon,
+                         SgaLogo, PulseLine, FadeIn, AuthShell) e formatadores
+                         (moeda e data)
   View/                  telas
     welcome/             tela inicial (Cadastre-se / Login)
     auth/                login e cadastro
     main/                área autenticada (navegação lateral responsiva)
-    commissions/         quadro kanban e detalhe da commission
-    dashboard/           Financeiro, Relatório de pedidos e Produtos
+    commissions/         quadro kanban (colunas, cards, estilo) e detalhe da
+                         commission
+    reports/             relatório de pedidos
+    products/            produtos (portfólio)
     catalog/             tipos de produtos e adicionais
     profile/             perfil do artista
     settings/            configurações
@@ -66,9 +69,10 @@ test/                    espelha a estrutura de lib/
   valor unitário e subtotal), contato, e-mail (quando houver), código de
   acompanhamento e data de criação.
 - **Seções da área autenticada** (menu lateral): *Pedidos* (o kanban de
-  commissions), *Financeiro*, *Relatório de pedidos*, *Produtos* e *Tipos de
-  produtos* (catálogo de tipos e adicionais, editável em memória). *Perfil*,
-  *Configurações* e *Suporte* ficam à parte das cinco principais. Todas leem
+  commissions), *Relatório de pedidos*, *Produtos* e *Tipos de produtos*
+  (catálogo de tipos e adicionais, editável em memória). *Perfil*,
+  *Configurações* e *Suporte* ficam à parte das quatro principais. Não há
+  tela de Financeiro: foi cortada de propósito, até existir backend para ela. Todas leem
   os dados por repositório (nunca direto dos mocks), então a troca pela API
   não mexe nas telas.
 - **Colunas do quadro** (no próprio quadro de Pedidos): cada coluna tem, no

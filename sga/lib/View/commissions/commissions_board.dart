@@ -1,6 +1,7 @@
 import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
+import '../../Core/theme/sga_theme.dart';
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart' hide NavDestination;
 import 'column_header.dart';
@@ -54,7 +55,7 @@ class CommissionsBoard extends StatelessWidget {
                   ? const EdgeInsets.symmetric(vertical: 10)
                   : const EdgeInsets.all(12),
               child: StylePackScope(
-                pack: sgaBoardPack,
+                pack: sgaBoardPackFor(dark: SgaColors.of(context).dark),
                 child: KanbanBoard<CommissionResumoModel>(
                   cardHeight: 104,
                   columns: [

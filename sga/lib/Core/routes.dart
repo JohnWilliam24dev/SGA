@@ -121,21 +121,18 @@ void _openCommissionDetail(
 
   showDialog<void>(
     context: context,
-    barrierDismissible: true,
     builder: (dialogContext) => Dialog(
       backgroundColor: const Color(0x00000000),
       insetPadding: const EdgeInsets.all(24),
-      // A Tela do Easy UI ocupa todo o espaço que recebe; limitamos o tamanho
-      // para o detalhe aparecer como um cartão, e não em tela cheia.
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
-          child: buildCommissionDetailScreen(
-            commission: commission,
-            statusNome: statusNome,
-            onBack: () => Navigator.of(dialogContext).pop(),
-          ),
+      // A nota de vidro tem o tamanho do conteúdo, até este limite; passando
+      // dele, o corpo rola dentro da própria nota.
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 760, maxHeight: 720),
+        child: buildCommissionDetailScreen(
+          commission: commission,
+          statusNome: statusNome,
+          compact: true,
+          onBack: () => Navigator.of(dialogContext).pop(),
         ),
       ),
     ),
@@ -145,6 +142,7 @@ void _openCommissionDetail(
 Widget buildCommissionDetailScreen({
   required CommissionResumoModel commission,
   required String statusNome,
+  bool compact = false,
   VoidCallback? onBack,
 }) {
   return Builder(
@@ -152,6 +150,7 @@ Widget buildCommissionDetailScreen({
       repository: _commissionRepository,
       commission: commission,
       statusNome: statusNome,
+      compact: compact,
       onBack: onBack ?? () => Navigator.of(context).pop(),
     ),
   );

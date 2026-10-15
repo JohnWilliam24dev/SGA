@@ -12,7 +12,7 @@ dependencies:
   easy_ui:
     git:
       url: https://github.com/JohnWilliam24dev/Easy_UI_Framework.git
-      ref: cf804bb8a97605e899ba84ef77a488d39093dea1
+      ref: 29cab95a8e54707e21d1a9616daa5b944fe86434
   image_picker: ^1.1.2
 
 dev_dependencies:

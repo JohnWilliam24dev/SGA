@@ -1,12 +1,18 @@
 import 'package:easy_ui/easy_ui.dart';
+import 'package:flutter/material.dart'
+    show IconButton, Icons, OutlinedButton, Tooltip;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
+import '../../Shared/widgets/glass/glass_panel.dart';
+import 'detail_header.dart';
+import 'detail_sections.dart';
 
 /// Detalhe de uma commission, aberto ao tocar no card do quadro.
 ///
-/// O cabeçalho vem do resumo (já na mão) e o restante é carregado pelo
-/// [AsyncView], que refaz a chamada em "Tentar de novo".
+/// No desktop ([compact]) é uma nota de vidro sobre o quadro; no celular, uma
+/// página própria que rola. O cabeçalho vem do resumo (já na mão) e o resto é
+/// carregado pelo [AsyncView], que refaz a chamada em "Tentar de novo".
 class CommissionDetailPage extends StatelessWidget {
   const CommissionDetailPage({
     super.key,
@@ -14,125 +20,101 @@ class CommissionDetailPage extends StatelessWidget {
     required this.commission,
     required this.statusNome,
     required this.onBack,
+    this.compact = false,
   });
 
   final CommissionRepository repository;
   final CommissionResumoModel commission;
   final String statusNome;
   final VoidCallback onBack;
+  final bool compact;
+
+  Widget get _cabecalho =>
+      DetailHeader(commission: commission, statusNome: statusNome);
+
+  Widget get _corpo => AsyncView<CommissionDetalhadaModel>(
+    load: () => repository.carregarDetalhe(commission.id),
+    loading: const SizedBox(
+      height: 260,
+      child: Center(child: Loader(message: 'Carregando detalhes...')),
+    ),
+    builder: (context, detalhe) =>
+        DetailBody(detalhe: detalhe, compact: compact),
+  );
 
   @override
-  Widget build(BuildContext context) {
-    return Tela(
-      title: 'Detalhes da Commission',
-      onBack: onBack,
-      scrollable: true,
-      background: const Backdrop.bubbles(child: SizedBox.shrink()),
-      child: Div(
-        maxWidth: 720.px,
-        align: Alignment.topCenter,
+  Widget build(BuildContext context) => compact ? _nota() : _pagina();
+
+  Widget _nota() {
+    return GlassPanel(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _cabecalho(),
-          AsyncView(
-            load: () => repository.carregarDetalhe(commission.id),
-            builder: (context, detalhe) => Div(
-              width: 100.pct,
-              children: [
-                _secaoCliente(detalhe),
-                _secaoPedido(detalhe),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _cabecalho() {
-    return Card(
-      variant: CardVariant.glass,
-      child: Div(
-        direction: LayoutDirection.horizontal,
-        align: Alignment.centerLeft,
-        children: [
-          Avatar(initials: commission.nomeCliente[0], diameter: 56),
-          LayoutItem(
-            size: 1.fr,
-            child: Div(
-              gap: 4.px,
-              children: [
-                Label(type: LabelType.title, text: commission.nomeCliente),
-                // Wrap: em tela estreita o "Criado em" desce para a linha de baixo
-                // em vez de estourar a linha.
-                Div(
-                  direction: LayoutDirection.wrap,
-                  gap: 8.px,
-                  children: [
-                    Badge(text: statusNome, variant: BadgeVariant.soft),
-                    Label(
-                      type: LabelType.caption,
-                      text: 'Criado em ${formatDate(commission.criadoEm)}',
-                    ),
-                  ],
+          Row(
+            children: [
+              Expanded(child: _cabecalho),
+              Tooltip(
+                message: 'Fechar detalhes',
+                child: IconButton(
+                  onPressed: onBack,
+                  icon: const Icon(Icons.close_rounded),
                 ),
-                // O valor fica na coluna do nome (e não solto no fim da linha),
-                // para não espremer o nome em telas estreitas.
-                Label(
-                  type: LabelType.heading,
-                  text: formatMoney(
-                    commission.orcamentoFinal ?? commission.precoSimulado,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _secaoCliente(CommissionDetalhadaModel detalhe) {
-    return Section(
-      title: 'Cliente',
-      child: Card(
-        child: Div(
-          children: [
-            DataField(label: 'Nome', value: detalhe.nomeCliente),
-            DataField(label: 'E-mail', value: detalhe.email ?? 'Não informado'),
-            DataField(label: 'Rede Social', value: detalhe.contato),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _secaoPedido(CommissionDetalhadaModel detalhe) {
-    return Section(
-      title: 'Pedido',
-      child: Card(
-        child: Div(
-          children: [
-            DataField(label: 'Tipo', value: detalhe.tipoProdutoNome),
-            if (detalhe.adicionais.isNotEmpty)
-              DataField(
-                label: 'Adicionais',
-                value: detalhe.adicionais.map((a) => a.nome).join(', '),
-              ),
-            const Divider(),
-            const Label(text: 'Descrição do pedido', type: LabelType.caption),
-            Label(text: detalhe.descricao),
-            if (detalhe.imagemRefUrl.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Label(text: 'Referências', type: LabelType.caption),
-              Grid.fit(
-                minCellWidth: 140,
-                children: [
-                  Picture(url: detalhe.imagemRefUrl),
-                ],
               ),
             ],
-          ],
+          ),
+          const SizedBox(height: 12),
+          Flexible(child: SingleChildScrollView(child: _corpo)),
+        ],
+      ),
+    );
+  }
+
+  Widget _pagina() {
+    return Tela(
+      padding: 0.px,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF159AFF), Color(0xFF74C8FF)],
+          ),
         ),
+        child: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(alignment: Alignment.centerLeft, child: _voltar()),
+                    const SizedBox(height: 16),
+                    _cabecalho,
+                    const SizedBox(height: 16),
+                    _corpo,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _voltar() {
+    return OutlinedButton.icon(
+      onPressed: onBack,
+      icon: const Icon(Icons.arrow_back_rounded, size: 18),
+      label: const Text('Voltar'),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF063C68),
+        side: const BorderSide(color: Color(0xFF0B79D0)),
+        backgroundColor: const Color(0xD9FFFFFF),
       ),
     );
   }

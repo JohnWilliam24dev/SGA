@@ -37,6 +37,7 @@ Widget _pagina(
   CommissionRepository repo,
   CommissionResumoModel resumo, {
   VoidCallback? onBack,
+  bool compact = false,
 }) {
   return sgaHome(
     CommissionDetailPage(
@@ -44,6 +45,7 @@ Widget _pagina(
       commission: resumo,
       statusNome: 'Orçamento',
       onBack: onBack ?? () {},
+      compact: compact,
     ),
   );
 }
@@ -68,23 +70,21 @@ void main() {
     );
 
     await tester.pumpWidget(_pagina(repo, resumo));
-    expect(find.text('Detalhes da Commission'), findsOneWidget);
     expect(find.text('Marina Costa'), findsOneWidget);
-    expect(find.text('Orçamento'), findsOneWidget);
-    expect(find.text('R\$ 280,00'), findsOneWidget);
+    expect(find.text('Ilustração · Orçamento'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     await _aguardar(tester);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.text('Marina Costa'), findsNWidgets(2)); // cabeçalho + campo Nome
+    expect(find.text('Orçamento'), findsOneWidget); // título da seção
+    expect(find.text('R\$ 280,00'), findsOneWidget);
     expect(find.text('marina.costa@exemplo.com'), findsOneWidget);
     expect(find.text('@marinacosta'), findsOneWidget);
-    expect(find.text('Ilustração'), findsOneWidget);
-    expect(find.text('Fundo simples'), findsOneWidget);
+    expect(find.textContaining('Fundo simples'), findsOneWidget);
     expect(find.textContaining('Ilustração full body'), findsOneWidget);
   });
 
-  testWidgets('orçamento fechado vale no cabeçalho e sem adicionais não lista', (
+  testWidgets('orçamento fechado aparece e sem adicionais avisa que não há', (
     tester,
   ) async {
     useTallViewport(tester);
@@ -94,8 +94,8 @@ void main() {
     await tester.pumpWidget(_pagina(repo, resumo));
     await _aguardar(tester);
 
-    expect(find.text('R\$ 360,00'), findsOneWidget);
-    expect(find.text('Adicionais'), findsNothing);
+    expect(find.text('R\$ 360,00'), findsWidgets);
+    expect(find.text('Nenhum adicional neste pedido.'), findsOneWidget);
   });
 
   testWidgets('sem e-mail, mostra "Não informado"', (tester) async {
@@ -129,7 +129,7 @@ void main() {
     expect(find.text('@marinacosta'), findsOneWidget);
   });
 
-  testWidgets('a seta de voltar avisa a tela que chamou', (tester) async {
+  testWidgets('o botão Voltar avisa a tela que chamou', (tester) async {
     useTallViewport(tester);
     var voltou = false;
     final repo = FakeCommissionRepository(latencia: Duration.zero);
@@ -137,8 +137,26 @@ void main() {
 
     await tester.pumpWidget(_pagina(repo, resumo, onBack: () => voltou = true));
     await _aguardar(tester);
-    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.tap(find.text('Voltar'));
 
     expect(voltou, isTrue);
+  });
+
+  testWidgets('na nota (desktop), o X fecha e avisa a tela que chamou', (
+    tester,
+  ) async {
+    useTallViewport(tester);
+    var fechou = false;
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(
+      _pagina(repo, resumo, onBack: () => fechou = true, compact: true),
+    );
+    await _aguardar(tester);
+    expect(find.text('@marinacosta'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close_rounded));
+
+    expect(fechou, isTrue);
   });
 }

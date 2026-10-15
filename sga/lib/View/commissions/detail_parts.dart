@@ -62,13 +62,21 @@ class ReferenceImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const aviso = SizedBox(
-      height: 56,
-      width: double.infinity,
-      child: Center(
-        child: Label(
-          type: LabelType.caption,
-          text: 'Imagem de referência indisponível',
+    // O aviso tem a mesma altura da imagem: se a imagem falhar depois de
+    // carregar, a nota não encolhe.
+    final aviso = DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0x14336E99),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: const Center(
+          child: Label(
+            type: LabelType.caption,
+            text: 'Imagem de referência indisponível',
+          ),
         ),
       ),
     );

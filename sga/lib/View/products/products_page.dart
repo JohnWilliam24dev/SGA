@@ -1,11 +1,17 @@
 import 'dart:typed_data';
 
-import 'package:easy_ui/easy_ui.dart';
+import 'package:easy_ui/easy_ui.dart' hide Icon;
 import 'package:flutter/widgets.dart' hide Icon;
 import 'package:image_picker/image_picker.dart';
 
 import '../../Domain/domain.dart';
+import 'product_catalog.dart';
+import 'product_form.dart';
+import 'products_mobile.dart';
+import 'products_mobile_section.dart';
 
+/// Produtos do portfólio: formulário para adicionar e a grade dos já
+/// cadastrados. No celular, um menu leva a cada uma das duas partes.
 class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});
 
@@ -37,15 +43,13 @@ class _ProductsPageState extends State<ProductsPage> {
   ];
 
   final _previews = <String, Uint8List>{};
-
-  // Trocar essa chave recria o formulário e limpa todos os campos (inclusive
-  // a imagem) depois de salvar um produto.
+  ProductsMobileView _view = ProductsMobileView.menu;
+  // Trocar a chave recria o formulário e limpa os campos (e a imagem).
   int _formVersion = 0;
 
   Future<Uint8List?> _pickImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image == null) return null;
-    return image.readAsBytes();
+    return image?.readAsBytes();
   }
 
   void _save(FormValues values) {
@@ -73,117 +77,74 @@ class _ProductsPageState extends State<ProductsPage> {
       );
       _previews[id] = imagem;
       _formVersion++;
+      _view = ProductsMobileView.catalog;
     });
     Toast.show(context, text: 'Produto adicionado.', type: ToastType.success);
   }
 
+  void _editar(ProdutoModel produto) =>
+      Toast.show(context, text: 'Edição de produto em breve.');
+
   @override
   Widget build(BuildContext context) {
-    return Div(
-      fill: true,
-      scrollable: true,
-      children: [
-        Responsive(
-          mobile: Div(
-            children: [
-              _buildForm(),
-              _buildCatalog(),
-            ],
-          ),
-          desktop: Div(
-            direction: LayoutDirection.horizontal,
-            children: [
-              LayoutItem(size: 4.fr, child: _buildForm()),
-              LayoutItem(size: 6.fr, child: _buildCatalog()),
-            ],
-          ),
-        ),
-      ],
+    final form = ProductForm(
+      key: ValueKey(_formVersion),
+      types: _types,
+      onPickImage: _pickImage,
+      onSave: _save,
     );
-  }
-
-  Widget _buildForm() {
-    return Card(
-      child: Div(
-        children: [
-          const Label(type: LabelType.title, text: 'Adicionar Produto'),
-          FormGroup(
-            key: ValueKey(_formVersion),
-            onSubmit: _save,
-            children: [
-              InputField(
-                name: 'nome',
-                hint: 'Nome do produto',
-                validation: [isRequired()],
-              ),
-              Select<String>.single(
-                name: 'tipo',
-                hint: 'Tipo',
-                options: [
-                  for (final t in _types) SelectOption(t.id, t.nome),
-                ],
-                onChanged: (_) {},
-                validation: [isRequired()],
-              ),
-              const InputField(
-                name: 'descricao',
-                hint: 'Descrição opcional',
-                minLines: 3,
-                maxLines: 3,
-              ),
-              ImageField(
-                name: 'imagem',
-                label: 'Imagem',
-                hint: 'Toque para selecionar imagem',
-                onPick: _pickImage,
-                validation: [isRequired(message: 'Selecione uma imagem')],
-              ),
-              const Button(text: 'Salvar Produto', expanded: true),
-            ],
-          ),
-        ],
-      ),
+    final catalog = ProductCatalog(
+      products: _products,
+      types: _types,
+      previews: _previews,
+      onEdit: _editar,
     );
-  }
 
-  Widget _buildCatalog() {
-    return Card(
-      child: Div(
-        children: [
-          const Label(type: LabelType.title, text: 'Meus Produtos'),
-          if (_products.isEmpty)
-            const EmptyState(title: 'Nenhum produto cadastrado.')
-          else
-            Grid.fit(
-              minCellWidth: 180,
-              children: [
-                for (final p in _products) _produtoCard(p),
-              ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final mobile =
+            Breakpoints.standard.sizeFor(width) == ScreenSize.mobile;
+        void ir(ProductsMobileView v) => setState(() => _view = v);
+
+        final Widget corpo;
+        if (mobile) {
+          corpo = switch (_view) {
+            ProductsMobileView.menu => ProductsMobileMenu(
+              onAddProduct: () => ir(ProductsMobileView.form),
+              onMyProducts: () => ir(ProductsMobileView.catalog),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _produtoCard(ProdutoModel p) {
-    final tipo = _types.firstWhere((t) => t.id == p.tipoProdutoId).nome;
-    final preview = _previews[p.id];
-    return Card(
-      paddingSteps: 1,
-      child: Div(
-        gap: 8.px,
-        children: [
-          SizedBox(
-            height: 120,
-            width: double.infinity,
-            child: preview != null
-                ? Picture(bytes: preview, radius: 8)
-                : const Center(child: Icon(Icons.inventory_2_outlined, size: 40)),
+            ProductsMobileView.form => ProductsMobileSection(
+              title: 'Adicionar produto',
+              onBack: () => ir(ProductsMobileView.menu),
+              child: form,
+            ),
+            ProductsMobileView.catalog => ProductsMobileSection(
+              title: 'Meus produtos',
+              onBack: () => ir(ProductsMobileView.menu),
+              child: catalog,
+            ),
+          };
+        } else if (width < 880) {
+          corpo = Column(children: [form, const SizedBox(height: 14), catalog]);
+        } else {
+          corpo = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 4, child: form),
+              const SizedBox(width: 14),
+              Expanded(flex: 6, child: catalog),
+            ],
+          );
+        }
+        return SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [corpo],
           ),
-          Label(text: p.nome),
-          Label(text: tipo, type: LabelType.caption),
-        ],
-      ),
+        );
+      },
     );
   }
 }

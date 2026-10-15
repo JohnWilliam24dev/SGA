@@ -4,6 +4,9 @@ import 'package:sga/View/catalog/catalog_page.dart';
 
 import '../support/helpers.dart';
 
+/// Com Scaffold, como no shell do app: é nele que o Toast aparece.
+Widget _pagina() => sgaHome(const Scaffold(body: CatalogPage()));
+
 Future<void> _avancar(WidgetTester tester) async {
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 500));
@@ -14,12 +17,13 @@ void main() {
     tester,
   ) async {
     useTallViewport(tester);
-    await tester.pumpWidget(sgaHome(const CatalogPage()));
+    await tester.pumpWidget(_pagina());
     await _avancar(tester);
 
     expect(find.text('Tipos de produtos'), findsWidgets);
     expect(find.text('Ilustração'), findsOneWidget);
-    expect(find.text('2 vinculados'), findsOneWidget);
+    // Ilustração e Modelo 3D têm 2 adicionais; Emote tem 1.
+    expect(find.text('2 vinculados'), findsNWidgets(2));
     expect(find.text('1 vinculado'), findsOneWidget);
     expect(find.text('Novo tipo'), findsOneWidget);
     expect(find.byType(Switch), findsNWidgets(3));
@@ -31,7 +35,7 @@ void main() {
     tester,
   ) async {
     useTallViewport(tester);
-    await tester.pumpWidget(sgaHome(const CatalogPage()));
+    await tester.pumpWidget(_pagina());
     await _avancar(tester);
 
     await tester.tap(find.text('Adicionais').first);
@@ -47,7 +51,7 @@ void main() {
     tester,
   ) async {
     useTallViewport(tester);
-    await tester.pumpWidget(sgaHome(const CatalogPage()));
+    await tester.pumpWidget(_pagina());
     await _avancar(tester);
 
     await tester.tap(find.text('Novo tipo'));
@@ -64,7 +68,7 @@ void main() {
 
   testWidgets('tipo já usado não é excluído e avisa o motivo', (tester) async {
     useTallViewport(tester);
-    await tester.pumpWidget(sgaHome(const CatalogPage()));
+    await tester.pumpWidget(_pagina());
     await _avancar(tester);
 
     await tester.tap(find.byTooltip('Excluir').last);

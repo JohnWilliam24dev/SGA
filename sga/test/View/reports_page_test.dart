@@ -27,8 +27,31 @@ void main() {
 
     expect(find.text('Pedidos no mês'), findsOneWidget);
     expect(find.text('Taxa de conclusão'), findsOneWidget);
-    expect(find.text('Pedidos por tipo'), findsOneWidget);
+    expect(find.text('Pedidos por tipo de arte'), findsOneWidget);
     expect(find.text('Pedidos por status'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('no desktop mostra rosca com legenda e barras por coluna', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _page(
+        ReportsPage(
+          repository: FakeCommissionRepository(latencia: Duration.zero),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CustomPaint), findsWidgets);
+    expect(find.textContaining('%'), findsWidgets);
+    expect(find.text('Fila'), findsOneWidget);
+    expect(find.text('Escolher período'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

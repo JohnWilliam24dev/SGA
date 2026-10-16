@@ -109,3 +109,7 @@ flutter run
 
 - `develop`: desenvolvimento e testes locais
 - `main`: versão revisada (recebe PR de `develop`)
+- `app-antigo`: referência visual do app antes da migração das telas para o
+  Easy UI novo
+- `backup/develop-pre-force`: cópia de segurança da `develop` antes do force
+  push

@@ -22,8 +22,8 @@ lib/
     models/              modelos da API (fromJson/toJson): Status, TipoProduto,
                          Adicional, Produto, CommissionAdicional,
                          CommissionResumo e CommissionDetalhada
-  Shared/                widgets reutilizáveis (AdaptiveDrawerScaffold,
-                         GlassAppShell e peças em glass/, SidebarToggleIcon,
+  Shared/                widgets reutilizáveis (GlassAppShell e
+                         peças em glass/, SidebarToggleIcon,
                          SgaLogo, PulseLine, FadeIn, AuthShell) e formatadores
                          (moeda e data)
   View/                  telas

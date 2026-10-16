@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
 import '../../Shared/shared.dart';
+import 'register_fields.dart';
+import 'terms_toggle.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({
@@ -70,39 +72,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   FormGroup(
                     width: 100.pct,
                     children: [
-                      InputField(
-                        name: 'nome',
-                        hint: 'Nome',
-                        validation: [
-                          isRequired(),
-                          minLength(3, message: 'Informe seu nome completo'),
-                        ],
+                      ...registerFields(),
+                      TermsToggle(
+                        accepted: _aceitouTermos,
+                        pending: _termosPendentes,
+                        onChanged: (aceitou) => setState(() {
+                          _aceitouTermos = aceitou;
+                          if (aceitou) _termosPendentes = false;
+                        }),
                       ),
-                      InputField(
-                        name: 'email',
-                        hint: 'E-mail',
-                        type: InputType.email,
-                        validation: [isRequired(), isEmail()],
-                      ),
-                      InputField(
-                        name: 'senha',
-                        hint: 'Senha',
-                        type: InputType.password,
-                        validation: [
-                          isRequired(),
-                          isPassword(min: 8, requireDigit: true),
-                        ],
-                      ),
-                      InputField(
-                        name: 'confirmar',
-                        hint: 'Confirmar senha',
-                        type: InputType.password,
-                        validation: [
-                          isRequired(),
-                          sameAs('senha', message: 'As senhas não conferem'),
-                        ],
-                      ),
-                      _termos(),
                       Button(
                         text: 'Criar conta',
                         expanded: true,
@@ -122,49 +100,15 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const Label(type: LabelType.caption, text: 'Já tem conta?'),
                 Button(
-              text: 'Entrar',
-              variant: ButtonVariant.link,
-              onPressed: widget.onGoToLogin,
-            ),
+                  text: 'Entrar',
+                  variant: ButtonVariant.link,
+                  onPressed: widget.onGoToLogin,
+                ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _termos() {
-    return Div(
-      gap: 0.px,
-      children: [
-        Div(
-          direction: LayoutDirection.horizontal,
-          align: Alignment.centerLeft,
-          gap: 4.px,
-          children: [
-            Toggle(
-              value: _aceitouTermos,
-              onChanged: (aceitou) => setState(() {
-                _aceitouTermos = aceitou;
-                if (aceitou) _termosPendentes = false;
-              }),
-            ),
-            LayoutItem(
-              size: 1.fr,
-              child: const Label(
-                type: LabelType.caption,
-                text: 'Li e aceito os Termos de Uso',
-              ),
-            ),
-          ],
-        ),
-        if (_termosPendentes)
-          const Label(
-            type: LabelType.error,
-            text: 'Você precisa aceitar os termos de uso.',
-          ),
-      ],
     );
   }
 }

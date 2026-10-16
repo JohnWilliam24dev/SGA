@@ -39,7 +39,13 @@ class GlassDesktopHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5),
-            Text(subtitle, style: TextStyle(fontSize: 12, color: sgaMuted)),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: SgaColors.of(context).onBackdropMuted,
+              ),
+            ),
           ],
         ),
       ),

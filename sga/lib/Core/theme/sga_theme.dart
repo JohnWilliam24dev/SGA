@@ -31,6 +31,11 @@ class SgaColors {
   Color get text => _tokens.textColor;
   Color get heading => dark ? const Color(0xFFF4F8FC) : const Color(0xFF09243A);
   Color get muted => _tokens.mutedTextColor;
+
+  /// Subtítulo que fica direto sobre o fundo azul (cabeçalho das telas),
+  /// onde o cinza-azulado de [muted] perderia contraste.
+  Color get onBackdropMuted =>
+      dark ? const Color(0xFFB7D3EA) : const Color(0xFF0A2F4E);
   Color get border => _tokens.borderColor;
   Color get primary => _tokens.primaryColor;
   Color get onPrimary => _tokens.onPrimaryColor;
@@ -59,14 +64,19 @@ Color get sgaOnSurface => sgaThemeMode.value == AppThemeMode.dark
     : const Color(0xFF16354C);
 
 @Deprecated('Use SgaColors.of(context).muted')
-Color get sgaMuted => sgaThemeMode.value == AppThemeMode.dark
-    ? const Color(0xFFB5C5D4)
-    : const Color(0xFF456078);
+Color get sgaMuted =>
+    sgaThemeMode.value == AppThemeMode.dark ? _mutedDark : _mutedLight;
 
 @Deprecated('Use SgaColors.of(context).heading')
 Color get sgaHeading => sgaThemeMode.value == AppThemeMode.dark
     ? const Color(0xFFF4F8FC)
     : const Color(0xFF09243A);
+
+/// Cor dos textos de apoio (subtítulos, legendas, rótulos). Um azul-ardósia
+/// da mesma família da marca, em vez de cinza: lê bem sobre os painéis
+/// brancos no claro e sobre os painéis escuros no escuro.
+const Color _mutedLight = Color(0xFF2F5F87);
+const Color _mutedDark = Color(0xFF9FBFDC);
 
 /// Paleta do SGA. O azul vivo e as superfícies claras translúcidas seguem a
 /// nova identidade visual do produto.
@@ -78,7 +88,7 @@ const AppTheme sgaTheme = AppTheme(
     backgroundColor: Color(0xFF1E95F3),
     surfaceColor: Color(0xFFFFFFFF),
     textColor: Color(0xFF0F2A43),
-    mutedTextColor: Color(0xFF456078),
+    mutedTextColor: _mutedLight,
     borderColor: Color(0x99FFFFFF),
     onPrimaryColor: Color(0xFFFFFFFF),
   ),
@@ -88,6 +98,7 @@ const AppTheme sgaTheme = AppTheme(
     backgroundColor: Color(0xFF0B1620),
     surfaceColor: Color(0xFF132434),
     textColor: Color(0xFFEAF2FA),
+    mutedTextColor: _mutedDark,
     onPrimaryColor: Color(0xFFFFFFFF),
   ),
 );

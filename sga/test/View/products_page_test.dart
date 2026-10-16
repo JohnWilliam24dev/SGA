@@ -1,4 +1,5 @@
 import 'package:easy_ui/easy_ui.dart';
+import 'package:flutter/material.dart' show TextField;
 import 'package:flutter/widgets.dart' show Size, Widget;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/View/products/products_page.dart';
@@ -76,5 +77,49 @@ void main() {
     expect(find.text('Selecione uma imagem'), findsOneWidget);
     expect(find.text('Produto adicionado.'), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Editar leva o produto ao formulário e salva as alterações', (
+    tester,
+  ) async {
+    _useDesktopViewport(tester);
+
+    await tester.pumpWidget(_page(const ProductsPage()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Editar').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Editar produto'), findsOneWidget);
+    expect(find.text('Salvar alterações'), findsOneWidget);
+
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Modelo 3D Vroid completo'),
+      'Modelo 3D renovado',
+    );
+    await tester.tap(find.text('Salvar alterações'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Produto atualizado.'), findsOneWidget);
+    expect(find.text('Modelo 3D renovado'), findsOneWidget);
+    expect(find.text('Adicionar produto'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('no celular, Editar abre o formulário e Cancelar edição sai', (
+    tester,
+  ) async {
+    useMobileViewport(tester);
+
+    await tester.pumpWidget(_page(const ProductsPage()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Meus produtos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Editar').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Salvar alterações'), findsOneWidget);
+    await tester.tap(find.text('Cancelar edição'));
+    await tester.pumpAndSettle();
+    expect(find.text('Salvar Produto'), findsOneWidget);
   });
 }

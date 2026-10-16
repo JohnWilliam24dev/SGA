@@ -5,8 +5,9 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
 import '../../Shared/widgets/glass/glass_panel.dart';
+import 'detail_body.dart';
+import 'detail_data.dart';
 import 'detail_header.dart';
-import 'detail_sections.dart';
 
 /// Detalhe de uma commission, aberto ao tocar no card do quadro.
 ///
@@ -21,6 +22,7 @@ class CommissionDetailPage extends StatelessWidget {
     required this.statusNome,
     required this.onBack,
     this.compact = false,
+    this.catalogo = const FakeCatalogoRepository(),
   });
 
   final CommissionRepository repository;
@@ -29,17 +31,24 @@ class CommissionDetailPage extends StatelessWidget {
   final VoidCallback onBack;
   final bool compact;
 
+  /// Tipos e adicionais que o pedido pode receber.
+  final CatalogoRepository catalogo;
+
   Widget get _cabecalho =>
       DetailHeader(commission: commission, statusNome: statusNome);
 
-  Widget get _corpo => AsyncView<CommissionDetalhadaModel>(
-    load: () => repository.carregarDetalhe(commission.id),
+  Widget get _corpo => AsyncView<DetailData>(
+    load: () => DetailData.carregar(repository, catalogo, commission.id),
     loading: const SizedBox(
       height: 260,
       child: Center(child: Loader(message: 'Carregando detalhes...')),
     ),
-    builder: (context, detalhe) =>
-        DetailBody(detalhe: detalhe, compact: compact),
+    builder: (context, data) => DetailBody(
+      data: data,
+      compact: compact,
+      repository: repository,
+      catalogo: catalogo,
+    ),
   );
 
   @override

@@ -159,4 +159,62 @@ void main() {
 
     expect(fechou, isTrue);
   });
+
+  testWidgets('Fechar Orçamento pede confirmação e trava a edição', (tester) async {
+    useTallViewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(_pagina(repo, resumo));
+    await _aguardar(tester);
+    await tester.enterText(find.widgetWithText(TextField, '280,00'), '350,00');
+    await tester.tap(find.text('Fechar Orçamento'));
+    await _aguardar(tester);
+    expect(find.text('Fechar orçamento?'), findsOneWidget);
+
+    await tester.tap(find.text('Fechar orçamento'));
+    await _aguardar(tester);
+    await _aguardar(tester);
+
+    expect(find.text('Fechar Orçamento'), findsNothing);
+    expect(find.text('R\$ 350,00'), findsOneWidget);
+    expect((await tester.runAsync(() => repo.carregarDetalhe('c1')))!.orcamentoFinal, 350);
+  });
+
+  testWidgets('pedido em Concluído sem fechar não deixa editar o orçamento', (
+    tester,
+  ) async {
+    useTallViewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    await tester.runAsync(
+      () => repo.mover(commissionId: 'c1', paraColunaId: 'concluido', paraIndice: 0),
+    );
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(_pagina(repo, resumo));
+    await _aguardar(tester);
+
+    expect(find.text('Fechar Orçamento'), findsNothing);
+    expect(find.text('Ainda não fechado'), findsOneWidget);
+  });
+
+  testWidgets('adicionar e remover adicional atualiza o valor simulado', (
+    tester,
+  ) async {
+    useTallViewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(_pagina(repo, resumo));
+    await _aguardar(tester);
+    await tester.tap(find.byTooltip('Aumentar quantidade'));
+    await _aguardar(tester);
+    expect(find.text('R\$ 320,00'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Remover adicional'));
+    await _aguardar(tester);
+    await _aguardar(tester);
+    expect(find.text('Nenhum adicional neste pedido.'), findsOneWidget);
+    expect(find.text('R\$ 240,00'), findsOneWidget);
+  });
 }

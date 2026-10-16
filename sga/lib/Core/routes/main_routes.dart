@@ -11,6 +11,7 @@ Widget buildMainScreen(BuildContext context, [Maker? maker]) {
   return MainShell(
     commissionRepository: commissionRepository,
     statusRepository: statusRepository,
+    catalogoRepository: catalogoRepository,
     onOpenCommission: (commission, statusNome) => openCommissionDetail(
       context,
       commission: commission,

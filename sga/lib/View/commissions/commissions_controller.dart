@@ -11,7 +11,11 @@ class CommissionsController extends ChangeNotifier {
   CommissionsController({
     required this.repository,
     required this.statusRepository,
-  });
+  }) {
+    // Pedido criado ou editado (no detalhe, por exemplo): o quadro se
+    // atualiza sozinho, sem o aviso de carregamento.
+    repository.addListener(_aoMudar);
+  }
 
   final CommissionRepository repository;
   final StatusRepository statusRepository;
@@ -20,8 +24,18 @@ class CommissionsController extends ChangeNotifier {
   bool falhou = false;
   bool _vivo = true;
 
+  Future<void> _aoMudar() async {
+    try {
+      colunas = await repository.carregarQuadro();
+      notifyListeners();
+    } catch (_) {
+      // Mantém o quadro que já está na tela.
+    }
+  }
+
   @override
   void dispose() {
+    repository.removeListener(_aoMudar);
     _vivo = false;
     super.dispose();
   }
@@ -41,6 +55,18 @@ class CommissionsController extends ChangeNotifier {
       falhou = true;
     }
     notifyListeners();
+  }
+
+  /// Cria um pedido na coluna inicial; devolve o motivo se foi recusado.
+  Future<String?> criarPedido(NovaCommission nova) async {
+    try {
+      await repository.criar(nova);
+      return null;
+    } on CommissionRegraException catch (e) {
+      return e.mensagem;
+    } catch (_) {
+      return 'Não foi possível criar o pedido.';
+    }
   }
 
   /// Move o card na hora; se o repositório falhar, o quadro volta ao que era.

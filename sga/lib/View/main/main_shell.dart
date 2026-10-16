@@ -21,10 +21,12 @@ class MainShell extends StatefulWidget {
     required this.onOpenCommission,
     required this.onLogout,
     required this.maker,
+    this.catalogoRepository = const FakeCatalogoRepository(),
   });
 
   final CommissionRepository commissionRepository;
   final StatusRepository statusRepository;
+  final CatalogoRepository catalogoRepository;
   final void Function(CommissionResumoModel commission, String statusNome)
   onOpenCommission;
   final VoidCallback onLogout;
@@ -60,6 +62,7 @@ class _MainShellState extends State<MainShell> {
       _ => CommissionsPage(
         repository: widget.commissionRepository,
         statusRepository: widget.statusRepository,
+        catalogo: widget.catalogoRepository,
         onOpenCommission: widget.onOpenCommission,
       ),
     };

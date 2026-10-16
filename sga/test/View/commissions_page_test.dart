@@ -97,4 +97,48 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byWidgetPredicate(inclinado), findsNothing);
   });
+
+  testWidgets('o botão "+" abre o menu com Adicionar Coluna e Adicionar Pedido', (
+    tester,
+  ) async {
+    viewport(tester);
+    await tester.pumpWidget(
+      _pagina(FakeCommissionRepository(latencia: Duration.zero)),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Adicionar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Adicionar Coluna'), findsOneWidget);
+    expect(find.text('Adicionar Pedido'), findsOneWidget);
+
+    await tester.tap(find.text('Adicionar Coluna'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nova coluna'), findsOneWidget);
+  });
+
+  testWidgets('um pedido criado no repositório aparece no quadro sozinho', (
+    tester,
+  ) async {
+    viewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    await tester.pumpWidget(_pagina(repo));
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(
+      () => repo.criar(
+        const NovaCommission(
+          nomeCliente: 'Cliente Novo',
+          contato: '@novo',
+          descricao: 'Teste',
+          tipoProdutoId: 'tp-emotes',
+          tipoProdutoNome: 'Emotes',
+          precoBase: 35,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cliente Novo'), findsOneWidget);
+  });
 }

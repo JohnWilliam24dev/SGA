@@ -8,13 +8,13 @@ import 'column_header.dart';
 import 'commission_card.dart';
 import 'kanban_style.dart';
 
-/// Quadro de commissions: botão "Nova coluna" e o kanban dentro do painel
-/// glass. Só desenha; quem decide o que fazer com cada gesto é a tela.
+/// Quadro de commissions: o kanban dentro do painel glass (o botão "+" que
+/// cria coluna e pedido fica por cima, na tela). Só desenha; quem decide o
+/// que fazer com cada gesto é a tela.
 class CommissionsBoard extends StatelessWidget {
   const CommissionsBoard({
     super.key,
     required this.colunas,
-    required this.onNovaColuna,
     required this.onMove,
     required this.onItemTap,
     required this.onColumnMove,
@@ -22,7 +22,6 @@ class CommissionsBoard extends StatelessWidget {
   });
 
   final List<CommissionColumn> colunas;
-  final VoidCallback onNovaColuna;
   final ValueChanged<KanbanMove<CommissionResumoModel>> onMove;
   final ValueChanged<CommissionResumoModel> onItemTap;
   final ValueChanged<KanbanColumnMove> onColumnMove;
@@ -38,17 +37,6 @@ class CommissionsBoard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Button(
-                text: 'Nova coluna',
-                icon: Icons.add_rounded,
-                onPressed: onNovaColuna,
-              ),
-            ),
-          ),
           Expanded(
             child: GlassPanel(
               padding: compact

@@ -30,8 +30,9 @@ lib/
     welcome/             tela inicial (Cadastre-se / Login)
     auth/                login e cadastro
     main/                área autenticada (navegação lateral responsiva)
-    commissions/         quadro kanban (colunas, cards, estilo) e detalhe da
-                         commission
+    commissions/         quadro kanban (colunas, cards, estilo), botão "+"
+                         (coluna e pedido), novo pedido e detalhe da commission
+                         (adicionais e orçamento editáveis)
     reports/             relatório de pedidos
     products/            produtos (portfólio)
     catalog/             tipos de produtos e adicionais

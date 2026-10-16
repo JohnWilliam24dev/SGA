@@ -15,6 +15,9 @@ final CommissionRepository commissionRepository = FakeCommissionRepository(
   statusRepository: statusRepository,
 );
 
+/// Tipos de produto e adicionais disponíveis para montar um pedido.
+final CatalogoRepository catalogoRepository = const FakeCatalogoRepository();
+
 /// As colunas do quadro (status do Maker). Pergunta ao repositório de
 /// commissions quantos cartões há em cada uma, para não excluir coluna cheia.
 final StatusRepository statusRepository = FakeStatusRepository(

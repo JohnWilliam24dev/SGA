@@ -54,6 +54,7 @@ Widget buildCommissionDetailScreen({
   return Builder(
     builder: (context) => CommissionDetailPage(
       repository: commissionRepository,
+      catalogo: catalogoRepository,
       commission: commission,
       statusNome: statusNome,
       compact: compact,

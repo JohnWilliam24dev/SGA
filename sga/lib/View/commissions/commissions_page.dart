@@ -2,15 +2,17 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
+import 'add_menu_button.dart';
 import 'column_actions.dart';
 import 'commissions_board.dart';
 import 'commissions_controller.dart';
+import 'order_actions.dart';
 
 /// Página principal: o quadro kanban de commissions.
 ///
 /// O estado e as regras moram no [CommissionsController]; as ações das
-/// colunas (nova, renomear, tipo, mover, excluir) em [ColumnActions]; o
-/// desenho em [CommissionsBoard]. Aqui só se liga uma coisa à outra.
+/// colunas (nova, renomear, tipo, mover, excluir) em [ColumnActions]; a
+/// criação de pedido em [OrderActions]; o desenho em [CommissionsBoard]. Aqui só se liga uma coisa à outra.
 ///
 /// Um toque simples no card avisa por [onOpenCommission] (com o título da
 /// coluna onde ele está) para abrir o detalhe; apertar e segurar move o card.
@@ -20,10 +22,14 @@ class CommissionsPage extends StatefulWidget {
     required this.repository,
     required this.statusRepository,
     required this.onOpenCommission,
+    this.catalogo,
   });
 
   final CommissionRepository repository;
   final StatusRepository statusRepository;
+
+  /// Tipos e adicionais para montar um pedido novo.
+  final CatalogoRepository? catalogo;
   final void Function(CommissionResumoModel commission, String statusNome)
   onOpenCommission;
 
@@ -32,12 +38,16 @@ class CommissionsPage extends StatefulWidget {
 }
 
 class _CommissionsPageState extends State<CommissionsPage>
-    with ColumnActions<CommissionsPage> {
+    with ColumnActions<CommissionsPage>, OrderActions<CommissionsPage> {
   @override
   late final CommissionsController controller = CommissionsController(
     repository: widget.repository,
     statusRepository: widget.statusRepository,
   );
+
+  @override
+  CatalogoRepository get catalogo =>
+      widget.catalogo ?? const FakeCatalogoRepository();
 
   @override
   void initState() {
@@ -79,13 +89,26 @@ class _CommissionsPageState extends State<CommissionsPage>
         if (colunas == null) {
           return const Loader(message: 'Carregando commissions...');
         }
-        return CommissionsBoard(
-          colunas: colunas,
-          onNovaColuna: novaColuna,
-          onMove: _mover,
-          onItemTap: _abrir,
-          onColumnMove: aoMoverColuna,
-          menuDaColuna: menuDaColuna,
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: CommissionsBoard(
+                colunas: colunas,
+                onMove: _mover,
+                onItemTap: _abrir,
+                onColumnMove: aoMoverColuna,
+                menuDaColuna: menuDaColuna,
+              ),
+            ),
+            Positioned(
+              right: 6,
+              bottom: 6,
+              child: AddMenuButton(
+                onAddColumn: novaColuna,
+                onAddOrder: novoPedido,
+              ),
+            ),
+          ],
         );
       },
     );

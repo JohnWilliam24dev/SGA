@@ -7,28 +7,40 @@ import '../../Core/theme/sga_theme.dart';
 import '../../Domain/domain.dart';
 import '../../Shared/widgets/glass/glass_panel.dart';
 
-/// Painel "Adicionar produto": nome, tipo, descrição, imagem e o botão
-/// Salvar. Trocar a `key` deste widget limpa todos os campos.
+/// Painel "Adicionar produto" (ou "Editar produto", quando recebe [initial]):
+/// nome, tipo, descrição, imagem e o botão Salvar. Trocar a `key` deste
+/// widget reinicia todos os campos.
 class ProductForm extends StatelessWidget {
   const ProductForm({
     super.key,
     required this.types,
     required this.onPickImage,
     required this.onSave,
+    this.initial,
+    this.initialPreview,
+    this.onCancel,
   });
 
   final List<TipoProdutoModel> types;
   final Future<Uint8List?> Function() onPickImage;
   final ValueChanged<FormValues> onSave;
 
+  /// Produto em edição (null = adicionando um novo) e a imagem dele, se há.
+  final ProdutoModel? initial;
+  final Uint8List? initialPreview;
+
+  /// Sai do modo de edição sem salvar; só aparece ao editar.
+  final VoidCallback? onCancel;
+
   @override
   Widget build(BuildContext context) {
+    final editando = initial != null;
     return GlassPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Adicionar produto',
+            editando ? 'Editar produto' : 'Adicionar produto',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
@@ -41,6 +53,7 @@ class ProductForm extends StatelessWidget {
             children: [
               InputField(
                 name: 'nome',
+                initialValue: initial?.nome,
                 label: 'Nome do produto',
                 hint: 'Ex.: Modelo 3D Vroid',
                 validation: [isRequired()],
@@ -48,15 +61,19 @@ class ProductForm extends StatelessWidget {
               Select<String>.single(
                 name: 'tipo',
                 hint: 'Tipo do produto',
+                value: initial?.tipoProdutoId,
+                // Ao editar, o tipo atual aparece mesmo se foi desabilitado.
                 options: [
-                  for (final t in types.where((t) => t.habilitado))
-                    SelectOption(t.id, t.nome),
+                  for (final t in types)
+                    if (t.habilitado || t.id == initial?.tipoProdutoId)
+                      SelectOption(t.id, t.nome),
                 ],
                 onChanged: (_) {},
                 validation: [isRequired()],
               ),
-              const InputField(
+              InputField(
                 name: 'descricao',
+                initialValue: initial?.descricao,
                 label: 'Descrição',
                 hint: 'Descrição opcional para o portfólio',
                 minLines: 3,
@@ -66,10 +83,24 @@ class ProductForm extends StatelessWidget {
                 name: 'imagem',
                 label: 'Imagem do produto',
                 hint: 'Selecionar imagem · PNG, JPG ou WebP · até 5 MB',
+                initialValue: initialPreview,
                 onPick: onPickImage,
-                validation: [isRequired(message: 'Selecione uma imagem')],
+                // Ao editar, sem escolher outra imagem fica a que já existe.
+                validation: editando
+                    ? const []
+                    : [isRequired(message: 'Selecione uma imagem')],
               ),
-              const Button(text: 'Salvar Produto', expanded: true),
+              Button(
+                text: editando ? 'Salvar alterações' : 'Salvar Produto',
+                expanded: true,
+              ),
+              if (onCancel != null)
+                Button(
+                  text: 'Cancelar edição',
+                  variant: ButtonVariant.ghost,
+                  expanded: true,
+                  onPressed: onCancel,
+                ),
             ],
           ),
         ],

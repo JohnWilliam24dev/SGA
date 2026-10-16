@@ -69,15 +69,22 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
         criadoEm: criadoEm,
       );
 
-  /// Cópia com outro status e/ou outra posição (o que muda ao mover o card).
-  CommissionDetalhadaModel copyWith({String? statusId, int? posicao}) {
+  /// Cópia com outros valores (o que muda ao mover o card, fechar o
+  /// orçamento ou editar os adicionais).
+  CommissionDetalhadaModel copyWith({
+    String? statusId,
+    int? posicao,
+    double? precoSimulado,
+    double? orcamentoFinal,
+    List<CommissionAdicionalModel>? adicionais,
+  }) {
     return CommissionDetalhadaModel(
       id: id,
       token: token,
       nomeCliente: nomeCliente,
       tipoProdutoNome: tipoProdutoNome,
-      precoSimulado: precoSimulado,
-      orcamentoFinal: orcamentoFinal,
+      precoSimulado: precoSimulado ?? this.precoSimulado,
+      orcamentoFinal: orcamentoFinal ?? this.orcamentoFinal,
       posicao: posicao ?? this.posicao,
       criadoEm: criadoEm,
       statusId: statusId ?? this.statusId,
@@ -86,7 +93,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
       descricao: descricao,
       imagemRefUrl: imagemRefUrl,
       email: email,
-      adicionais: adicionais,
+      adicionais: adicionais ?? this.adicionais,
     );
   }
 

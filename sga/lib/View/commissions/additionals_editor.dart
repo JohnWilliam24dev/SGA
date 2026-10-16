@@ -47,6 +47,7 @@ class AdditionalsEditor extends StatelessWidget {
       adicionalId: a.id,
       nome: a.nome,
       quantidade: 1,
+      descricaoCliente: null,
       valorUnitario: valorUnitarioDoAdicional(a, precoBase),
     ),
   ]);

@@ -8,6 +8,7 @@ const _fundo = CommissionAdicionalModel(
   adicionalId: 'a-fundo',
   nome: 'Fundo simples',
   quantidade: 2,
+  descricaoCliente: null,
   valorUnitario: 40,
 );
 
@@ -66,6 +67,7 @@ void main() {
                 adicionalId: 'a-pose',
                 nome: 'Pose extra',
                 quantidade: 21,
+                descricaoCliente: null,
                 valorUnitario: 60,
               ),
             ],

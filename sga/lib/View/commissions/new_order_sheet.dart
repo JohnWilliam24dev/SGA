@@ -95,6 +95,8 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
                     name: 'tipo',
                     label: 'Tipo do produto',
                     hint: 'Escolha o tipo',
+                    // O Select volta ao `value` a cada rebuild: ele é controlado.
+                    value: opcao?.tipo.id,
                     options: [
                       for (final o in widget.opcoes)
                         SelectOption(o.tipo.id, o.tipo.nome),

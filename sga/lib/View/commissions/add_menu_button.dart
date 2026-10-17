@@ -2,8 +2,6 @@ import 'package:flutter/material.dart'
     show Icon, Icons, PopupMenuButton, PopupMenuItem, PopupMenuPosition;
 import 'package:flutter/widgets.dart';
 
-import '../../Core/theme/sga_theme.dart';
-
 enum _Acao { coluna, pedido }
 
 /// Botão flutuante "+" do quadro. Abre um menu, no mesmo estilo do menu do
@@ -20,11 +18,8 @@ class AddMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = SgaColors.of(context);
-    // Azul-marinho (branco no escuro): o quadro é azul e o painel é branco,
-    // então só um tom bem diferente dos dois se destaca nos dois fundos.
-    final fundo = colors.heading;
-    final icone = colors.dark ? const Color(0xFF09243A) : const Color(0xFFFFFFFF);
+    // Bola branca com "+" preto nos dois temas: destaca do quadro azul e
+    // do painel.
     return PopupMenuButton<_Acao>(
       tooltip: 'Adicionar',
       position: PopupMenuPosition.over,
@@ -45,11 +40,10 @@ class AddMenuButton extends StatelessWidget {
         ),
       ],
       child: DecoratedBox(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: fundo,
-          border: Border.all(color: const Color(0xFFFFFFFF), width: 3),
-          boxShadow: const [
+          color: Color(0xFFFFFFFF),
+          boxShadow: [
             BoxShadow(
               color: Color(0x40003A70),
               blurRadius: 14,
@@ -60,7 +54,7 @@ class AddMenuButton extends StatelessWidget {
         child: SizedBox(
           width: 56,
           height: 56,
-          child: Icon(Icons.add_rounded, color: icone, size: 30),
+          child: Icon(Icons.add_rounded, color: Color(0xFF000000), size: 30),
         ),
       ),
     );

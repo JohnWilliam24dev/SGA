@@ -46,11 +46,6 @@ class _BudgetEditorState extends State<BudgetEditor> {
     super.dispose();
   }
 
-  void _aceitarSimulado() {
-    _digitou = true;
-    _valor.text = _texto(widget.simulado);
-  }
-
   Future<void> _fechar() async {
     final valor = parseDecimal(_valor.text);
     if (valor == null || valor < 0) {
@@ -74,21 +69,7 @@ class _BudgetEditorState extends State<BudgetEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: DetailField('Valor simulado', formatarMoeda(widget.simulado)),
-            ),
-            // Aceitar o simulado: o orçamento passa a ter o mesmo valor
-            // (continua editável até o Fechar Orçamento).
-            if (widget.editavel)
-              Button(
-                text: 'Aceitar',
-                variant: ButtonVariant.outline,
-                onPressed: _aceitarSimulado,
-              ),
-          ],
-        ),
+        DetailField('Valor simulado', formatarMoeda(widget.simulado)),
         const SizedBox(height: 8),
         if (widget.editavel) ...[
           const Label(type: LabelType.caption, text: 'Orçamento final'),

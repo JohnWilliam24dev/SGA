@@ -21,6 +21,10 @@ class AddMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = SgaColors.of(context);
+    // Azul-marinho (branco no escuro): o quadro é azul e o painel é branco,
+    // então só um tom bem diferente dos dois se destaca nos dois fundos.
+    final fundo = colors.heading;
+    final icone = colors.dark ? const Color(0xFF09243A) : const Color(0xFFFFFFFF);
     return PopupMenuButton<_Acao>(
       tooltip: 'Adicionar',
       position: PopupMenuPosition.over,
@@ -43,7 +47,7 @@ class AddMenuButton extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: colors.primary,
+          color: fundo,
           border: Border.all(color: const Color(0xFFFFFFFF), width: 3),
           boxShadow: const [
             BoxShadow(
@@ -56,7 +60,7 @@ class AddMenuButton extends StatelessWidget {
         child: SizedBox(
           width: 56,
           height: 56,
-          child: Icon(Icons.add_rounded, color: colors.onPrimary, size: 30),
+          child: Icon(Icons.add_rounded, color: icone, size: 30),
         ),
       ),
     );

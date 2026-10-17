@@ -125,18 +125,20 @@ void main() {
     await tester.pumpWidget(_pagina(repo));
     await tester.pumpAndSettle();
 
-    await tester.runAsync(
-      () => repo.criar(
-        const NovaCommission(
-          nomeCliente: 'Cliente Novo',
-          contato: '@novo',
-          descricao: 'Teste',
-          tipoProdutoId: 'tp-emotes',
-          tipoProdutoNome: 'Emotes',
-          precoBase: 35,
-        ),
+    // Na zona do teste (sem runAsync), para o relógio falso também avançar
+    // a recarga do quadro disparada pelo aviso do repositório.
+    final criando = repo.criar(
+      const NovaCommission(
+        nomeCliente: 'Cliente Novo',
+        contato: '@novo',
+        descricao: 'Teste',
+        tipoProdutoId: 'tp-emotes',
+        tipoProdutoNome: 'Emotes',
+        precoBase: 35,
       ),
     );
+    await tester.pumpAndSettle();
+    await criando;
     await tester.pumpAndSettle();
 
     expect(find.text('Cliente Novo'), findsOneWidget);

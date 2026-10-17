@@ -46,6 +46,11 @@ class _BudgetEditorState extends State<BudgetEditor> {
     super.dispose();
   }
 
+  void _aceitarSimulado() {
+    _digitou = true;
+    _valor.text = _texto(widget.simulado);
+  }
+
   Future<void> _fechar() async {
     final valor = parseDecimal(_valor.text);
     if (valor == null || valor < 0) {
@@ -69,7 +74,21 @@ class _BudgetEditorState extends State<BudgetEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        DetailField('Valor simulado', formatarMoeda(widget.simulado)),
+        Row(
+          children: [
+            Expanded(
+              child: DetailField('Valor simulado', formatarMoeda(widget.simulado)),
+            ),
+            // Aceitar o simulado: o orçamento passa a ter o mesmo valor
+            // (continua editável até o Fechar Orçamento).
+            if (widget.editavel)
+              Button(
+                text: 'Aceitar',
+                variant: ButtonVariant.outline,
+                onPressed: _aceitarSimulado,
+              ),
+          ],
+        ),
         const SizedBox(height: 8),
         if (widget.editavel) ...[
           const Label(type: LabelType.caption, text: 'Orçamento final'),
@@ -79,7 +98,11 @@ class _BudgetEditorState extends State<BudgetEditor> {
                 child: InputField(
                   controller: _valor,
                   type: InputType.decimal,
-                  prefix: const Label(text: 'R\$'),
+                  // Centralizado na vertical e colado ao valor.
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(left: 14, right: 2),
+                    child: Center(widthFactor: 1, child: Label(text: 'R\$')),
+                  ),
                   onChanged: (_) => _digitou = true,
                 ),
               ),

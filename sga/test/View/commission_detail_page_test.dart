@@ -217,4 +217,18 @@ void main() {
     expect(find.text('Nenhum adicional neste pedido.'), findsOneWidget);
     expect(find.text('R\$ 240,00'), findsOneWidget);
   });
+
+  testWidgets('Aceitar copia o valor simulado para o orçamento', (tester) async {
+    useTallViewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(_pagina(repo, resumo));
+    await _aguardar(tester);
+    await tester.enterText(find.widgetWithText(TextField, '280,00'), '999,00');
+    await tester.tap(find.text('Aceitar'));
+    await tester.pump();
+
+    expect(find.widgetWithText(TextField, '280,00'), findsOneWidget);
+  });
 }

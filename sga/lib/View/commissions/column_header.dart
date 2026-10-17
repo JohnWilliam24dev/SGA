@@ -58,7 +58,16 @@ class _CountChip extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        child: Label(type: LabelType.caption, text: '$count'),
+        // O selo é claro nos dois temas, então o número leva um azul-marinho
+        // fixo: a cor de apoio do tema (clara no escuro) sumiria nele.
+        child: Text(
+          '$count',
+          style: DefaultTextStyle.of(context).style.copyWith(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF09243A),
+          ),
+        ),
       ),
     );
   }

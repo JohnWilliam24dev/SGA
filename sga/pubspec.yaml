@@ -14,6 +14,8 @@ dependencies:
       url: https://github.com/JohnWilliam24dev/Easy_UI_Framework.git
       ref: 29cab95a8e54707e21d1a9616daa5b944fe86434
   image_picker: ^1.1.2
+  dio: ^5.7.0
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:

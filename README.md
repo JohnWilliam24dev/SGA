@@ -14,7 +14,9 @@ Visual limpo, de sistema de saúde, com azul `#1E90FF` como cor da marca
 ```
 lib/
   main.dart              ponto de entrada
-  Core/                  tema (tokens + StylePack), rotas e a raiz SgaApp
+  Core/                  tema (tokens + StylePack), rotas, a raiz SgaApp e a
+                         rede (network/: ApiClient com dio, ApiException,
+                         renovação do token e armazenamento seguro da sessão)
   Domain/                Maker, Credenciais, CommissionColumn, regra de mover
                          commission (commission_board), o repositório de
                          commissions e o de status, com as regras do quadro
@@ -96,6 +98,17 @@ e os dados de commissions são simulados em
 usa `CommissionResumoModel` e o detalhe usa `CommissionDetalhadaModel`, os
 mesmos modelos que a API vai devolver. A integração com o servidor entra
 trocando essa implementação.
+
+## API
+
+A URL do servidor vem do build, nunca do código:
+
+```bash
+flutter run --dart-define=API_BASE_URL=https://seu-servidor
+```
+
+Sem `API_BASE_URL`, o debug usa `http://localhost:3000`; em release o app
+falha ao iniciar (no emulador Android use `http://10.0.2.2:3000`).
 
 ## Rodando
 

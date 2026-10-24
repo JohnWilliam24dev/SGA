@@ -16,7 +16,9 @@ lib/
   main.dart              ponto de entrada
   Core/                  tema (tokens + StylePack), rotas, a raiz SgaApp e a
                          rede (network/: ApiClient com dio, ApiException,
-                         renovação do token e armazenamento seguro da sessão)
+                         renovação do token, SessaoStore e armazenamento seguro
+                         da sessão) e o SessaoGate (tela certa pela sessão)
+  Data/                  repositórios que falam com a API (auth HTTP e fake)
   Domain/                Maker, Credenciais, CommissionColumn, regra de mover
                          commission (commission_board), o repositório de
                          commissions e o de status, com as regras do quadro
@@ -47,10 +49,12 @@ test/                    espelha a estrutura de lib/
 ## Telas
 
 - **Inicial:** marca animada e os botões Cadastre-se e Login.
-- **Cadastro:** nome, e-mail, senha, confirmar senha e aceite dos termos de
-  uso. Ao enviar, gera um `Maker` e abre o app (ainda sem servidor).
-- **Login:** e-mail, senha e o link "Esqueci a senha" (ainda sem função).
-  Qualquer login válido entra, enquanto não há autenticação.
+- **Cadastro:** nome, e-mail, senha (10 a 128 caracteres), confirmar senha e
+  aceite dos termos de uso. Envia para a API; todo Maker novo entra com sessão
+  restrita e precisa ativar o 2FA (tela ainda em construção).
+- **Login:** e-mail, senha e o link "Esqueci a senha" (ainda sem função). Se a
+  conta tem 2FA, pede o código de 6 dígitos (ou um código de recuperação).
+  Sem servidor (testes), a auth simulada deixa qualquer login válido entrar.
 - **Commissions (página principal):** quadro kanban no estilo Trello/Jira.
   As colunas são os status do Maker (padrão: Fila, Em andamento, Concluído e
   Cancelado) e os cards são o resumo da

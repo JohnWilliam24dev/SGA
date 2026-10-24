@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
@@ -14,7 +16,8 @@ class RegisterPage extends StatefulWidget {
     required this.onBack,
   });
 
-  final ValueChanged<Maker> onRegister;
+  /// Pode ser assíncrono (ver `LoginPage.onLogin`).
+  final FutureOr<void> Function(Maker) onRegister;
   final VoidCallback onGoToLogin;
   final VoidCallback onBack;
 
@@ -26,12 +29,12 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _aceitouTermos = false;
   bool _termosPendentes = false;
 
-  void _enviar(FormValues values) {
+  FutureOr<void> _enviar(FormValues values) {
     if (!_aceitouTermos) {
       setState(() => _termosPendentes = true);
       return;
     }
-    widget.onRegister(
+    return widget.onRegister(
       Maker(
         nome: values['nome']!.trim(),
         email: values['email']!.trim(),

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import 'Core/app/sga_app.dart';
+import 'Core/app/bootstrap.dart';
 
-void main() => runApp(const SgaApp());
+void main() => runApp(buildSgaApp());

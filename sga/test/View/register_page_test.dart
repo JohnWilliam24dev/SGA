@@ -29,6 +29,18 @@ void main() {
     expect(recebido, isNull);
   });
 
+  testWidgets('senha com menos de 10 caracteres é recusada', (tester) async {
+    useTallViewport(tester);
+    await tester.pumpWidget(_cadastro());
+    await tester.pumpAndSettle();
+
+    await preencherCadastro(tester, senha: 'Senha1234', confirmar: 'Senha1234');
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump();
+
+    expect(find.textContaining('10 ou mais caracteres'), findsOneWidget);
+  });
+
   testWidgets('confirmação diferente da senha mostra erro', (tester) async {
     useTallViewport(tester);
     await tester.pumpWidget(_cadastro());
@@ -69,7 +81,7 @@ void main() {
       const Maker(
         nome: 'Maria Silva',
         email: 'maria@exemplo.com',
-        senha: 'Senha1234',
+        senha: 'Senha12345',
         aceitouTermos: true,
       ),
     );

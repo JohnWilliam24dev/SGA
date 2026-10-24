@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
@@ -13,7 +15,9 @@ class LoginPage extends StatelessWidget {
     required this.onBack,
   });
 
-  final ValueChanged<Credenciais> onLogin;
+  /// Pode ser assíncrono: o botão mostra o carregamento até terminar e
+  /// exibe a mensagem de uma `UserFacingException` lançada daqui.
+  final FutureOr<void> Function(Credenciais) onLogin;
   final VoidCallback onForgotPassword;
   final VoidCallback onGoToRegister;
   final VoidCallback onBack;
@@ -59,7 +63,7 @@ class LoginPage extends StatelessWidget {
                         name: 'senha',
                         hint: 'Senha',
                         type: InputType.password,
-                        validation: [isRequired()],
+                        validation: [isRequired(), maxLength(128)],
                       ),
                       Align(
                         alignment: Alignment.centerRight,

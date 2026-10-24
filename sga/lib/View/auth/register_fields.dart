@@ -9,6 +9,7 @@ List<Widget> registerFields() => [
     validation: [
       isRequired(),
       minLength(3, message: 'Informe seu nome completo'),
+      maxLength(80),
     ],
   ),
   InputField(
@@ -23,7 +24,8 @@ List<Widget> registerFields() => [
     type: InputType.password,
     validation: [
       isRequired(),
-      isPassword(min: 8, requireDigit: true),
+      isPassword(min: 10, requireDigit: true),
+      maxLength(128),
     ],
   ),
   InputField(

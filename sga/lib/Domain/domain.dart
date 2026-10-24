@@ -1,6 +1,7 @@
 /// Entidades e regras do SGA, independentes de tela e de tema.
 library;
 
+export 'auth_repository.dart';
 export 'commission_board.dart';
 export 'commission_column.dart';
 export 'catalogo_repository.dart';

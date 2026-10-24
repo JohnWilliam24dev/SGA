@@ -27,8 +27,8 @@ Future<void> preencherCadastro(
   WidgetTester tester, {
   String nome = 'Maria Silva',
   String email = 'maria@exemplo.com',
-  String senha = 'Senha1234',
-  String confirmar = 'Senha1234',
+  String senha = 'Senha12345',
+  String confirmar = 'Senha12345',
 }) async {
   final campos = find.byType(TextField);
   await tester.enterText(campos.at(0), nome);

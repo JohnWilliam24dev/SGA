@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show Listenable;
 import 'commission_column.dart';
 import 'models/models.dart';
 import 'nova_commission.dart';
+import 'pagina.dart';
 
 /// De onde vem o quadro de commissions. Hoje é simulado em memória; quando o
 /// banco entrar, basta uma nova implementação desta interface.
@@ -12,6 +13,13 @@ import 'nova_commission.dart';
 abstract interface class CommissionRepository implements Listenable {
   /// Colunas do quadro, cada uma com seus resumos, na ordem de exibição.
   Future<List<CommissionColumn>> carregarQuadro();
+
+  /// Próxima página dos pedidos de uma coluna (a API traz 50 por vez).
+  /// [offset] é quantos pedidos a tela já tem nela.
+  Future<Pagina<CommissionResumoModel>> carregarMais(
+    String statusId, {
+    required int offset,
+  });
 
   /// Dados completos de uma commission, para a tela de detalhe. Falha se o
   /// [commissionId] não existir.

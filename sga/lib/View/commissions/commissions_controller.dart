@@ -2,12 +2,14 @@ import 'package:easy_ui/easy_ui.dart' show KanbanColumnMove, KanbanMove;
 import 'package:flutter/foundation.dart';
 
 import '../../Domain/domain.dart';
+import 'commissions_paginacao.dart';
 
 /// Estado e regras do quadro de commissions, sem nenhum widget: a tela só
 /// desenha o que está aqui e mostra os avisos que os métodos devolvem.
 ///
 /// Os métodos que podem falhar devolvem a mensagem de erro (ou `null`).
-class CommissionsController extends ChangeNotifier {
+class CommissionsController extends ChangeNotifier
+    with CommissionsPaginacao {
   CommissionsController({
     required this.repository,
     required this.statusRepository,
@@ -17,9 +19,11 @@ class CommissionsController extends ChangeNotifier {
     repository.addListener(_aoMudar);
   }
 
+  @override
   final CommissionRepository repository;
   final StatusRepository statusRepository;
 
+  @override
   List<CommissionColumn>? colunas;
   bool falhou = false;
   bool _vivo = true;
@@ -62,10 +66,8 @@ class CommissionsController extends ChangeNotifier {
     try {
       await repository.criar(nova);
       return null;
-    } on CommissionRegraException catch (e) {
-      return e.mensagem;
-    } catch (_) {
-      return 'Não foi possível criar o pedido.';
+    } catch (e) {
+      return mensagemDeErro(e, 'Não foi possível criar o pedido.');
     }
   }
 
@@ -88,10 +90,10 @@ class CommissionsController extends ChangeNotifier {
         paraIndice: movimento.toIndex,
       );
       return null;
-    } catch (_) {
+    } catch (e) {
       colunas = anteriores;
       notifyListeners();
-      return 'Não foi possível mover a commission.';
+      return mensagemDeErro(e, 'Não foi possível mover a commission.');
     }
   }
 
@@ -101,10 +103,8 @@ class CommissionsController extends ChangeNotifier {
     String? erro;
     try {
       await acao();
-    } on StatusRegraException catch (e) {
-      erro = e.mensagem;
-    } catch (_) {
-      erro = 'Não foi possível salvar a alteração.';
+    } catch (e) {
+      erro = mensagemDeErro(e, 'Não foi possível salvar a alteração.');
     }
     await carregar();
     return erro;

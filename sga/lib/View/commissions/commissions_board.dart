@@ -19,6 +19,8 @@ class CommissionsBoard extends StatelessWidget {
     required this.onItemTap,
     required this.onColumnMove,
     required this.menuDaColuna,
+    this.onLoadMore,
+    this.carregandoMais = const {},
   });
 
   final List<CommissionColumn> colunas;
@@ -27,6 +29,11 @@ class CommissionsBoard extends StatelessWidget {
   final ValueChanged<KanbanColumnMove> onColumnMove;
   final Widget Function(CommissionColumn coluna, int indice, int total)
   menuDaColuna;
+
+  /// Pede a próxima página de uma coluna; [carregandoMais] são as colunas
+  /// que estão buscando uma agora.
+  final ValueChanged<CommissionColumn>? onLoadMore;
+  final Set<String> carregandoMais;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +70,12 @@ class CommissionsBoard extends StatelessWidget {
                   columnHeaderBuilder: (context, column, indice, handle) =>
                       ColumnHeader(
                         title: column.title,
-                        count: column.items.length,
+                        count: colunas[indice].quantidade,
+                        restantes: colunas[indice].restantes,
+                        carregandoMais: carregandoMais.contains(column.id),
+                        onLoadMore: onLoadMore == null
+                            ? null
+                            : () => onLoadMore!(colunas[indice]),
                         menu: menuDaColuna(
                           colunas[indice],
                           indice,

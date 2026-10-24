@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../Domain/domain.dart';
 import '../../View/commissions/commission_detail_page.dart';
+import '../app/auth_scope.dart';
 import 'app_route.dart';
 
 /// No desktop o pedido é uma nota sobre o quadro; no celular, onde não há
@@ -53,8 +54,8 @@ Widget buildCommissionDetailScreen({
 }) {
   return Builder(
     builder: (context) => CommissionDetailPage(
-      repository: commissionRepository,
-      catalogo: catalogoRepository,
+      repository: AuthScope.of(context).dados.commission,
+      catalogo: AuthScope.of(context).dados.catalogo,
       commission: commission,
       statusNome: statusNome,
       compact: compact,

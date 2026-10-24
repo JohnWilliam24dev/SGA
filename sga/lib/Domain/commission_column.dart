@@ -17,6 +17,8 @@ class CommissionColumn {
     required this.tipo,
     required this.ordem,
     this.commissions = const <CommissionResumoModel>[],
+    this.total,
+    this.temMais = false,
   });
 
   final String id;
@@ -25,9 +27,25 @@ class CommissionColumn {
   final int ordem;
   final List<CommissionResumoModel> commissions;
 
+  /// Quantos pedidos a coluna tem no total, quando só parte deles foi
+  /// carregada (a API traz 50 por vez). `null` = todos já estão em
+  /// [commissions].
+  final int? total;
+
+  /// Se ainda há pedidos para carregar nesta coluna.
+  final bool temMais;
+
+  /// O número que o selo da coluna mostra.
+  int get quantidade => total ?? commissions.length;
+
+  /// Quantos pedidos faltam carregar.
+  int get restantes => (quantidade - commissions.length).clamp(0, quantidade);
+
   CommissionColumn copyWith({
     List<CommissionResumoModel>? commissions,
     int? ordem,
+    int? total,
+    bool? temMais,
   }) {
     return CommissionColumn(
       id: id,
@@ -35,6 +53,8 @@ class CommissionColumn {
       tipo: tipo,
       ordem: ordem ?? this.ordem,
       commissions: commissions ?? this.commissions,
+      total: total ?? this.total,
+      temMais: temMais ?? this.temMais,
     );
   }
 

@@ -12,6 +12,7 @@ export 'fake_commission_repository.dart';
 export 'maker.dart';
 export 'models/models.dart';
 export 'nova_commission.dart';
+export 'pagina.dart';
 export 'preco.dart';
 export 'status_repository.dart';
 export 'status_rules.dart';

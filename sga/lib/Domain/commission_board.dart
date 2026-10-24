@@ -13,6 +13,7 @@ List<CommissionColumn> moverCommission(
   required int paraIndice,
 }) {
   CommissionResumoModel? movida;
+  String? origemId;
   final restantes = <CommissionColumn>[];
 
   for (final coluna in colunas) {
@@ -22,8 +23,13 @@ List<CommissionColumn> moverCommission(
       continue;
     }
     movida = coluna.commissions[indice];
+    origemId = coluna.id;
     restantes.add(
-      coluna.copyWith(commissions: [...coluna.commissions]..removeAt(indice)),
+      coluna.copyWith(
+        commissions: [...coluna.commissions]..removeAt(indice),
+        // Mudando de coluna, o total da origem diminui (ver abaixo o destino).
+        total: coluna.id == paraColunaId ? null : _somar(coluna.total, -1),
+      ),
     );
   }
 
@@ -39,11 +45,15 @@ List<CommissionColumn> moverCommission(
               paraIndice.clamp(0, coluna.commissions.length).toInt(),
               movida,
             ),
+          total: origemId == paraColunaId ? null : _somar(coluna.total, 1),
         )
       else
         coluna,
   ];
 }
+
+/// Soma [delta] ao total de uma coluna paginada (`null` fica `null`).
+int? _somar(int? total, int delta) => total == null ? null : total + delta;
 
 /// Move a coluna [columnId] para a posição [paraIndice] do quadro e renumera
 /// a `ordem` de todas de 1 em diante.

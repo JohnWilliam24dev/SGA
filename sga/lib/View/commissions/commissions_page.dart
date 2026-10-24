@@ -66,6 +66,11 @@ class _CommissionsPageState extends State<CommissionsPage>
     if (erro != null && mounted) avisarErro(erro);
   }
 
+  Future<void> _carregarMais(CommissionColumn coluna) async {
+    final erro = await controller.carregarMais(coluna.id);
+    if (erro != null && mounted) avisarErro(erro);
+  }
+
   void _abrir(CommissionResumoModel commission) {
     final colunas = controller.colunas ?? const <CommissionColumn>[];
     final coluna = colunas.where(
@@ -96,6 +101,8 @@ class _CommissionsPageState extends State<CommissionsPage>
                 colunas: colunas,
                 onMove: _mover,
                 onItemTap: _abrir,
+                onLoadMore: _carregarMais,
+                carregandoMais: controller.carregandoMais,
                 onColumnMove: aoMoverColuna,
                 menuDaColuna: menuDaColuna,
               ),

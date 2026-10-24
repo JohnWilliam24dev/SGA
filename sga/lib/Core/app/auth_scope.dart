@@ -2,8 +2,10 @@ import 'package:flutter/widgets.dart';
 
 import '../../Domain/domain.dart';
 import '../network/network.dart';
+import 'app_dependencies.dart';
 
-/// Entrega a sessão e os repositórios de auth e de 2FA a qualquer rota, sem passar
+/// Entrega a sessão, os repositórios de auth e de 2FA e os dados da área
+/// logada a qualquer rota, sem passar
 /// parâmetro de tela em tela. Fica acima do Navigator.
 class AuthScope extends InheritedWidget {
   const AuthScope({
@@ -11,11 +13,13 @@ class AuthScope extends InheritedWidget {
     required this.auth,
     required this.sessao,
     required this.doisFator,
+    required this.dados,
     required super.child,
   });
 
   final AuthRepository auth;
   final DoisFatorRepository doisFator;
+  final AppDependencies dados;
   final SessaoStore sessao;
 
   /// Os dois objetos não mudam durante a vida do app, então quem lê não

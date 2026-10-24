@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'commission_regra_exception.dart';
 import 'models/models.dart';
 import 'nova_commission.dart';
+import 'pagina.dart';
 import 'preco.dart';
 import 'status_repository.dart';
 
@@ -21,6 +22,12 @@ mixin CommissionEdicoes on ChangeNotifier {
 
   /// Troca o pedido (mesma coluna e posição) por uma versão editada.
   void atualizar(CommissionDetalhadaModel novo);
+
+  /// O simulado entrega o quadro inteiro de uma vez: nunca sobra página.
+  Future<Pagina<CommissionResumoModel>> carregarMais(
+    String statusId, {
+    required int offset,
+  }) async => Pagina(itens: const [], total: offset, temMais: false);
 
   Future<CommissionDetalhadaModel> criar(NovaCommission nova) async {
     await Future<void>.delayed(latencia);

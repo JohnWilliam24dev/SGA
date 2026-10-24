@@ -1,5 +1,6 @@
 import '../../Data/data.dart';
 import '../network/network.dart';
+import 'app_dependencies.dart';
 import 'sga_app.dart';
 
 /// Monta o app de verdade: rede, sessão guardada no aparelho e auth na API.
@@ -13,5 +14,6 @@ SgaApp buildSgaApp() {
     sessao: sessao,
     auth: HttpAuthRepository(client: client, sessao: sessao),
     doisFator: HttpDoisFatorRepository(client: client, sessao: sessao),
+    dados: AppDependencies.http(client),
   );
 }

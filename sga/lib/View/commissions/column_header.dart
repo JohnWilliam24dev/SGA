@@ -10,6 +10,9 @@ class ColumnHeader extends StatelessWidget {
     required this.count,
     required this.menu,
     this.handle,
+    this.restantes = 0,
+    this.carregandoMais = false,
+    this.onLoadMore,
   });
 
   final String title;
@@ -19,8 +22,31 @@ class ColumnHeader extends StatelessWidget {
   /// Alça de arrastar a coluna; `null` no celular, onde não há reordenação.
   final Widget? handle;
 
+  /// Pedidos da coluna que ainda não foram carregados (a API traz 50 por
+  /// vez). Com [onLoadMore], aparece o botão "Carregar mais".
+  final int restantes;
+  final bool carregandoMais;
+  final VoidCallback? onLoadMore;
+
   @override
   Widget build(BuildContext context) {
+    final linha = _linha();
+    if (restantes <= 0 || onLoadMore == null) return linha;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        linha,
+        Button(
+          text: 'Carregar mais ($restantes)',
+          variant: ButtonVariant.link,
+          loading: carregandoMais,
+          onPressed: onLoadMore,
+        ),
+      ],
+    );
+  }
+
+  Widget _linha() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 10, 8, 2),
       child: Row(

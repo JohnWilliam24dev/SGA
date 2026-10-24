@@ -22,6 +22,10 @@ class TwoFactorPage extends StatefulWidget {
 class _TwoFactorPageState extends State<TwoFactorPage> {
   bool _recuperacao = false;
 
+  /// Um nome por modo: ao alternar, o campo novo é criado antes de o antigo
+  /// sair, e o FormGroup não aceita dois campos com o mesmo nome.
+  String get _campo => _recuperacao ? 'codigoRecuperacao' : 'codigo';
+
   @override
   Widget build(BuildContext context) {
     return AuthShell(
@@ -60,20 +64,20 @@ class _TwoFactorPageState extends State<TwoFactorPage> {
                     children: [
                       InputField(
                         key: ValueKey(_recuperacao),
-                        name: 'codigo',
+                        name: _campo,
                         hint: _recuperacao ? 'Código de recuperação' : 'Código de 6 dígitos',
                         autofocus: true,
                         validation: [
                           isRequired(),
                           if (!_recuperacao)
-                            matches(RegExp(r'^\d{6}$'), message: 'Digite os 6 dígitos'),
+                            matches(RegExp(r'^\s*\d{6}\s*$'), message: 'Digite os 6 dígitos'),
                         ],
                       ),
                       Button(
                         text: 'Confirmar',
                         expanded: true,
                         onSubmit: (values) =>
-                            widget.onSubmit(values['codigo']!.trim(), _recuperacao),
+                            widget.onSubmit(values[_campo]!.trim(), _recuperacao),
                       ),
                       Button(
                         text: _recuperacao

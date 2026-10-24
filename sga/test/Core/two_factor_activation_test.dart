@@ -64,7 +64,7 @@ void main() {
     expect(find.text('Confirme que guardou os códigos.'), findsOneWidget);
     expect(find.byType(CommissionsPage), findsNothing);
 
-    await tester.tap(find.byType(Toggle));
+    await tester.tap(find.byWidgetPredicate((w) => w is Toggle));
     await tester.pump();
     await tester.tap(find.text('Continuar'));
     await _aguardar(tester);

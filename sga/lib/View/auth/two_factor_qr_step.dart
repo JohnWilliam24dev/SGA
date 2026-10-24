@@ -66,7 +66,7 @@ class TwoFactorQrStep extends StatelessWidget {
               hint: 'Código de 6 dígitos',
               validation: [
                 isRequired(),
-                matches(RegExp(r'^\d{6}$'), message: 'Digite os 6 dígitos'),
+                matches(RegExp(r'^\s*\d{6}\s*$'), message: 'Digite os 6 dígitos'),
               ],
             ),
             Button(

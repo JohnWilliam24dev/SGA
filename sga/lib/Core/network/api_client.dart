@@ -37,6 +37,11 @@ class ApiClient {
   set onSessaoEncerrada(void Function()? ao) =>
       _refresher.onSessaoEncerrada = ao;
 
+  /// Renova a sessão agora (mesma trava do 401: nunca duas renovações ao
+  /// mesmo tempo). Serve, por exemplo, para liberar o escopo completo logo
+  /// depois de ativar o 2FA. Falha com [ApiException].
+  Future<void> renovarSessao() => _refresher.renovar();
+
   Future<dynamic> get(
     String caminho, {
     Map<String, dynamic>? query,

@@ -2,20 +2,13 @@ import 'package:flutter/material.dart' show ElevatedButton, TextField;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Core/core.dart';
 import 'package:sga/View/auth/two_factor_page.dart';
-import 'package:sga/View/auth/two_factor_pending_page.dart';
+import 'package:sga/View/auth/two_factor_setup_page.dart';
 import 'package:sga/View/commissions/commissions_page.dart';
 import 'package:sga/View/welcome/welcome_page.dart';
 
 import '../support/fake_adapter.dart';
 import '../support/fake_auth_2fa.dart';
 import '../support/helpers.dart';
-
-const _restrita = SessaoTokens(
-  accessToken: 'a',
-  refreshToken: 'r',
-  makerId: 'm1',
-  escopo: 'ativar2fa',
-);
 
 /// Avança ~1 s sem esperar tudo assentar, para o toast (4 s) continuar na tela.
 Future<void> _aguardar(WidgetTester tester) async {
@@ -49,10 +42,10 @@ void main() {
     tester,
   ) async {
     useTallViewport(tester);
-    final sessao = SessaoStore(MemoryTokenStorage(_restrita));
+    final sessao = SessaoStore(MemoryTokenStorage(tokensRestrita));
     await tester.pumpWidget(SgaApp(sessao: sessao, auth: Auth2fa(sessao)));
     await tester.pumpAndSettle();
-    expect(find.byType(TwoFactorPendingPage), findsOneWidget);
+    expect(find.byType(TwoFactorSetupPage), findsOneWidget);
 
     await tester.tap(find.text('Sair'));
     await tester.pumpAndSettle();

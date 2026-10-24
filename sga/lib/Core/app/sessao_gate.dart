@@ -2,7 +2,6 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Domain/domain.dart';
-import '../../View/auth/two_factor_pending_page.dart';
 import '../network/network.dart';
 import '../routes.dart';
 import 'auth_scope.dart';
@@ -65,9 +64,7 @@ class _SessaoGateState extends State<SessaoGate> {
       builder: (context, _) => switch (_escopo.sessao.estado) {
         SessaoEstado.carregando => const SizedBox.shrink(),
         SessaoEstado.deslogado => Builder(builder: buildWelcomeScreen),
-        SessaoEstado.restrita => TwoFactorPendingPage(
-            onLogout: () => _escopo.auth.sair(),
-          ),
+        SessaoEstado.restrita => Builder(builder: buildTwoFactorSetupScreen),
         SessaoEstado.logada => Builder(
             builder: (context) => buildMainScreen(context, _maker),
           ),

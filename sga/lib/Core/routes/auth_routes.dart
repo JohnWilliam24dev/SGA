@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
@@ -5,6 +7,7 @@ import '../../Domain/domain.dart';
 import '../../View/auth/login_page.dart';
 import '../../View/auth/register_page.dart';
 import '../../View/auth/two_factor_page.dart';
+import '../../View/auth/two_factor_setup_page.dart';
 import '../../View/welcome/welcome_page.dart';
 import '../app/auth_scope.dart';
 import '../network/network.dart';
@@ -13,9 +16,9 @@ import 'app_route.dart';
 /// Roda uma ação de auth e troca o erro da API por uma mensagem que o botão
 /// do formulário sabe exibir. Ao dar certo a sessão muda e o `SessaoGate`
 /// leva para a tela certa: aqui ninguém navega para dentro do app.
-Future<void> _comMensagem(Future<void> Function() acao) async {
+Future<T> _comMensagem<T>(Future<T> Function() acao) async {
   try {
-    await acao();
+    return await acao();
   } on ApiException catch (e) {
     throw UserFacingException(e.mensagemParaUsuario);
   }
@@ -75,5 +78,16 @@ Widget buildTwoFactorScreen(BuildContext context, String desafio) {
       ),
     ),
     onBack: () => Navigator.of(context).pop(),
+  );
+}
+
+/// Ativação obrigatória do 2FA, para quem entrou com sessão restrita.
+Widget buildTwoFactorSetupScreen(BuildContext context) {
+  final escopo = AuthScope.of(context);
+  return TwoFactorSetupPage(
+    onCarregar: () => _comMensagem(escopo.doisFator.iniciar),
+    onConfirmar: (codigo) => _comMensagem(() => escopo.doisFator.confirmar(codigo)),
+    onConcluir: () => _comMensagem(escopo.doisFator.concluirAtivacao),
+    onLogout: () => unawaited(escopo.auth.sair()),
   );
 }

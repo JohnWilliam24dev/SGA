@@ -10,10 +10,10 @@ import 'sessao_gate.dart';
 
 /// Raiz do SGA: tema azul explícito, pack próprio e a navegação por sessão.
 ///
-/// Sem [sessao] e [auth], usa auth simulada em memória (testes e demo). O
-/// `main` passa as versões reais.
+/// Sem [sessao] e [auth], usa auth simulada em memória (testes e demo); o
+/// [doisFator] também cai no simulado se não vier. O `main` passa as reais.
 class SgaApp extends StatefulWidget {
-  const SgaApp({super.key, this.sessao, this.auth})
+  const SgaApp({super.key, this.sessao, this.auth, this.doisFator})
       : assert(
           (sessao == null) == (auth == null),
           'Informe sessao e auth juntos, ou nenhum.',
@@ -21,6 +21,7 @@ class SgaApp extends StatefulWidget {
 
   final SessaoStore? sessao;
   final AuthRepository? auth;
+  final DoisFatorRepository? doisFator;
 
   @override
   State<SgaApp> createState() => _SgaAppState();
@@ -30,6 +31,8 @@ class _SgaAppState extends State<SgaApp> {
   late final SessaoStore _sessao =
       widget.sessao ?? SessaoStore(MemoryTokenStorage());
   late final AuthRepository _auth = widget.auth ?? FakeAuthRepository(_sessao);
+  late final DoisFatorRepository _doisFator =
+      widget.doisFator ?? FakeDoisFatorRepository(_sessao);
 
   @override
   void dispose() {
@@ -41,6 +44,7 @@ class _SgaAppState extends State<SgaApp> {
   Widget build(BuildContext context) {
     return AuthScope(
       auth: _auth,
+      doisFator: _doisFator,
       sessao: _sessao,
       child: ValueListenableBuilder<AppThemeMode>(
         valueListenable: sgaThemeMode,

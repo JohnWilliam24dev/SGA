@@ -50,6 +50,13 @@ const tokensA1 = SessaoTokens(
   escopo: 'completo',
 );
 
+const tokensRestrita = SessaoTokens(
+  accessToken: 'a1',
+  refreshToken: 'r1',
+  makerId: 'm1',
+  escopo: 'ativar2fa',
+);
+
 Map<String, dynamic> sessaoJson(String n) => {
       'makerId': 'm1',
       'accessToken': 'a$n',

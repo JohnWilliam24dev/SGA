@@ -4,6 +4,10 @@
 library;
 
 export 'routes/auth_routes.dart'
-    show buildLoginScreen, buildRegisterScreen, buildWelcomeScreen;
+    show
+        buildLoginScreen,
+        buildRegisterScreen,
+        buildTwoFactorSetupScreen,
+        buildWelcomeScreen;
 export 'routes/commission_routes.dart' show buildCommissionDetailScreen;
 export 'routes/main_routes.dart' show buildMainScreen;

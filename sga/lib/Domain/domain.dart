@@ -15,3 +15,4 @@ export 'nova_commission.dart';
 export 'preco.dart';
 export 'status_repository.dart';
 export 'status_rules.dart';
+export 'two_factor_repository.dart';

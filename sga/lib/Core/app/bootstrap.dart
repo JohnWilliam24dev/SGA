@@ -12,5 +12,6 @@ SgaApp buildSgaApp() {
   return SgaApp(
     sessao: sessao,
     auth: HttpAuthRepository(client: client, sessao: sessao),
+    doisFator: HttpDoisFatorRepository(client: client, sessao: sessao),
   );
 }

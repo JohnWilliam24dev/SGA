@@ -29,12 +29,12 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _aceitouTermos = false;
   bool _termosPendentes = false;
 
-  FutureOr<void> _enviar(FormValues values) {
+  Future<void> _enviar(FormValues values) async {
     if (!_aceitouTermos) {
       setState(() => _termosPendentes = true);
       return;
     }
-    return widget.onRegister(
+    await widget.onRegister(
       Maker(
         nome: values['nome']!.trim(),
         email: values['email']!.trim(),

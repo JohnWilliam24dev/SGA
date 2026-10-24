@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Core/core.dart';
 
 /// Servidor falso para os testes de rede: [responder] decide cada resposta.

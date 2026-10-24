@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show TextField;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sga/Core/core.dart';
+import 'package:sga/Data/data.dart';
 import 'package:sga/Domain/domain.dart';
 import 'package:sga/View/auth/two_factor_setup_page.dart';
 import 'package:sga/View/commissions/commissions_page.dart';

@@ -96,12 +96,11 @@ test/                    espelha a estrutura de lib/
   sistema vira o ícone de "mostrar a barra" ao passar o mouse); celular com
   drawer (fundo escurece ao abrir).
 
-As colunas vêm de `lib/Domain/status_repository.dart` (`FakeStatusRepository`)
-e os dados de commissions são simulados em
-`lib/Domain/commission_repository.dart` (`FakeCommissionRepository`): o quadro
-usa `CommissionResumoModel` e o detalhe usa `CommissionDetalhadaModel`, os
-mesmos modelos que a API vai devolver. A integração com o servidor entra
-trocando essa implementação.
+Em testes e na demo sem servidor, as colunas e os pedidos vêm das versões
+simuladas (`FakeStatusRepository` e `FakeCommissionRepository`, em
+`lib/Domain/`). Com o servidor, vêm de `lib/Data/` (`HttpStatusRepository` e
+`HttpCommissionRepository`). O quadro usa `CommissionResumoModel` e o detalhe
+usa `CommissionDetalhadaModel` nos dois casos.
 
 ## API
 

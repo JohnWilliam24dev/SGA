@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:easy_ui/easy_ui.dart' show Button, ButtonVariant;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
@@ -15,12 +16,21 @@ class ProductCatalog extends StatelessWidget {
     required this.types,
     required this.previews,
     required this.onEdit,
+    this.restantes = 0,
+    this.carregandoMais = false,
+    this.onLoadMore,
   });
 
   final List<ProdutoModel> products;
   final List<TipoProdutoModel> types;
   final Map<String, Uint8List> previews;
   final ValueChanged<ProdutoModel> onEdit;
+
+  /// Produtos que ainda não foram carregados (a API traz 50 por vez); com
+  /// [onLoadMore], aparece o botão "Carregar mais".
+  final int restantes;
+  final bool carregandoMais;
+  final VoidCallback? onLoadMore;
 
   String _tipoDe(ProdutoModel produto) {
     for (final tipo in types) {
@@ -66,6 +76,18 @@ class ProductCatalog extends StatelessWidget {
                 tipo: _tipoDe(products[i]),
                 preview: previews[products[i].id],
                 onEdit: () => onEdit(products[i]),
+              ),
+            ),
+          if (restantes > 0 && onLoadMore != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Center(
+                child: Button(
+                  text: 'Carregar mais ($restantes)',
+                  variant: ButtonVariant.outline,
+                  loading: carregandoMais,
+                  onPressed: onLoadMore,
+                ),
               ),
             ),
         ],

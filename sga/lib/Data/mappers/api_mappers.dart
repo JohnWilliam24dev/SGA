@@ -110,3 +110,12 @@ AdicionalModel adicionalDoCatalogoDeApi(Map<String, dynamic> j) =>
 
 /// A API aceita número com até 2 casas na entrada.
 double duasCasas(double valor) => (valor * 100).round() / 100;
+
+/// Produto do portfólio: `tipoProduto` vem aninhado (`{id, nome}`).
+ProdutoModel produtoDeApi(Map<String, dynamic> j) => ProdutoModel(
+      id: j['id'] as String,
+      nome: j['nome'] as String,
+      imagemUrl: j['imagemUrl'] as String,
+      tipoProdutoId: mapaDe(j['tipoProduto'])['id'] as String,
+      descricao: j['descricao'] as String?,
+    );

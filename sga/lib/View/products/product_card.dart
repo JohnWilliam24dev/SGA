@@ -40,21 +40,15 @@ class ProductCard extends StatelessWidget {
               child: SizedBox(
                 height: 72,
                 width: double.infinity,
-                child: preview == null
-                    ? DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [colors.chartTertiary, colors.chartSecondary],
+                child: preview != null
+                    ? Image.memory(preview!, fit: BoxFit.cover)
+                    : produto.imagemUrl.isEmpty
+                        ? _Vazio(colors)
+                        : Image.network(
+                            produto.imagemUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => _Vazio(colors),
                           ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.inventory_2_outlined,
-                            color: colors.text,
-                          ),
-                        ),
-                      )
-                    : Image.memory(preview!, fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 8),
@@ -89,6 +83,24 @@ class ProductCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Imagem de reserva: gradiente com ícone, para produto sem foto ou foto que
+/// não carregou.
+class _Vazio extends StatelessWidget {
+  const _Vazio(this.colors);
+
+  final SgaColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [colors.chartTertiary, colors.chartSecondary]),
+      ),
+      child: Center(child: Icon(Icons.inventory_2_outlined, color: colors.text)),
     );
   }
 }

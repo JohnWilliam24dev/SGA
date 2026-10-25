@@ -10,6 +10,7 @@ class AppDependencies {
     required this.status,
     required this.catalogo,
     required this.catalogoAdmin,
+    required this.produtos,
   });
 
   /// Dados simulados em memória, um conjunto novo a cada chamada.
@@ -26,10 +27,11 @@ class AppDependencies {
       status: status,
       catalogo: const FakeCatalogoRepository(),
       catalogoAdmin: FakeCatalogoAdminRepository(),
+      produtos: FakeProdutoRepository(),
     );
   }
 
-  /// Status, quadro e catálogo na API.
+  /// Status, quadro, catálogo e produtos na API.
   factory AppDependencies.http(ApiClient client) {
     final catalogo = HttpCatalogoRepository(client);
     return AppDependencies(
@@ -37,6 +39,7 @@ class AppDependencies {
       status: HttpStatusRepository(client),
       catalogo: catalogo,
       catalogoAdmin: catalogo,
+      produtos: HttpProdutoRepository(client),
     );
   }
 
@@ -44,4 +47,5 @@ class AppDependencies {
   final StatusRepository status;
   final CatalogoRepository catalogo;
   final CatalogoAdminRepository catalogoAdmin;
+  final ProdutoRepository produtos;
 }

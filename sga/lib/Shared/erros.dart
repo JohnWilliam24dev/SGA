@@ -7,6 +7,7 @@ String mensagemDeErro(Object erro, String padrao) => switch (erro) {
       CommissionRegraException(:final mensagem) => mensagem,
       StatusRegraException(:final mensagem) => mensagem,
       CatalogoRegraException(:final mensagem) => mensagem,
+      ProdutoRegraException(:final mensagem) => mensagem,
       final ApiException e => e.mensagemParaUsuario,
       _ => padrao,
     };

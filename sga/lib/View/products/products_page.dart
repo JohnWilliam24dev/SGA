@@ -1,13 +1,10 @@
-import 'dart:typed_data';
-
 import 'package:easy_ui/easy_ui.dart' hide Icon;
 import 'package:flutter/widgets.dart' hide Icon;
-import 'package:image_picker/image_picker.dart';
 
 import '../../Domain/domain.dart';
 import 'product_catalog.dart';
 import 'product_form.dart';
-import 'products_controller.dart';
+import 'productscontroller.dart';
 import 'products_mobile.dart';
 import 'products_mobile_section.dart';
 
@@ -16,45 +13,36 @@ import 'products_mobile_section.dart';
 ///
 /// "Editar" num cartão leva o produto para o formulário, já preenchido; no
 /// celular isso abre a tela do formulário.
+///
+/// Os dados vêm do [ProdutoRepository] (a API traz 50 por vez) e os tipos do
+/// [CatalogoAdminRepository]; sem eles, a tela usa os simulados.
 class ProductsPage extends StatefulWidget {
-  const ProductsPage({super.key});
+  const ProductsPage({super.key, this.produtos, this.catalogo});
+
+  final ProdutoRepository? produtos;
+  final CatalogoAdminRepository? catalogo;
 
   @override
   State<ProductsPage> createState() => _ProductsPageState();
 }
 
-class _ProductsPageState extends State<ProductsPage> {
-  final _controller = ProductsController();
+class _ProductsPageState extends State<ProductsPage> with ProductsAcoes<ProductsPage> {
+  @override
+  late final controller = ProductsController(
+    produtos: widget.produtos ?? FakeProdutoRepository(),
+    catalogo: widget.catalogo ?? FakeCatalogoAdminRepository(),
+  );
   final _scroll = ScrollController();
 
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     _scroll.dispose();
     super.dispose();
   }
 
-  Future<Uint8List?> _pickImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    return image?.readAsBytes();
-  }
-
-  void _save(FormValues values) {
-    final adicionando = _controller.editing == null;
-    final aviso = _controller.salvar(values);
-    if (aviso != null) {
-      Toast.show(context, text: aviso, type: ToastType.warning);
-      return;
-    }
-    Toast.show(
-      context,
-      text: adicionando ? 'Produto adicionado.' : 'Produto atualizado.',
-      type: ToastType.success,
-    );
-  }
-
   void _editar(ProdutoModel produto) {
-    _controller.editar(produto);
+    controller.editar(produto);
     // No desktop o formulário fica no topo da página.
     if (_scroll.hasClients) {
       _scroll.animateTo(
@@ -68,21 +56,27 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, _) => LayoutBuilder(builder: _layout),
+      listenable: controller,
+      builder: (context, _) {
+        final c = controller;
+        if (c.carregando) return const Loader(message: 'Carregando produtos...');
+        if (c.falha != null) {
+          return ErrorState(description: c.falha, onRetry: c.carregar);
+        }
+        return LayoutBuilder(builder: _layout);
+      },
     );
   }
 
   Widget _layout(BuildContext context, BoxConstraints constraints) {
-    final c = _controller;
+    final c = controller;
     final editando = c.editing;
     final form = ProductForm(
       key: ValueKey(c.formVersion),
       types: c.types,
       initial: editando,
-      initialPreview: editando == null ? null : c.previews[editando.id],
-      onPickImage: _pickImage,
-      onSave: _save,
+      onPickImage: pickImage,
+      onSave: save,
       onCancel: editando == null ? null : c.cancelarEdicao,
     );
     final catalog = ProductCatalog(
@@ -90,6 +84,9 @@ class _ProductsPageState extends State<ProductsPage> {
       types: c.types,
       previews: c.previews,
       onEdit: _editar,
+      restantes: c.restantes,
+      carregandoMais: c.carregandoMais,
+      onLoadMore: carregarMais,
     );
 
     final width = constraints.maxWidth;

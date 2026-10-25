@@ -1,18 +1,21 @@
+import 'package:easy_ui/easy_ui.dart' show ErrorState, Loader;
 import 'package:flutter/material.dart'
     show Material, MaterialType, Tab, TabBar, TabBarView, TabController;
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
+import '../../Domain/domain.dart';
 import 'catalog_actions.dart';
 import 'catalog_entries.dart';
 import 'catalog_list.dart';
 import 'catalog_rows.dart';
-import 'catalog_seed.dart';
 
-/// Catálogo do Maker: abas Tipos de produtos e Adicionais. Por enquanto os
-/// registros vivem em memória, para exercitar os fluxos antes da API.
+/// Catálogo do Maker: abas Tipos de produtos e Adicionais, lidos e gravados
+/// pelo [CatalogoAdminRepository]. Sem [repository], usa o catálogo simulado.
 class CatalogPage extends StatefulWidget {
-  const CatalogPage({super.key});
+  const CatalogPage({super.key, this.repository});
+
+  final CatalogoAdminRepository? repository;
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
@@ -22,9 +25,34 @@ class _CatalogPageState extends State<CatalogPage>
     with SingleTickerProviderStateMixin, CatalogActions<CatalogPage> {
   late final _tabs = TabController(length: 2, vsync: this);
   @override
-  final types = seedTypes();
+  late final CatalogoAdminRepository repo =
+      widget.repository ?? FakeCatalogoAdminRepository();
   @override
-  final additionals = seedAdditionals();
+  List<CatalogType> types = [];
+  @override
+  List<CatalogAdditional> additionals = [];
+  bool _carregando = true;
+  String? _falha;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregar();
+  }
+
+  Future<void> _carregar() async {
+    setState(() {
+      _carregando = true;
+      _falha = null;
+    });
+    final falha = await recarregar();
+    if (mounted) {
+      setState(() {
+        _carregando = false;
+        _falha = falha;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -34,6 +62,10 @@ class _CatalogPageState extends State<CatalogPage>
 
   @override
   Widget build(BuildContext context) {
+    if (_carregando) return const Loader(message: 'Carregando catálogo...');
+    if (_falha != null) {
+      return ErrorState(description: _falha, onRetry: _carregar);
+    }
     final colors = SgaColors.of(context);
     return Column(
       children: [
@@ -71,9 +103,7 @@ class _CatalogPageState extends State<CatalogPage>
                 onRemove: removeType,
                 rowBuilder: (item) => TypeRow(
                   item: item,
-                  onEnabled: (v) => setState(
-                    () => item.model = typeWithEnabled(item.model, v),
-                  ),
+                  onEnabled: (v) => alternarTipo(item, v),
                 ),
               ),
               CatalogList<CatalogAdditional>(
@@ -90,9 +120,7 @@ class _CatalogPageState extends State<CatalogPage>
                 onRemove: removeAdditional,
                 rowBuilder: (item) => AdditionalRow(
                   item: item,
-                  onEnabled: (v) => setState(
-                    () => item.model = additionalWithEnabled(item.model, v),
-                  ),
+                  onEnabled: (v) => alternarAdicional(item, v),
                 ),
               ),
             ],

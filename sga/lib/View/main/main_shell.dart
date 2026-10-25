@@ -22,11 +22,15 @@ class MainShell extends StatefulWidget {
     required this.onLogout,
     required this.maker,
     this.catalogoRepository = const FakeCatalogoRepository(),
+    this.catalogoAdmin,
   });
 
   final CommissionRepository commissionRepository;
   final StatusRepository statusRepository;
   final CatalogoRepository catalogoRepository;
+
+  /// Administração do catálogo; sem ele, a seção usa o catálogo simulado.
+  final CatalogoAdminRepository? catalogoAdmin;
   final void Function(CommissionResumoModel commission, String statusNome)
   onOpenCommission;
   final VoidCallback onLogout;
@@ -52,7 +56,7 @@ class _MainShellState extends State<MainShell> {
     return switch (_selecionado) {
       Secao.reports => ReportsPage(repository: widget.commissionRepository),
       Secao.products => const ProductsPage(),
-      Secao.productTypes => const CatalogPage(),
+      Secao.productTypes => CatalogPage(repository: widget.catalogoAdmin),
       Secao.profile => MakerProfilePage(
         maker: _maker,
         onMakerChanged: (maker) => setState(() => _maker = maker),

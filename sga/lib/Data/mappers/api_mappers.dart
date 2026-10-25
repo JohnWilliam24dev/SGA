@@ -81,3 +81,32 @@ CommissionColumn colunaDeApi(Map<String, dynamic> j) {
     temMais: j['temMais'] as bool,
   );
 }
+
+TipoProdutoModel tipoDeApi(Map<String, dynamic> j) => TipoProdutoModel(
+      id: j['id'] as String,
+      nome: j['nome'] as String,
+      precoBase: dinheiro(j['precoBase']),
+      habilitado: j['habilitado'] as bool,
+    );
+
+/// Tipo com os ids dos adicionais vinculados (`adicionalIds`).
+TipoCatalogado tipoCatalogadoDeApi(Map<String, dynamic> j) => TipoCatalogado(
+      tipo: tipoDeApi(j),
+      adicionalIds: {
+        for (final id in (j['adicionalIds'] as List? ?? const [])) id as String,
+      },
+    );
+
+/// `precoFixo` e `porcentagem` vêm em texto ou nulos (só um é preenchido).
+AdicionalModel adicionalDoCatalogoDeApi(Map<String, dynamic> j) =>
+    AdicionalModel(
+      id: j['id'] as String,
+      nome: j['nome'] as String,
+      descricao: j['descricao'] as String?,
+      precoFixo: dinheiroOuNulo(j['precoFixo']),
+      porcentagem: dinheiroOuNulo(j['porcentagem']),
+      habilitado: j['habilitado'] as bool,
+    );
+
+/// A API aceita número com até 2 casas na entrada.
+double duasCasas(double valor) => (valor * 100).round() / 100;

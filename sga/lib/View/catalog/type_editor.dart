@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import '../../Domain/models/adicional_model.dart';
 import '../../Core/theme/sga_theme.dart';
 import 'catalog_entries.dart';
+import 'catalog_limits.dart';
 import 'editor_fields.dart';
 import 'editor_sheet.dart';
 
@@ -51,16 +52,17 @@ class _TypeEditorState extends State<TypeEditor> {
     super.dispose();
   }
 
+  void _aviso(String texto) =>
+      Toast.show(context, text: texto, type: ToastType.warning);
+
   void _save() {
     final value = double.tryParse(_price.text.replaceAll(',', '.'));
-    if (_name.text.trim().isEmpty || value == null || value < 0) {
-      Toast.show(
-        context,
-        text: 'Informe um nome e um preço base válido.',
-        type: ToastType.warning,
-      );
-      return;
-    }
+    final erro = erroDoTipo(
+      nome: _name.text,
+      preco: value,
+      vinculados: _selected.length,
+    );
+    if (erro != null) return _aviso(erro);
     Navigator.of(context).pop(
       TypeDraft(
         name: _name.text.trim(),

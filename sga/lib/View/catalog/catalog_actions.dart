@@ -1,23 +1,60 @@
 import 'package:easy_ui/easy_ui.dart' show Modal, Toast, ToastType;
 import 'package:flutter/widgets.dart';
 
-import '../../Domain/models/adicional_model.dart';
-import '../../Domain/models/tipo_produto_model.dart';
+import '../../Domain/domain.dart';
+import '../../Shared/erros.dart';
 import 'additional_editor.dart';
 import 'catalog_entries.dart';
 import 'type_editor.dart';
 
-/// Ações do catálogo (criar, editar, excluir) sobre as listas em memória de
-/// quem usa este mixin. Cada ação avisa o resultado por um Toast.
+/// Ações do catálogo (carregar, criar, editar, habilitar, excluir) sobre o
+/// [CatalogoAdminRepository]. Cada ação avisa o resultado por um Toast e, no
+/// fim, relê o catálogo: a tela espelha o que o servidor guardou.
 mixin CatalogActions<T extends StatefulWidget> on State<T> {
+  CatalogoAdminRepository get repo;
   List<CatalogType> get types;
+  set types(List<CatalogType> valor);
   List<CatalogAdditional> get additionals;
+  set additionals(List<CatalogAdditional> valor);
 
   void _ok(String text) =>
       Toast.show(context, text: text, type: ToastType.success);
 
   void _erro(String text) =>
       Toast.show(context, text: text, type: ToastType.error);
+
+  /// Relê tipos e adicionais; devolve o motivo se falhou.
+  Future<String?> recarregar() async {
+    try {
+      final tipos = await repo.listarTipos();
+      final adicionais = await repo.listarAdicionais();
+      if (!mounted) return null;
+      setState(() {
+        types = [
+          for (final t in tipos)
+            CatalogType(model: t.tipo, additionalIds: {...t.adicionalIds}),
+        ];
+        additionals = [for (final a in adicionais) CatalogAdditional(model: a)];
+      });
+      return null;
+    } catch (e) {
+      return mensagemDeErro(e, 'Não foi possível carregar o catálogo.');
+    }
+  }
+
+  /// Roda a [acao] e relê o catálogo, com sucesso ou não (uma falha no meio
+  /// pode ter salvado parte).
+  Future<void> _rodar(Future<void> Function() acao, String sucesso) async {
+    String? falha;
+    try {
+      await acao();
+    } catch (e) {
+      falha = mensagemDeErro(e, 'Não foi possível salvar. Tente de novo.');
+    }
+    if (falha != null && mounted) _erro(falha);
+    await recarregar();
+    if (falha == null && mounted) _ok(sucesso);
+  }
 
   Future<bool> _confirmaExclusao(String title) async {
     final ok = await Modal.confirm(
@@ -39,25 +76,16 @@ mixin CatalogActions<T extends StatefulWidget> on State<T> {
       ),
     );
     if (draft == null || !mounted) return;
-    final model = TipoProdutoModel(
-      id: entry?.model.id ?? 'type-${DateTime.now().microsecondsSinceEpoch}',
-      nome: draft.name,
-      precoBase: draft.basePrice,
-      habilitado: draft.enabled,
+    await _rodar(
+      () => repo.salvarTipo(
+        id: entry?.model.id,
+        nome: draft.name,
+        precoBase: draft.basePrice,
+        habilitado: draft.enabled,
+        adicionalIds: draft.additionalIds,
+      ),
+      entry == null ? 'Tipo de produto criado.' : 'Tipo de produto atualizado.',
     );
-    final novo = CatalogType(
-      model: model,
-      additionalIds: draft.additionalIds,
-      protected: entry?.protected ?? false,
-    );
-    setState(() {
-      if (entry == null) {
-        types.insert(0, novo);
-      } else {
-        types[types.indexOf(entry)] = novo;
-      }
-    });
-    _ok(entry == null ? 'Tipo de produto criado.' : 'Tipo de produto atualizado.');
   }
 
   Future<void> editAdditional([CatalogAdditional? entry]) async {
@@ -66,56 +94,57 @@ mixin CatalogActions<T extends StatefulWidget> on State<T> {
       builder: (_) => AdditionalEditor(initial: entry?.model),
     );
     if (draft == null || !mounted) return;
-    final model = AdicionalModel(
-      id: entry?.model.id ?? 'add-${DateTime.now().microsecondsSinceEpoch}',
-      nome: draft.name,
-      descricao: draft.description.isEmpty ? null : draft.description,
-      precoFixo: draft.rule == PriceRule.fixed ? draft.value : null,
-      porcentagem: draft.rule == PriceRule.percent ? draft.value : null,
-      habilitado: draft.enabled,
+    await _rodar(
+      () => repo.salvarAdicional(
+        id: entry?.model.id,
+        nome: draft.name,
+        descricao: draft.description,
+        precoFixo: draft.rule == PriceRule.fixed ? draft.value : null,
+        porcentagem: draft.rule == PriceRule.percent ? draft.value : null,
+        habilitado: draft.enabled,
+      ),
+      entry == null ? 'Adicional criado.' : 'Adicional atualizado.',
     );
-    final novo = CatalogAdditional(
-      model: model,
-      protected: entry?.protected ?? false,
-    );
-    setState(() {
-      if (entry == null) {
-        additionals.insert(0, novo);
-      } else {
-        additionals[additionals.indexOf(entry)] = novo;
-      }
-    });
-    _ok(entry == null ? 'Adicional criado.' : 'Adicional atualizado.');
+  }
+
+  /// O interruptor muda na hora; se o servidor recusar, volta ao que estava.
+  Future<void> alternarTipo(CatalogType entry, bool valor) async {
+    final antes = entry.model;
+    setState(() => entry.model = typeWithEnabled(antes, valor));
+    try {
+      await repo.definirTipoHabilitado(antes.id, valor);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => entry.model = antes);
+      _erro(mensagemDeErro(e, 'Não foi possível alterar o tipo.'));
+    }
+  }
+
+  Future<void> alternarAdicional(CatalogAdditional entry, bool valor) async {
+    final antes = entry.model;
+    setState(() => entry.model = additionalWithEnabled(antes, valor));
+    try {
+      await repo.definirAdicionalHabilitado(antes.id, valor);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => entry.model = antes);
+      _erro(mensagemDeErro(e, 'Não foi possível alterar o adicional.'));
+    }
   }
 
   Future<void> removeType(CatalogType entry) async {
     if (!await _confirmaExclusao('Excluir tipo de produto')) return;
-    if (entry.protected) {
-      _erro(
-        'Este tipo já foi usado em pedidos ou no portfólio. Desabilite-o '
-        'para mantê-lo fora de novos pedidos.',
-      );
-      return;
-    }
-    setState(() => types.remove(entry));
-    _ok('Tipo de produto excluído.');
+    await _rodar(
+      () => repo.excluirTipo(entry.model.id),
+      'Tipo de produto excluído.',
+    );
   }
 
   Future<void> removeAdditional(CatalogAdditional entry) async {
     if (!await _confirmaExclusao('Excluir adicional')) return;
-    if (entry.protected) {
-      _erro(
-        'Este adicional já foi usado em um pedido. Desabilite-o para não '
-        'exibi-lo em novos formulários.',
-      );
-      return;
-    }
-    setState(() {
-      additionals.remove(entry);
-      for (final type in types) {
-        type.additionalIds.remove(entry.model.id);
-      }
-    });
-    _ok('Adicional excluído.');
+    await _rodar(
+      () => repo.excluirAdicional(entry.model.id),
+      'Adicional excluído.',
+    );
   }
 }

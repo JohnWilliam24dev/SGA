@@ -9,6 +9,7 @@ class AppDependencies {
     required this.commission,
     required this.status,
     required this.catalogo,
+    required this.catalogoAdmin,
   });
 
   /// Dados simulados em memória, um conjunto novo a cada chamada.
@@ -24,18 +25,23 @@ class AppDependencies {
       commission: commission,
       status: status,
       catalogo: const FakeCatalogoRepository(),
+      catalogoAdmin: FakeCatalogoAdminRepository(),
     );
   }
 
-  /// Status e quadro na API. O catálogo ainda é simulado (entra em HTTP numa
-  /// fase própria).
-  factory AppDependencies.http(ApiClient client) => AppDependencies(
-        commission: HttpCommissionRepository(client),
-        status: HttpStatusRepository(client),
-        catalogo: const FakeCatalogoRepository(),
-      );
+  /// Status, quadro e catálogo na API.
+  factory AppDependencies.http(ApiClient client) {
+    final catalogo = HttpCatalogoRepository(client);
+    return AppDependencies(
+      commission: HttpCommissionRepository(client),
+      status: HttpStatusRepository(client),
+      catalogo: catalogo,
+      catalogoAdmin: catalogo,
+    );
+  }
 
   final CommissionRepository commission;
   final StatusRepository status;
   final CatalogoRepository catalogo;
+  final CatalogoAdminRepository catalogoAdmin;
 }

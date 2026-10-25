@@ -2,6 +2,7 @@ import 'package:easy_ui/easy_ui.dart' show KanbanColumnMove, KanbanMove;
 import 'package:flutter/foundation.dart';
 
 import '../../Domain/domain.dart';
+import '../../Shared/erros.dart';
 import 'commissions_paginacao.dart';
 
 /// Estado e regras do quadro de commissions, sem nenhum widget: a tela só

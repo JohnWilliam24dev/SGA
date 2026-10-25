@@ -1,27 +1,21 @@
 import '../../Domain/models/adicional_model.dart';
 import '../../Domain/models/tipo_produto_model.dart';
 
-/// Um tipo de produto na lista, com os adicionais vinculados. [protected]
-/// marca o tipo que já foi usado em pedidos ou no portfólio: só pode ser
-/// desabilitado, não excluído.
+/// Um tipo de produto na lista, com os adicionais vinculados. Se ele já foi
+/// usado em pedidos ou no portfólio, o servidor recusa a exclusão (o
+/// caminho é desabilitá-lo).
 class CatalogType {
-  CatalogType({
-    required this.model,
-    required this.additionalIds,
-    this.protected = false,
-  });
+  CatalogType({required this.model, required this.additionalIds});
 
   TipoProdutoModel model;
   final Set<String> additionalIds;
-  final bool protected;
 }
 
-/// Um adicional na lista. [protected] vale como em [CatalogType].
+/// Um adicional na lista.
 class CatalogAdditional {
-  CatalogAdditional({required this.model, this.protected = false});
+  CatalogAdditional({required this.model});
 
   AdicionalModel model;
-  final bool protected;
 }
 
 TipoProdutoModel typeWithEnabled(TipoProdutoModel model, bool value) =>

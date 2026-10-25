@@ -1,16 +1,7 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 
-import '../../Core/network/network.dart';
 import '../../Domain/domain.dart';
-
-/// Texto de erro para a tela: a mensagem da regra ou da API, quando há uma;
-/// senão o [padrao].
-String mensagemDeErro(Object erro, String padrao) => switch (erro) {
-      CommissionRegraException(:final mensagem) => mensagem,
-      StatusRegraException(:final mensagem) => mensagem,
-      final ApiException e => e.mensagemParaUsuario,
-      _ => padrao,
-    };
+import '../../Shared/erros.dart';
 
 /// "Carregar mais" por coluna: a API traz 50 pedidos por vez.
 mixin CommissionsPaginacao on ChangeNotifier {

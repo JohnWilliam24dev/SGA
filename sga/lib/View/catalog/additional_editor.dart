@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show RadioGroup, RadioListTile;
 import 'package:flutter/widgets.dart';
 
 import '../../Domain/models/adicional_model.dart';
+import 'catalog_limits.dart';
 import 'editor_fields.dart';
 import 'editor_sheet.dart';
 
@@ -58,16 +59,18 @@ class _AdditionalEditorState extends State<AdditionalEditor> {
     super.dispose();
   }
 
+  void _aviso(String texto) =>
+      Toast.show(context, text: texto, type: ToastType.warning);
+
   void _save() {
     final value = double.tryParse(_value.text.replaceAll(',', '.'));
-    if (_name.text.trim().isEmpty || value == null || value < 0) {
-      Toast.show(
-        context,
-        text: 'Informe nome e valor válido.',
-        type: ToastType.warning,
-      );
-      return;
-    }
+    final erro = erroDoAdicional(
+      nome: _name.text,
+      descricao: _description.text,
+      valor: value,
+      porcentagem: _rule == PriceRule.percent,
+    );
+    if (erro != null) return _aviso(erro);
     Navigator.of(context).pop(
       AdditionalDraft(
         name: _name.text.trim(),

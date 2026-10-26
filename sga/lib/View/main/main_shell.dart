@@ -24,6 +24,8 @@ class MainShell extends StatefulWidget {
     this.catalogoRepository = const FakeCatalogoRepository(),
     this.catalogoAdmin,
     this.produtos,
+    this.makerRepository,
+    this.makerId,
   });
 
   final CommissionRepository commissionRepository;
@@ -35,6 +37,11 @@ class MainShell extends StatefulWidget {
 
   /// Portfólio; sem ele, a seção usa o portfólio simulado.
   final ProdutoRepository? produtos;
+
+  /// Perfil do Maker na API (com o [makerId] da sessão); sem ele, o perfil
+  /// fica só na tela.
+  final MakerRepository? makerRepository;
+  final String? makerId;
   final void Function(CommissionResumoModel commission, String statusNome)
   onOpenCommission;
   final VoidCallback onLogout;
@@ -52,6 +59,26 @@ class _MainShellState extends State<MainShell> {
   void initState() {
     super.initState();
     _maker = widget.maker;
+    _carregarMaker();
+  }
+
+  /// Traz o nome, os termos e o "faço e não faço" guardados no servidor.
+  Future<void> _carregarMaker() async {
+    final repo = widget.makerRepository;
+    final id = widget.makerId;
+    if (repo == null || id == null) return;
+    try {
+      final remoto = await repo.carregar(id);
+      if (!mounted) return;
+      setState(() => _maker = _maker.copyWith(
+            nome: remoto.nome,
+            termosServico: remoto.termosServico,
+            faz: remoto.faz,
+            naoFaz: remoto.naoFaz,
+          ));
+    } catch (_) {
+      // O perfil é secundário: sem ele, o app abre com os dados da sessão.
+    }
   }
 
   void _ir(String id) => setState(() => _selecionado = id);
@@ -67,6 +94,8 @@ class _MainShellState extends State<MainShell> {
       Secao.profile => MakerProfilePage(
         maker: _maker,
         onMakerChanged: (maker) => setState(() => _maker = maker),
+        repository: widget.makerRepository,
+        makerId: widget.makerId,
       ),
       Secao.settings => const SettingsPage(),
       Secao.support => const SupportPage(),

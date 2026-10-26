@@ -21,7 +21,7 @@ Future<Maker?> editarPerfil(BuildContext context, Maker maker) {
       InputField(
         name: 'nome',
         label: 'Nome completo',
-        validation: [isRequired()],
+        validation: [isRequired(), maxLength(80)],
       ),
       InputField(
         name: 'email',

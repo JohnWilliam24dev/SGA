@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart'
     show InputDecoration, OutlineInputBorder, TextField;
+import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter/widgets.dart';
 
 import '../../Shared/widgets/glass/glass_panel.dart';
@@ -37,6 +38,8 @@ class _ProfileTermsState extends State<ProfileTerms> {
         minLines: 9,
         maxLines: 14,
         onChanged: widget.onChanged,
+        // Limite da API para os termos de serviço.
+        inputFormatters: [LengthLimitingTextInputFormatter(5000)],
         decoration: const InputDecoration(
           hintText: 'Escreva aqui os seus termos de serviço...',
           alignLabelWithHint: true,

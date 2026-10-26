@@ -11,6 +11,7 @@ class AppDependencies {
     required this.catalogo,
     required this.catalogoAdmin,
     required this.produtos,
+    this.maker,
   });
 
   /// Dados simulados em memória, um conjunto novo a cada chamada.
@@ -31,7 +32,7 @@ class AppDependencies {
     );
   }
 
-  /// Status, quadro, catálogo e produtos na API.
+  /// Status, quadro, catálogo, produtos e perfil na API.
   factory AppDependencies.http(ApiClient client) {
     final catalogo = HttpCatalogoRepository(client);
     return AppDependencies(
@@ -40,6 +41,7 @@ class AppDependencies {
       catalogo: catalogo,
       catalogoAdmin: catalogo,
       produtos: HttpProdutoRepository(client),
+      maker: HttpMakerRepository(client),
     );
   }
 
@@ -48,4 +50,7 @@ class AppDependencies {
   final CatalogoRepository catalogo;
   final CatalogoAdminRepository catalogoAdmin;
   final ProdutoRepository produtos;
+
+  /// Perfil na API; `null` nos dados simulados (o perfil fica só no app).
+  final MakerRepository? maker;
 }

@@ -17,6 +17,8 @@ Widget buildMainScreen(BuildContext context, [Maker? maker]) {
     catalogoRepository: dados.catalogo,
     catalogoAdmin: dados.catalogoAdmin,
     produtos: dados.produtos,
+    makerRepository: dados.maker,
+    makerId: AuthScope.of(context).sessao.makerId,
     onOpenCommission: (commission, statusNome) => openCommissionDetail(
       context,
       commission: commission,

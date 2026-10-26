@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart' show immutable, listEquals;
 
 /// Quem usa o SGA para criar e gerenciar a sua arte (o artista).
 ///
-/// Reúne o cadastro e as informações públicas usadas na contratação. A
-/// persistência remota continua sendo uma próxima etapa.
+/// Reúne o cadastro e as informações públicas usadas na contratação. A API
+/// guarda só o nome, os termos e o "faço e não faço"; ver [MakerRepository].
 @immutable
 class Maker {
   const Maker({

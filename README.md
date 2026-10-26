@@ -114,12 +114,14 @@ Sem `API_BASE_URL`, o debug usa `http://localhost:3000`; em release o app
 falha ao iniciar (no emulador Android use `http://10.0.2.2:3000`).
 
 Com o servidor, já falam com a API: status (colunas), quadro de commissions,
-catálogo (tipos e adicionais) e produtos do portfólio. O quadro e os produtos
+catálogo (tipos e adicionais), produtos do portfólio e perfil. O quadro e os produtos
 têm "Carregar mais" (a API traz 50 por vez) e o mover do quadro é otimista,
 com rollback. Produtos aceitam imagem PNG, JPG ou WebP de até 4 MB; a imagem
 de um produto já cadastrado não troca (ao editar, o campo some). Criar pedido,
-editar adicionais, fechar orçamento, o perfil e os relatórios seguem
-simulados até as próximas fases. Os repositórios de cada ambiente são
+editar adicionais, fechar orçamento e os relatórios seguem simulados até as
+próximas fases. No perfil, o servidor só guarda o nome, os termos de serviço e
+o "faço e não faço" (as duas listas viram um texto só); os outros campos
+valem só enquanto o app está aberto, e o app avisa quando algum deles muda. Os repositórios de cada ambiente são
 montados em `lib/Core/app/app_dependencies.dart`.
 
 ## Rodando

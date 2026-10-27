@@ -1,5 +1,5 @@
 import 'package:easy_ui/easy_ui.dart';
-import 'package:flutter/widgets.dart' show Size;
+import 'package:flutter/widgets.dart' show EditableText, Size;
 import 'package:flutter_test/flutter_test.dart' hide matches;
 import 'package:sga/Core/core.dart';
 import 'package:sga/Data/data.dart';

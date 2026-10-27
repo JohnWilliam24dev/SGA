@@ -21,7 +21,7 @@ class _TwoFactorSectionState extends State<TwoFactorSection> {
   List<String>? _codigos;
   int _versao = 0;
 
-  Future<void> _gerar(Map<String, String> v) async {
+  Future<void> _gerar(FormValues v) async {
     try {
       final novos = await widget.repository.regenerarCodigos(
         codigo: v['codigo']!.trim(),

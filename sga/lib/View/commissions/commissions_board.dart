@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
 import '../../Domain/domain.dart';
-import '../../Shared/shared.dart' hide NavDestination;
+import '../../Shared/shared.dart';
 import 'column_header.dart';
 import 'commission_card.dart';
 import 'kanban_style.dart';

@@ -76,7 +76,7 @@ class _AdditionalEditorState extends State<AdditionalEditor> {
         name: _name.text.trim(),
         description: _description.text.trim(),
         rule: _rule,
-        value: value,
+        value: value!,
         enabled: _enabled,
       ),
     );

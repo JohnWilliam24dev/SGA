@@ -5,7 +5,7 @@ import 'package:sga/View/auth/register_page.dart';
 
 import '../support/helpers.dart';
 
-Widget _cadastro({ValueChanged<Maker>? onRegister}) {
+Widget _cadastro({ValueChanged<Cadastro>? onRegister}) {
   return sgaHome(
     RegisterPage(
       onRegister: onRegister ?? (_) {},

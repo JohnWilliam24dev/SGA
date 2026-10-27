@@ -66,7 +66,7 @@ class _TypeEditorState extends State<TypeEditor> {
     Navigator.of(context).pop(
       TypeDraft(
         name: _name.text.trim(),
-        basePrice: value,
+        basePrice: value!,
         enabled: _enabled,
         additionalIds: _selected,
       ),

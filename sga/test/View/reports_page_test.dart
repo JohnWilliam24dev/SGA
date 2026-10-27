@@ -19,13 +19,17 @@ void main() {
     await tester.pumpWidget(
       _page(
         ReportsPage(
-          repository: FakeCommissionRepository(latencia: Duration.zero),
+          repository: FakeRelatorioRepository(
+            FakeCommissionRepository(latencia: Duration.zero),
+          ),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Pedidos no mês'), findsOneWidget);
+    expect(find.text('Pedidos no período'), findsOneWidget);
+    expect(find.text('Receita'), findsOneWidget);
+    expect(find.text('Ticket médio'), findsOneWidget);
     expect(find.text('Taxa de conclusão'), findsOneWidget);
     expect(find.text('Pedidos por tipo de arte'), findsOneWidget);
     expect(find.text('Pedidos por status'), findsOneWidget);
@@ -42,7 +46,9 @@ void main() {
     await tester.pumpWidget(
       _page(
         ReportsPage(
-          repository: FakeCommissionRepository(latencia: Duration.zero),
+          repository: FakeRelatorioRepository(
+            FakeCommissionRepository(latencia: Duration.zero),
+          ),
         ),
       ),
     );
@@ -51,7 +57,40 @@ void main() {
     expect(find.byType(CustomPaint), findsWidgets);
     expect(find.textContaining('%'), findsWidgets);
     expect(find.text('Fila'), findsOneWidget);
-    expect(find.text('Escolher período'), findsOneWidget);
+    expect(find.text('Este mês'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('tocar no período troca o filtro e busca de novo', (tester) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Espiao(
+      FakeRelatorioRepository(FakeCommissionRepository(latencia: Duration.zero)),
+    );
+
+    await tester.pumpWidget(_page(ReportsPage(repository: repo)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Este mês'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mês passado'), findsOneWidget);
+    expect(repo.pedidos.length, 2);
+    expect(repo.pedidos.first, (de: null, ate: null));
+    expect(repo.pedidos.last.de, isNotNull);
+    expect(repo.pedidos.last.ate!.isAfter(repo.pedidos.last.de!), isTrue);
+  });
+}
+
+class _Espiao implements RelatorioRepository {
+  _Espiao(this._base);
+
+  final RelatorioRepository _base;
+  final pedidos = <({DateTime? de, DateTime? ate})>[];
+
+  @override
+  Future<RelatorioResumoModel> carregarResumo({DateTime? de, DateTime? ate}) {
+    pedidos.add((de: de, ate: ate));
+    return _base.carregarResumo(de: de, ate: ate);
+  }
 }

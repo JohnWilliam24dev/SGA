@@ -11,6 +11,7 @@ class AppDependencies {
     required this.catalogo,
     required this.catalogoAdmin,
     required this.produtos,
+    required this.relatorios,
     this.maker,
   });
 
@@ -29,10 +30,11 @@ class AppDependencies {
       catalogo: const FakeCatalogoRepository(),
       catalogoAdmin: FakeCatalogoAdminRepository(),
       produtos: FakeProdutoRepository(),
+      relatorios: FakeRelatorioRepository(commission),
     );
   }
 
-  /// Status, quadro, catálogo, produtos e perfil na API.
+  /// Status, quadro, catálogo, produtos, relatórios e perfil na API.
   factory AppDependencies.http(ApiClient client) {
     final catalogo = HttpCatalogoRepository(client);
     return AppDependencies(
@@ -41,6 +43,7 @@ class AppDependencies {
       catalogo: catalogo,
       catalogoAdmin: catalogo,
       produtos: HttpProdutoRepository(client),
+      relatorios: HttpRelatorioRepository(client),
       maker: HttpMakerRepository(client),
     );
   }
@@ -50,6 +53,7 @@ class AppDependencies {
   final CatalogoRepository catalogo;
   final CatalogoAdminRepository catalogoAdmin;
   final ProdutoRepository produtos;
+  final RelatorioRepository relatorios;
 
   /// Perfil na API; `null` nos dados simulados (o perfil fica só no app).
   final MakerRepository? maker;

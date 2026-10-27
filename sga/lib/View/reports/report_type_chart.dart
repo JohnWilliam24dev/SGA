@@ -8,17 +8,17 @@ import 'report_donut.dart';
 /// "Pedidos por tipo de arte": rosca à esquerda e legenda com a porcentagem
 /// de cada tipo. Os três tipos mais pedidos aparecem; o resto vira "Outros".
 class ReportTypeChart extends StatelessWidget {
-  const ReportTypeChart({super.key, required this.orders});
+  const ReportTypeChart({super.key, required this.porTipo});
 
-  final List<CommissionResumoModel> orders;
+  final List<RelatorioPorTipo> porTipo;
+
+  int get _total => porTipo.fold(0, (soma, t) => soma + t.total);
 
   List<MapEntry<String, int>> _contagem() {
-    final porTipo = <String, int>{};
-    for (final order in orders) {
-      porTipo.update(order.tipoProdutoNome, (v) => v + 1, ifAbsent: () => 1);
-    }
-    final ordenado = porTipo.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final ordenado = [
+      for (final t in porTipo)
+        if (t.total > 0) MapEntry(t.nome, t.total),
+    ]..sort((a, b) => b.value.compareTo(a.value));
     final topo = ordenado.take(3).toList();
     final outros = ordenado.skip(3).fold<int>(0, (soma, e) => soma + e.value);
     return [...topo, if (outros > 0) MapEntry('Outros', outros)];
@@ -36,7 +36,7 @@ class ReportTypeChart extends StatelessWidget {
     final contagem = _contagem();
     final fatias = [
       for (var i = 0; i < contagem.length; i++)
-        DonutSlice(contagem[i].value / orders.length, cores[i]),
+        DonutSlice(contagem[i].value / _total, cores[i]),
     ];
     final legenda = Column(
       mainAxisSize: MainAxisSize.min,
@@ -44,7 +44,7 @@ class ReportTypeChart extends StatelessWidget {
       children: [
         for (var i = 0; i < contagem.length; i++)
           _Legenda(
-            '${contagem[i].key} · ${(contagem[i].value * 100 / orders.length).round()}%',
+            '${contagem[i].key} · ${(contagem[i].value * 100 / _total).round()}%',
             cores[i],
           ),
       ],
@@ -67,7 +67,7 @@ class ReportTypeChart extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          if (orders.isEmpty)
+          if (_total == 0)
             Text('Ainda não há pedidos.', style: TextStyle(color: colors.muted))
           else
             LayoutBuilder(

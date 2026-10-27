@@ -7,21 +7,25 @@ import '../../Domain/domain.dart';
 import '../../Shared/widgets/glass/glass_panel.dart';
 
 /// "Pedidos por status": uma barra de progresso por coluna do quadro, com a
-/// fatia de pedidos que está em cada uma.
+/// fatia dos pedidos do período que está em cada uma.
 class ReportStatusChart extends StatelessWidget {
   const ReportStatusChart({
     super.key,
-    required this.columns,
+    required this.itens,
+    required this.periodo,
     required this.onPickPeriod,
   });
 
-  final List<CommissionColumn> columns;
+  final List<RelatorioPorStatus> itens;
+
+  /// Nome do período mostrado no botão; tocar nele troca o período.
+  final String periodo;
   final VoidCallback onPickPeriod;
 
   @override
   Widget build(BuildContext context) {
     final colors = SgaColors.of(context);
-    final total = columns.fold<int>(0, (soma, c) => soma + c.commissions.length);
+    final total = itens.fold<int>(0, (soma, s) => soma + s.total);
     return GlassPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +42,7 @@ class ReportStatusChart extends StatelessWidget {
           if (total == 0)
             Text('Ainda não há pedidos.', style: TextStyle(color: colors.muted))
           else
-            for (final coluna in columns)
+            for (final item in itens)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Column(
@@ -48,19 +52,19 @@ class ReportStatusChart extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            coluna.titulo,
+                            item.nome,
                             style: TextStyle(fontSize: 11, color: colors.text),
                           ),
                         ),
                         Text(
-                          '${coluna.commissions.length}',
+                          '${item.total}',
                           style: TextStyle(fontSize: 11, color: colors.muted),
                         ),
                       ],
                     ),
                     const SizedBox(height: 5),
                     LinearProgressIndicator(
-                      value: coluna.commissions.length / total,
+                      value: item.total / total,
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(6),
                       backgroundColor: const Color(0x66FFFFFF),
@@ -73,7 +77,7 @@ class ReportStatusChart extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Button(
-              text: 'Escolher período',
+              text: periodo,
               variant: ButtonVariant.outline,
               onPressed: onPickPeriod,
             ),

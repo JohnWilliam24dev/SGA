@@ -24,6 +24,7 @@ class MainShell extends StatefulWidget {
     this.catalogoRepository = const FakeCatalogoRepository(),
     this.catalogoAdmin,
     this.produtos,
+    this.relatorioRepository,
     this.makerRepository,
     this.makerId,
   });
@@ -34,6 +35,9 @@ class MainShell extends StatefulWidget {
 
   /// Administração do catálogo; sem ele, a seção usa o catálogo simulado.
   final CatalogoAdminRepository? catalogoAdmin;
+
+  /// Relatório; sem ele, soma os pedidos do repositório de commissions.
+  final RelatorioRepository? relatorioRepository;
 
   /// Portfólio; sem ele, a seção usa o portfólio simulado.
   final ProdutoRepository? produtos;
@@ -85,7 +89,11 @@ class _MainShellState extends State<MainShell> {
 
   Widget _pagina() {
     return switch (_selecionado) {
-      Secao.reports => ReportsPage(repository: widget.commissionRepository),
+      Secao.reports => ReportsPage(
+        repository:
+            widget.relatorioRepository ??
+            FakeRelatorioRepository(widget.commissionRepository),
+      ),
       Secao.products => ProductsPage(
         produtos: widget.produtos,
         catalogo: widget.catalogoAdmin,

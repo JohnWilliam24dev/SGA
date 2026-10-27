@@ -2,7 +2,8 @@ import '../../Core/network/network.dart';
 import '../../Domain/domain.dart';
 import '../mappers/api_mappers.dart';
 
-/// Perfil na API: `GET` e `PATCH /makers/:id`. A API tem só `nome`,
+/// Perfil na API: `GET` e `PATCH /makers/me` (o dono vem do token; o
+/// `PATCH /makers/:id` foi removido do backend). A API tem só `nome`,
 /// `termosCondicoes` e `facoENaoFaco` (as duas listas viram um texto, ver
 /// `codificarEscopo`); o resto do [Maker] fica só no app.
 class HttpMakerRepository implements MakerRepository {
@@ -12,7 +13,7 @@ class HttpMakerRepository implements MakerRepository {
 
   @override
   Future<Maker> carregar(String makerId) async {
-    final json = mapaDe(await _client.get('/makers/$makerId'));
+    final json = mapaDe(await _client.get('/makers/me'));
     final escopo = decodificarEscopo(json['facoENaoFaco'] as String?);
     return Maker(
       nome: json['nome'] as String,
@@ -38,7 +39,7 @@ class HttpMakerRepository implements MakerRepository {
       if (!_mesmasListas(anterior, novo))
         'facoENaoFaco': codificarEscopo(novo.faz, novo.naoFaz),
     };
-    if (corpo.isNotEmpty) await _client.patch('/makers/$makerId', corpo: corpo);
+    if (corpo.isNotEmpty) await _client.patch('/makers/me', corpo: corpo);
     return [
       if (novo.email != anterior.email) 'e-mail',
       if (novo.nomeArtistico != anterior.nomeArtistico) 'nome artístico',

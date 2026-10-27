@@ -24,6 +24,7 @@ class ApiException implements Exception {
     this.status,
     this.codigo,
     this.retryAfter,
+    this.campos = const [],
   });
 
   /// Monta o erro a partir de uma resposta HTTP com falha.
@@ -42,6 +43,7 @@ class ApiException implements Exception {
       codigo: codigo,
       retryAfter: _segundos(retryAfter),
       mensagem: _texto(mapa['error']) ?? _padrao[tipo]!,
+      campos: _campos(mapa['campos']),
     );
   }
 
@@ -75,6 +77,8 @@ class ApiException implements Exception {
   final String mensagem;
   final String? codigo;
 
+  /// Campos recusados no 400 (`adicionais.1.quantidade` em itens de lista).
+  final List<({String campo, String mensagem})> campos;
   /// Quanto esperar (header `Retry-After`) quando [tipo] é `limite`.
   final Duration? retryAfter;
 
@@ -116,6 +120,12 @@ class ApiException implements Exception {
     };
     return t == null || t.trim().isEmpty ? null : t.trim();
   }
+
+  static List<({String campo, String mensagem})> _campos(Object? v) => [
+        for (final c in v is List ? v : const [])
+          if (c is Map && c['campo'] is String && c['mensagem'] is String)
+            (campo: c['campo'] as String, mensagem: c['mensagem'] as String),
+      ];
 
   static Duration? _segundos(String? valor) {
     final n = int.tryParse(valor ?? '');

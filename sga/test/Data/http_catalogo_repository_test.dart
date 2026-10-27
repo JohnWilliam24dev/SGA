@@ -44,18 +44,27 @@ void main() {
     expect((lista[1].precoFixo, lista[1].porcentagem), (null, 15.5));
   });
 
-  test('carregarOpcoes só traz habilitados e seus adicionais habilitados', () async {
-    final t = _montar((o) async => o.path == '/tipos-produto'
-        ? jsonBody([
-            _tipo('t1', adds: ['a1', 'a2']),
-            _tipo('t2', ativo: false, adds: ['a1']),
-          ], 200)
-        : jsonBody([_add('a1'), _add('a2', ativo: false)], 200));
+  test('carregarOpcoes lê GET /catalogo/opcoes (já só habilitados)', () async {
+    final t = _montar((_) async => jsonBody({
+          'tipos': [
+            {
+              'id': 't1', 'nome': 'Retrato', 'precoBase': '120.00',
+              'adicionais': [
+                {'id': 'a1', 'nome': 'Fundo', 'descricao': null,
+                 'precoFixo': '40.00', 'porcentagem': null, 'valorUnitario': '40.00'},
+                {'id': 'a2', 'nome': 'Express', 'descricao': 'Rápido',
+                 'precoFixo': null, 'porcentagem': '20.00', 'valorUnitario': '24.00'},
+              ],
+            },
+          ],
+        }, 200));
 
     final opcoes = await t.repo.carregarOpcoes();
 
-    expect(opcoes.map((o) => o.tipo.id), ['t1']);
-    expect(opcoes.single.adicionais.map((a) => a.id), ['a1']);
+    expect(t.adapter.chamadas.single.path, '/catalogo/opcoes');
+    expect((opcoes.single.tipo.id, opcoes.single.tipo.precoBase), ('t1', 120.0));
+    expect(opcoes.single.adicionais.map((a) => a.id), ['a1', 'a2']);
+    expect(opcoes.single.adicionais[1].porcentagem, 20.0);
   });
 
   test('criar tipo faz POST e depois PUT dos adicionais', () async {

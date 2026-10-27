@@ -17,6 +17,12 @@ double dinheiro(Object? valor) =>
 double? dinheiroOuNulo(Object? valor) =>
     valor == null ? null : dinheiro(valor);
 
+/// No app, `orcamentoFinal != null` significa "orçamento fechado". A API
+/// separa as duas coisas (`orcamentoFinal` pode existir como rascunho), então
+/// o valor só entra aqui quando `orcamentoFechado` é verdadeiro.
+double? orcamentoFechadoDeApi(Map<String, dynamic> j) =>
+    j['orcamentoFechado'] == true ? dinheiroOuNulo(j['orcamentoFinal']) : null;
+
 /// Cartão do quadro (`tipoProduto` aqui é só o nome).
 CommissionResumoModel resumoDeApi(Map<String, dynamic> j) {
   return CommissionResumoModel(
@@ -25,7 +31,7 @@ CommissionResumoModel resumoDeApi(Map<String, dynamic> j) {
     nomeCliente: j['nomeCliente'] as String,
     tipoProdutoNome: j['tipoProduto'] as String,
     precoSimulado: dinheiro(j['precoSimulado']),
-    orcamentoFinal: dinheiroOuNulo(j['orcamentoFinal']),
+    orcamentoFinal: orcamentoFechadoDeApi(j),
     posicao: j['posicao'] as int,
     criadoEm: DateTime.parse(j['criadoEm'] as String),
   );

@@ -27,7 +27,7 @@ void main() {
 
     final m = await t.repo.carregar('m1');
 
-    expect(t.adapter.chamadas.single.path, '/makers/m1');
+    expect(t.adapter.chamadas.single.path, '/makers/me');
     expect((m.nome, m.termosServico), ('Ana Souza', 'Pago antes'));
     expect((m.faz, m.naoFaz), (['Retrato'], ['NSFW']));
     expect((m.email, m.senha), ('', ''));
@@ -48,7 +48,7 @@ void main() {
     await t.repo.salvar('m1', anterior: _base, novo: _base.copyWith(termosServico: 'Novos'));
 
     expect(t.adapter.chamadas.first.method, 'PATCH');
-    expect(t.adapter.chamadas.first.path, '/makers/m1');
+    expect(t.adapter.chamadas.first.path, '/makers/me');
     expect(_corpo(t.adapter.chamadas[0]), {'nome': 'Ana B'});
     expect(_corpo(t.adapter.chamadas[1]), {'termosCondicoes': 'Novos'});
   });

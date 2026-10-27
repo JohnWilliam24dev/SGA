@@ -32,21 +32,22 @@ class HttpCatalogoRepository
           adicionalDoCatalogoDeApi(j),
       ]);
 
-  /// Só tipos habilitados, cada um com seus adicionais habilitados.
+  /// `GET /catalogo/opcoes`: só tipos e adicionais habilitados, no formato
+  /// da vitrine pública. O `valorUnitario` vem calculado pelo servidor, mas o
+  /// [AdicionalModel] guarda a regra (`precoFixo` ou `porcentagem`) e o app
+  /// recalcula igual com `preco.dart` para estimar o pedido.
   @override
   Future<List<OpcaoDeTipo>> carregarOpcoes() async {
-    final tipos = await listarTipos();
-    final adicionais = {for (final a in await listarAdicionais()) a.id: a};
+    final json = mapaDe(await _client.get('/catalogo/opcoes'));
     return [
-      for (final t in tipos)
-        if (t.tipo.habilitado)
-          OpcaoDeTipo(
-            tipo: t.tipo,
-            adicionais: [
-              for (final id in t.adicionalIds)
-                if (adicionais[id]?.habilitado ?? false) adicionais[id]!,
-            ],
-          ),
+      for (final t in listaDe(json['tipos']))
+        OpcaoDeTipo(
+          tipo: tipoDeApi({...t, 'habilitado': true}),
+          adicionais: [
+            for (final a in listaDe(t['adicionais']))
+              adicionalDoCatalogoDeApi({...a, 'habilitado': true}),
+          ],
+        ),
     ];
   }
 

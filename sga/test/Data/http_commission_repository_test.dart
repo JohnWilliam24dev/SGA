@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart' show RequestOptions, ResponseBody;
+import 'package:dio/dio.dart' show FormData, RequestOptions, ResponseBody;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sga/Core/core.dart';
 import 'package:sga/Data/data.dart';
+import 'package:sga/Data/mappers/api_mappers.dart';
 import 'package:sga/Domain/domain.dart';
 
 import '../support/fake_adapter.dart';
@@ -9,7 +10,8 @@ import '../support/fake_adapter.dart';
 Map<String, dynamic> _cartao(String id, {String? orcamento}) => {
       'id': id, 'token': 'AB3DE', 'nomeCliente': 'Ana', 'contato': '@ana',
       'tipoProduto': 'Ilustração', 'precoSimulado': '120.00',
-      'orcamentoFinal': orcamento, 'posicao': 0, 'statusId': 's1',
+      'orcamentoFinal': orcamento, 'orcamentoFechado': orcamento != null,
+      'posicao': 0, 'statusId': 's1',
       'imagemRefUrl': 'https://x/img.png', 'criadoEm': '2026-10-01T10:00:00.000Z',
     };
 
@@ -123,13 +125,99 @@ void main() {
     expect(await t.repo.contarPorStatus('nao-existe'), 0);
   });
 
-  test('ações sem contrato no backend recusam com mensagem clara', () async {
+  test('fecharOrcamento faz POST em /orcamento/fechar com 2 casas', () async {
     final t = _montar((_) async => jsonBody({}, 200));
+    await t.repo.fecharOrcamento('c1', 150.456);
+    final c = t.adapter.chamadas.single;
+    expect((c.method, c.path), ('POST', '/commissions/c1/orcamento/fechar'));
+    expect(Map<String, dynamic>.from(c.data as Map), {'orcamentoFinal': 150.46});
+  });
+
+  test('fechar com orçamento já fechado (409) vira CommissionRegraException', () async {
+    final t = _montar((_) async => jsonBody({'error': 'Orçamento fechado.'}, 409));
     await expectLater(
       t.repo.fecharOrcamento('c1', 10),
-      throwsA(isA<CommissionRegraException>()),
+      throwsA(isA<CommissionRegraException>()
+          .having((e) => e.mensagem, 'mensagem', 'Orçamento fechado.')),
     );
-    expect(await t.repo.orcamentoEditavel('c1'), isFalse);
-    expect(t.adapter.chamadas, isEmpty);
+  });
+
+  test('salvarAdicionais faz PUT com o conjunto final e usa o nome se não há texto', () async {
+    final t = _montar((_) async => jsonBody({}, 200));
+    await t.repo.salvarAdicionais('c1', const [
+      CommissionAdicionalModel(
+        adicionalId: 'a1', nome: 'Fundo', quantidade: 2,
+        descricaoCliente: null, valorUnitario: 40,
+      ),
+    ]);
+    final c = t.adapter.chamadas.single;
+    expect((c.method, c.path), ('PUT', '/commissions/c1/adicionais'));
+    expect(Map<String, dynamic>.from(c.data as Map), {
+      'adicionais': [
+        {'adicionalId': 'a1', 'quantidade': 2, 'descricaoCliente': 'Fundo'},
+      ],
+    });
+  });
+
+  test('orcamentoEditavel: falso se fechado ou em coluna final', () async {
+    Future<bool> com(bool fechado, String tipo) async {
+      final t = _montar((_) async => jsonBody({
+            'orcamentoFechado': fechado,
+            'status': {'id': 's', 'nome': 'x', 'tipo': tipo},
+          }, 200));
+      return t.repo.orcamentoEditavel('c1');
+    }
+
+    expect(await com(false, 'EM_ANDAMENTO'), isTrue);
+    expect(await com(true, 'EM_ANDAMENTO'), isFalse);
+    expect(await com(false, 'CONCLUIDO'), isFalse);
+    expect(await com(false, 'CANCELADO'), isFalse);
+  });
+
+  test('criar manda multipart para /commissions/manual e devolve o detalhe', () async {
+    final t = _montar((_) async => jsonBody({
+          'id': 'c9', 'token': 'AB3DE', 'nomeCliente': 'Bia', 'contato': '@bia',
+          'email': null, 'descricao': 'Retrato', 'imagemRefUrl': null,
+          'precoSimulado': '160.00', 'orcamentoFinal': null, 'orcamentoFechado': false,
+          'posicao': 0, 'criadoEm': '2026-10-26T10:00:00.000Z',
+          'status': {'id': 's1', 'nome': 'Fila', 'tipo': 'INICIAL'},
+          'tipoProduto': {'id': 't1', 'nome': 'Ilustração'},
+          'adicionais': [],
+        }, 201));
+
+    final criada = await t.repo.criar(const NovaCommission(
+      nomeCliente: 'Bia', contato: '@bia', descricao: 'Retrato',
+      tipoProdutoId: 't1', tipoProdutoNome: 'Ilustração', precoBase: 120,
+    ));
+
+    final c = t.adapter.chamadas.single;
+    expect((c.method, c.path), ('POST', '/commissions/manual'));
+    expect(c.data, isA<FormData>());
+    final campos = {for (final f in (c.data as FormData).fields) f.key: f.value};
+    expect(campos['tipoProdutoId'], 't1');
+    expect(campos['adicionais'], '[]');
+    expect(campos.containsKey('email'), isFalse);
+    expect((criada.id, criada.precoSimulado, criada.imagemRefUrl), ('c9', 160.0, ''));
+  });
+
+  test('orçamento só vira "final" no app quando a API diz que está fechado', () {
+    final base = {
+      'id': 'c1', 'token': 'T', 'nomeCliente': 'x', 'tipoProduto': 'Y',
+      'precoSimulado': '100.00', 'orcamentoFinal': '150.00', 'posicao': 0,
+      'criadoEm': '2026-10-26T10:00:00.000Z',
+    };
+    expect(resumoDeApi({...base, 'orcamentoFechado': false}).orcamentoFinal, isNull);
+    expect(resumoDeApi({...base, 'orcamentoFechado': true}).orcamentoFinal, 150.0);
+  });
+
+  test('ApiException lê os campos da validação por campo', () {
+    final e = ApiException.deResposta(400, {
+      'error': 'Quantidade do adicional inválida.',
+      'campos': [
+        {'campo': 'adicionais.1.quantidade', 'mensagem': 'Quantidade do adicional inválida.'},
+      ],
+    });
+    expect(e.campos.single.campo, 'adicionais.1.quantidade');
+    expect(e.mensagem, 'Quantidade do adicional inválida.');
   });
 }

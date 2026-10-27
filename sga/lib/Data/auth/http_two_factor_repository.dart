@@ -35,6 +35,33 @@ class HttpDoisFatorRepository implements DoisFatorRepository {
   }
 
   @override
+  Future<DoisFatorEstado> estado() async {
+    final json = _mapa(await _client.get('/auth/2fa/estado'));
+    return DoisFatorEstado(
+      ativo: json['ativo'] == true,
+      codigosRecuperacaoRestantes:
+          (json['codigosRecuperacaoRestantes'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  @override
+  Future<List<String>> regenerarCodigos({
+    required String codigo,
+    String? senha,
+  }) async {
+    final json = _mapa(
+      await _client.post(
+        '/auth/2fa/codigos-recuperacao',
+        corpo: {
+          'codigo': codigo,
+          if (senha != null && senha.isNotEmpty) 'senha': senha,
+        },
+      ),
+    );
+    return List<String>.from(json['codigosRecuperacao'] as List);
+  }
+
+  @override
   Future<void> concluirAtivacao() async {
     try {
       await _client.renovarSessao();

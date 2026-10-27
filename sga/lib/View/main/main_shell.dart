@@ -25,6 +25,7 @@ class MainShell extends StatefulWidget {
     this.catalogoAdmin,
     this.produtos,
     this.relatorioRepository,
+    this.doisFator,
     this.makerRepository,
     this.makerId,
   });
@@ -38,6 +39,9 @@ class MainShell extends StatefulWidget {
 
   /// Relatório; sem ele, soma os pedidos do repositório de commissions.
   final RelatorioRepository? relatorioRepository;
+
+  /// Gestão do 2FA em Configurações; sem ele, a seção Segurança não aparece.
+  final DoisFatorRepository? doisFator;
 
   /// Portfólio; sem ele, a seção usa o portfólio simulado.
   final ProdutoRepository? produtos;
@@ -105,7 +109,7 @@ class _MainShellState extends State<MainShell> {
         repository: widget.makerRepository,
         makerId: widget.makerId,
       ),
-      Secao.settings => const SettingsPage(),
+      Secao.settings => SettingsPage(doisFator: widget.doisFator),
       Secao.support => const SupportPage(),
       _ => CommissionsPage(
         repository: widget.commissionRepository,

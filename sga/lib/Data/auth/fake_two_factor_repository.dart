@@ -32,6 +32,18 @@ class FakeDoisFatorRepository implements DoisFatorRepository {
   }
 
   @override
+  Future<DoisFatorEstado> estado() async => const DoisFatorEstado(
+        ativo: true,
+        codigosRecuperacaoRestantes: 8,
+      );
+
+  @override
+  Future<List<String>> regenerarCodigos({
+    required String codigo,
+    String? senha,
+  }) => confirmar(codigo);
+
+  @override
   Future<void> concluirAtivacao() => _sessao.iniciar(
         const SessaoTokens(
           accessToken: 'fake',

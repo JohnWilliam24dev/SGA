@@ -74,4 +74,33 @@ void main() {
 
     expect(t.store.estado, SessaoEstado.deslogado);
   });
+
+  test('estado lê ativo e quantos códigos de recuperação restam', () async {
+    final t = _montar((_) async =>
+        jsonBody({'ativo': true, 'codigosRecuperacaoRestantes': 2}, 200));
+
+    final e = await t.repo.estado();
+
+    expect(t.adapter.chamadas.single.path, '/auth/2fa/estado');
+    expect((e.ativo, e.codigosRecuperacaoRestantes), (true, 2));
+  });
+
+  test('regenerarCodigos manda código e senha e devolve o lote novo', () async {
+    final t = _montar((_) async => jsonBody({
+          'codigosRecuperacao': ['AAAAAAAAAA01', 'AAAAAAAAAA02'],
+        }, 200));
+
+    final codigos = await t.repo.regenerarCodigos(codigo: '123456', senha: 'Senha12345');
+
+    final c = t.adapter.chamadas.single;
+    expect((c.method, c.path), ('POST', '/auth/2fa/codigos-recuperacao'));
+    expect(Map<String, dynamic>.from(c.data as Map), {'codigo': '123456', 'senha': 'Senha12345'});
+    expect(codigos, ['AAAAAAAAAA01', 'AAAAAAAAAA02']);
+  });
+
+  test('regenerarCodigos sem senha não manda o campo', () async {
+    final t = _montar((_) async => jsonBody({'codigosRecuperacao': []}, 200));
+    await t.repo.regenerarCodigos(codigo: '123456');
+    expect(Map<String, dynamic>.from(t.adapter.chamadas.single.data as Map), {'codigo': '123456'});
+  });
 }

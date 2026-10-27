@@ -2,9 +2,14 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
+import '../../Domain/domain.dart';
+import 'two_factor_section.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.doisFator});
+
+  /// Gestão do 2FA; sem ele (testes de layout), a seção Segurança some.
+  final DoisFatorRepository? doisFator;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -45,6 +50,7 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
+            if (doisFator != null) TwoFactorSection(repository: doisFator!),
           ],
         );
       },

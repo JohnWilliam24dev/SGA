@@ -181,6 +181,29 @@ void main() {
     expect((await tester.runAsync(() => repo.carregarDetalhe('c1')))!.orcamentoFinal, 350);
   });
 
+  testWidgets('orçamento fechado pode ser reaberto e volta a ser editável', (tester) async {
+    useTallViewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    await tester.runAsync(() => repo.fecharOrcamento('c1', 350));
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(_pagina(repo, resumo));
+    await _aguardar(tester);
+    expect(find.text('Reabrir Orçamento'), findsOneWidget);
+    expect(find.text('Fechar Orçamento'), findsNothing);
+
+    await tester.tap(find.text('Reabrir Orçamento'));
+    await _aguardar(tester);
+    expect(find.text('Reabrir orçamento?'), findsOneWidget);
+    await tester.tap(find.text('Reabrir orçamento'));
+    await _aguardar(tester);
+    await _aguardar(tester);
+
+    expect(find.text('Fechar Orçamento'), findsOneWidget);
+    expect(find.text('Reabrir Orçamento'), findsNothing);
+    expect((await tester.runAsync(() => repo.carregarDetalhe('c1')))!.orcamentoFinal, isNull);
+  });
+
   testWidgets('pedido em Concluído sem fechar não deixa editar o orçamento', (
     tester,
   ) async {

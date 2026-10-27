@@ -128,6 +128,29 @@ void main() {
       );
     });
 
+    test('reabrir devolve a edição e tira o valor final do card', () async {
+      final repo = _novo();
+      expect(await repo.orcamentoReabrivel('c1'), isFalse);
+      await repo.fecharOrcamento('c1', 300);
+      expect(await repo.orcamentoReabrivel('c1'), isTrue);
+
+      await repo.reabrirOrcamento('c1');
+
+      expect(_resumo(await repo.carregarQuadro(), 'c1').orcamentoFinal, isNull);
+      expect(await repo.orcamentoEditavel('c1'), isTrue);
+      expect(await repo.orcamentoReabrivel('c1'), isFalse);
+    });
+
+    test('reabrir recusa orçamento já aberto e pedido encerrado', () async {
+      final repo = _novo();
+      expect(repo.reabrirOrcamento('c1'), throwsA(isA<CommissionRegraException>()));
+
+      await repo.fecharOrcamento('c1', 300);
+      await repo.mover(commissionId: 'c1', paraColunaId: 'concluido', paraIndice: 0);
+      expect(await repo.orcamentoReabrivel('c1'), isFalse);
+      expect(repo.reabrirOrcamento('c1'), throwsA(isA<CommissionRegraException>()));
+    });
+
     test('recusa valor negativo', () async {
       expect(
         _novo().fecharOrcamento('c1', -1),

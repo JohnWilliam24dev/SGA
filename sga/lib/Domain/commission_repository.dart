@@ -54,4 +54,12 @@ abstract interface class CommissionRepository implements Listenable {
   /// Se o orçamento ainda pode ser editado: falso quando já foi fechado ou
   /// quando o pedido está em coluna Concluído ou Cancelado.
   Future<bool> orcamentoEditavel(String commissionId);
+
+  /// Se um orçamento já fechado pode ser reaberto: só enquanto o pedido
+  /// está em coluna aberta (fora de Concluído e Cancelado).
+  Future<bool> orcamentoReabrivel(String commissionId);
+
+  /// Reabre o orçamento fechado: o valor volta a ser editável e deixa de
+  /// substituir o simulado no card.
+  Future<void> reabrirOrcamento(String commissionId);
 }

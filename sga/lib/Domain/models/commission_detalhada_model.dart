@@ -76,6 +76,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
     int? posicao,
     double? precoSimulado,
     double? orcamentoFinal,
+    bool limparOrcamento = false,
     List<CommissionAdicionalModel>? adicionais,
   }) {
     return CommissionDetalhadaModel(
@@ -84,7 +85,9 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
       nomeCliente: nomeCliente,
       tipoProdutoNome: tipoProdutoNome,
       precoSimulado: precoSimulado ?? this.precoSimulado,
-      orcamentoFinal: orcamentoFinal ?? this.orcamentoFinal,
+      orcamentoFinal: limparOrcamento
+          ? null
+          : orcamentoFinal ?? this.orcamentoFinal,
       posicao: posicao ?? this.posicao,
       criadoEm: criadoEm,
       statusId: statusId ?? this.statusId,

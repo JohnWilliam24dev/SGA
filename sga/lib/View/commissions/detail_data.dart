@@ -7,11 +7,15 @@ class DetailData {
   const DetailData({
     required this.detalhe,
     required this.editavel,
+    required this.reabrivel,
     required this.opcao,
   });
 
   final CommissionDetalhadaModel detalhe;
   final bool editavel;
+
+  /// Orçamento fechado que ainda pode ser reaberto.
+  final bool reabrivel;
   final OpcaoDeTipo? opcao;
 
   static Future<DetailData> carregar(
@@ -21,11 +25,13 @@ class DetailData {
   ) async {
     final detalhe = await repository.carregarDetalhe(commissionId);
     final editavel = await repository.orcamentoEditavel(commissionId);
+    final reabrivel = await repository.orcamentoReabrivel(commissionId);
     final opcoes = await catalogo.carregarOpcoes();
     final achadas = opcoes.where((o) => o.tipo.id == detalhe.tipoProdutoId);
     return DetailData(
       detalhe: detalhe,
       editavel: editavel,
+      reabrivel: reabrivel,
       opcao: achadas.isEmpty ? null : achadas.first,
     );
   }
@@ -42,6 +48,7 @@ class DetailData {
         adicionais: novos,
       ),
       editavel: editavel,
+      reabrivel: reabrivel,
       opcao: opcao,
     );
   }

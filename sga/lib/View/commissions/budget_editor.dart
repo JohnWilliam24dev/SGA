@@ -14,12 +14,18 @@ class BudgetEditor extends StatefulWidget {
     required this.orcamentoFinal,
     required this.editavel,
     required this.onFechar,
+    this.reabrivel = false,
+    this.onReabrir,
   });
 
   final double simulado;
   final double? orcamentoFinal;
   final bool editavel;
   final Future<void> Function(double valor) onFechar;
+
+  /// Orçamento fechado que o Maker pode reabrir.
+  final bool reabrivel;
+  final Future<void> Function()? onReabrir;
 
   @override
   State<BudgetEditor> createState() => _BudgetEditorState();
@@ -63,6 +69,18 @@ class _BudgetEditorState extends State<BudgetEditor> {
     if (ok == true) await widget.onFechar(valor);
   }
 
+  Future<void> _reabrir() async {
+    final ok = await Modal.confirm(
+      context,
+      title: 'Reabrir orçamento?',
+      message:
+          'O valor volta a poder ser editado e deixa de substituir o valor '
+          'simulado até você fechar de novo.',
+      confirmText: 'Reabrir orçamento',
+    );
+    if (ok == true) await widget.onReabrir!();
+  }
+
   @override
   Widget build(BuildContext context) {
     final fechado = widget.orcamentoFinal;
@@ -100,6 +118,12 @@ class _BudgetEditorState extends State<BudgetEditor> {
             'Orçamento final',
             fechado == null ? 'Ainda não fechado' : formatarMoeda(fechado),
           ),
+          if (widget.reabrivel && widget.onReabrir != null)
+            Button(
+              text: 'Reabrir Orçamento',
+              variant: ButtonVariant.outline,
+              onPressed: _reabrir,
+            ),
           if (fechado == null)
             const Label(
               type: LabelType.caption,

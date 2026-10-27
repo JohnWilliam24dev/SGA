@@ -9,7 +9,7 @@ import '../mappers/api_mappers.dart';
 
 /// Criar pedido, trocar adicionais e fechar orçamento na API
 /// (`POST /commissions/manual`, `PUT :id/adicionais` e
-/// `POST :id/orcamento/fechar`). O preço é sempre do servidor: o app manda
+/// `POST :id/orcamento/fechar` e `/reabrir`). O preço é sempre do servidor: o app manda
 /// só as escolhas e usa o detalhe devolvido.
 mixin HttpCommissionAcoes on ChangeNotifier {
   ApiClient get cliente;
@@ -64,13 +64,34 @@ mixin HttpCommissionAcoes on ChangeNotifier {
         notifyListeners();
       });
 
-  /// Editável = orçamento aberto e pedido fora de Concluído/Cancelado
-  /// (a API responde 409 nos dois casos).
+  /// Fechado e coluna final, lidos do detalhe (`orcamentoFechado` e
+  /// `status.tipo`): a API responde 409 em fechar/editar/reabrir fora das
+  /// regras, e a tela usa isto para nem oferecer a ação.
+  Future<({bool fechado, bool encerrado})> _situacao(String id) async {
+    final j = mapaDe(await cliente.get('/commissions/$id'));
+    final tipo = mapaDe(j['status'])['tipo'];
+    return (
+      fechado: j['orcamentoFechado'] == true,
+      encerrado: tipo == 'CONCLUIDO' || tipo == 'CANCELADO',
+    );
+  }
+
+  /// Editável = orçamento aberto e pedido fora de Concluído/Cancelado.
   Future<bool> orcamentoEditavel(String commissionId) => regra(() async {
-        final j = mapaDe(await cliente.get('/commissions/$commissionId'));
-        final tipo = mapaDe(j['status'])['tipo'];
-        return j['orcamentoFechado'] != true &&
-            tipo != 'CONCLUIDO' &&
-            tipo != 'CANCELADO';
+        final s = await _situacao(commissionId);
+        return !s.fechado && !s.encerrado;
+      });
+
+  /// Reabrível = orçamento fechado e pedido fora de Concluído/Cancelado.
+  Future<bool> orcamentoReabrivel(String commissionId) => regra(() async {
+        final s = await _situacao(commissionId);
+        return s.fechado && !s.encerrado;
+      });
+
+  /// `POST :id/orcamento/reabrir`: o valor final fica gravado e volta a ser
+  /// editável.
+  Future<void> reabrirOrcamento(String commissionId) => regra(() async {
+        await cliente.post('/commissions/$commissionId/orcamento/reabrir');
+        notifyListeners();
       });
 }

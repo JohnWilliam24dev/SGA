@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'commission_board.dart';
 import 'commission_column.dart';
 import 'commission_edicoes.dart';
+import 'commission_reabertura.dart';
 import 'commission_repository.dart';
 import 'mock/commission_samples.dart';
 import 'models/models.dart';
@@ -15,7 +16,7 @@ import 'status_repository.dart';
 /// fonte: o detalhe de uma commission sempre reflete a coluna e a posição em
 /// que ela está no quadro.
 class FakeCommissionRepository extends ChangeNotifier
-    with CommissionEdicoes
+    with CommissionEdicoes, CommissionReabertura
     implements CommissionRepository {
   FakeCommissionRepository({
     this.latencia = const Duration(milliseconds: 400),

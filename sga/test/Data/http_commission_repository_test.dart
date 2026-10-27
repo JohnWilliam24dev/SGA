@@ -174,6 +174,37 @@ void main() {
     expect(await com(false, 'CANCELADO'), isFalse);
   });
 
+  test('reabrirOrcamento faz POST em /orcamento/reabrir', () async {
+    final t = _montar((_) async => jsonBody({}, 200));
+    await t.repo.reabrirOrcamento('c1');
+    final c = t.adapter.chamadas.single;
+    expect((c.method, c.path), ('POST', '/commissions/c1/orcamento/reabrir'));
+  });
+
+  test('reabrir com orçamento já aberto (409) mostra a mensagem do servidor', () async {
+    final t = _montar((_) async => jsonBody({'error': 'O orçamento deste pedido já está aberto.'}, 409));
+    await expectLater(
+      t.repo.reabrirOrcamento('c1'),
+      throwsA(isA<CommissionRegraException>()
+          .having((e) => e.mensagem, 'mensagem', 'O orçamento deste pedido já está aberto.')),
+    );
+  });
+
+  test('orcamentoReabrivel: só fechado e fora de coluna final', () async {
+    Future<bool> com(bool fechado, String tipo) async {
+      final t = _montar((_) async => jsonBody({
+            'orcamentoFechado': fechado,
+            'status': {'id': 's', 'nome': 'x', 'tipo': tipo},
+          }, 200));
+      return t.repo.orcamentoReabrivel('c1');
+    }
+
+    expect(await com(true, 'EM_ANDAMENTO'), isTrue);
+    expect(await com(false, 'EM_ANDAMENTO'), isFalse);
+    expect(await com(true, 'CONCLUIDO'), isFalse);
+    expect(await com(true, 'CANCELADO'), isFalse);
+  });
+
   test('criar manda multipart para /commissions/manual e devolve o detalhe', () async {
     final t = _montar((_) async => jsonBody({
           'id': 'c9', 'token': 'AB3DE', 'nomeCliente': 'Bia', 'contato': '@bia',

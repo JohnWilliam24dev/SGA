@@ -29,7 +29,8 @@ void main() {
 
     expect(t.adapter.chamadas.single.path, '/makers/me');
     expect((m.nome, m.termosServico), ('Ana Souza', 'Pago antes'));
-    expect((m.faz, m.naoFaz), (['Retrato'], ['NSFW']));
+    expect(m.faz, ['Retrato']);
+    expect(m.naoFaz, ['NSFW']);
     expect(m.email, '');
   });
 
@@ -38,7 +39,9 @@ void main() {
           'id': 'm1', 'nome': 'Ana', 'termosCondicoes': null, 'facoENaoFaco': null,
         }, 200));
     final m = await t.repo.carregar('m1');
-    expect((m.termosServico, m.faz, m.naoFaz), ('', <String>[], <String>[]));
+    expect(m.termosServico, '');
+    expect(m.faz, isEmpty);
+    expect(m.naoFaz, isEmpty);
   });
 
   test('salvar manda só o que mudou', () async {

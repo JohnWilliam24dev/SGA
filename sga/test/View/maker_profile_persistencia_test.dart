@@ -26,7 +26,9 @@ class _Repo implements MakerRepository {
 }
 
 Widget _pagina(_Repo repo, [ValueChanged<Maker>? aoMudar]) => sgaHome(
-      MakerProfilePage(maker: _maker, onMakerChanged: aoMudar ?? (_) {}, repository: repo, makerId: 'm1'),
+      Scaffold(
+        body: MakerProfilePage(maker: _maker, onMakerChanged: aoMudar ?? (_) {}, repository: repo, makerId: 'm1'),
+      ),
     );
 
 Future<void> _avancar(WidgetTester tester) async {

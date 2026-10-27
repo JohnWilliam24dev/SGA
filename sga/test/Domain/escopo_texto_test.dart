@@ -18,12 +18,14 @@ void main() {
   test('decodificar desfaz o que codificar fez', () {
     final texto = codificarEscopo(['A', 'B C'], ['D']);
     final r = decodificarEscopo(texto);
-    expect((r.faz, r.naoFaz), (['A', 'B C'], ['D']));
+    expect(r.faz, ['A', 'B C']);
+    expect(r.naoFaz, ['D']);
   });
 
   test('só uma das listas também volta certo', () {
     final r = decodificarEscopo(codificarEscopo([], ['Só isto']));
-    expect((r.faz, r.naoFaz), (<String>[], ['Só isto']));
+    expect(r.faz, isEmpty);
+    expect(r.naoFaz, ['Só isto']);
   });
 
   test('texto vazio ou nulo dá listas vazias', () {
@@ -33,7 +35,8 @@ void main() {
 
   test('texto livre escrito em outro lugar não se perde: vira um item de faço', () {
     final r = decodificarEscopo('Faço retratos e não faço NSFW');
-    expect((r.faz, r.naoFaz), (['Faço retratos e não faço NSFW'], <String>[]));
+    expect(r.faz, ['Faço retratos e não faço NSFW']);
+    expect(r.naoFaz, isEmpty);
   });
 
   test('o limite é o da API', () => expect(limiteEscopoTexto, 2000));

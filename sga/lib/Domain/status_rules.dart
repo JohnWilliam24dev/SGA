@@ -1,3 +1,4 @@
+import 'limites_api.dart';
 import 'models/status_model.dart';
 
 /// Uma regra do kanban foi violada (ex.: excluir a última coluna Cancelado).
@@ -87,6 +88,11 @@ List<StatusModel> criarStatus(
   required String id,
   required String nome,
 }) {
+  if (atuais.length >= statusPorMakerMaximo) {
+    throw const StatusRegraException(
+      'Você pode ter no máximo $statusPorMakerMaximo colunas.',
+    );
+  }
   final limpo = _nomeValido(nome);
   final ultima = atuais.fold<int>(0, (m, s) => s.ordem > m ? s.ordem : m);
   return [
@@ -201,6 +207,11 @@ String _nomeValido(String nome) {
   final limpo = nome.trim();
   if (limpo.isEmpty) {
     throw const StatusRegraException('Informe o nome da coluna.');
+  }
+  if (limpo.length > nomeMaximo) {
+    throw const StatusRegraException(
+      'O nome da coluna vai até $nomeMaximo caracteres.',
+    );
   }
   return limpo;
 }

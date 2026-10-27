@@ -15,6 +15,7 @@ export 'fake_produto_repository.dart';
 export 'fake_relatorio_repository.dart';
 export 'escopo_texto.dart';
 export 'imagem_produto.dart';
+export 'limites_api.dart';
 export 'maker.dart';
 export 'maker_repository.dart';
 export 'models/models.dart';

@@ -106,7 +106,7 @@ class AdditionalsEditor extends StatelessWidget {
         for (final item in itens) _linha(item),
         PopupMenuButton<AdicionalModel>(
           tooltip: 'Adicionar adicional',
-          enabled: restantes.isNotEmpty,
+          enabled: restantes.isNotEmpty && itens.length < adicionaisPorPedidoMaximo,
           onSelected: _adicionar,
           itemBuilder: (_) => [
             for (final a in restantes)

@@ -55,7 +55,7 @@ class ProductForm extends StatelessWidget {
                 initialValue: initial?.nome,
                 label: 'Nome do produto',
                 hint: 'Ex.: Modelo 3D Vroid',
-                validation: [isRequired(), maxLength(80)],
+                validation: [isRequired(), maxLength(nomeMaximo)],
               ),
               Select<String>.single(
                 name: 'tipo',

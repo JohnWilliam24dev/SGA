@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 import 'commission_regra_exception.dart';
+import 'limites_api.dart';
 import 'models/models.dart';
 import 'nova_commission.dart';
 import 'pagina.dart';
@@ -118,6 +119,11 @@ mixin CommissionEdicoes on ChangeNotifier {
   }
 
   void _validarAdicionais(List<CommissionAdicionalModel> lista) {
+    if (lista.length > adicionaisPorPedidoMaximo) {
+      throw const CommissionRegraException(
+        'Um pedido aceita até $adicionaisPorPedidoMaximo adicionais diferentes.',
+      );
+    }
     final ids = <String>{};
     for (final a in lista) {
       if (a.quantidade < 1 || a.quantidade > quantidadeMaximaDeAdicional) {

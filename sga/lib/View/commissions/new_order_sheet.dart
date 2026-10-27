@@ -77,19 +77,19 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
                   InputField(
                     name: 'cliente',
                     label: 'Nome do cliente',
-                    validation: [isRequired()],
+                    validation: [isRequired(), maxLength(nomeMaximo)],
                   ),
                   InputField(
                     name: 'contato',
                     label: 'Contato',
                     hint: 'WhatsApp, Discord, @...',
-                    validation: [isRequired()],
+                    validation: [isRequired(), maxLength(contatoMaximo)],
                   ),
                   InputField(
                     name: 'email',
                     label: 'E-mail (opcional)',
                     type: InputType.email,
-                    validation: [isEmail()],
+                    validation: [isEmail(), maxLength(emailMaximo)],
                   ),
                   Select<String>.single(
                     name: 'tipo',
@@ -122,7 +122,7 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
                     label: 'Descrição do pedido',
                     minLines: 3,
                     maxLines: 3,
-                    validation: [isRequired()],
+                    validation: [isRequired(), maxLength(descricaoPedidoMaximo)],
                   ),
                   Wrap(
                     alignment: WrapAlignment.end,

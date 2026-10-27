@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart' hide Icon;
 import '../../Domain/domain.dart';
 import 'product_catalog.dart';
 import 'product_form.dart';
+import 'products_acoes.dart';
 import 'products_controller.dart';
 import 'products_mobile.dart';
 import 'products_mobile_section.dart';

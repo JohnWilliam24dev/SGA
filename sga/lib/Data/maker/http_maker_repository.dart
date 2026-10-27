@@ -18,7 +18,6 @@ class HttpMakerRepository implements MakerRepository {
     return Maker(
       nome: json['nome'] as String,
       email: '',
-      senha: '',
       aceitouTermos: true,
       termosServico: json['termosCondicoes'] as String? ?? '',
       faz: escopo.faz,

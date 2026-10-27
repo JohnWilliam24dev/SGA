@@ -5,7 +5,6 @@ void main() {
   const maker = Maker(
     nome: 'Maria',
     email: 'maria@exemplo.com',
-    senha: 'Senha1234',
     aceitouTermos: true,
   );
 
@@ -15,17 +14,19 @@ void main() {
       const Maker(
         nome: 'Maria',
         email: 'maria@exemplo.com',
-        senha: 'Senha1234',
-        aceitouTermos: true,
+            aceitouTermos: true,
       ),
     );
     expect(maker.hashCode, maker.hashCode);
   });
 
   test('toString não expõe a senha', () {
-    expect(maker.toString(), isNot(contains('Senha1234')));
     expect(
       const Credenciais(email: 'a@b.com', senha: 'segredo').toString(),
+      isNot(contains('segredo')),
+    );
+    expect(
+      const Cadastro(nome: 'A', email: 'a@b.com', senha: 'segredo').toString(),
       isNot(contains('segredo')),
     );
   });

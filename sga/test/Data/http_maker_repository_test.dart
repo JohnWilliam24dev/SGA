@@ -6,7 +6,7 @@ import 'package:sga/Domain/domain.dart';
 
 import '../support/fake_adapter.dart';
 
-const _base = Maker(nome: 'Ana', email: 'ana@x.com', senha: '', aceitouTermos: true);
+const _base = Maker(nome: 'Ana', email: 'ana@x.com', aceitouTermos: true);
 
 ({HttpMakerRepository repo, FakeAdapter adapter}) _montar(
   Future<ResponseBody> Function(RequestOptions) responder,
@@ -30,7 +30,7 @@ void main() {
     expect(t.adapter.chamadas.single.path, '/makers/me');
     expect((m.nome, m.termosServico), ('Ana Souza', 'Pago antes'));
     expect((m.faz, m.naoFaz), (['Retrato'], ['NSFW']));
-    expect((m.email, m.senha), ('', ''));
+    expect(m.email, '');
   });
 
   test('carregar com campos nulos devolve vazios', () async {

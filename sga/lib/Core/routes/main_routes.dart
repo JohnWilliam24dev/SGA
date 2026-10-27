@@ -32,7 +32,6 @@ Widget buildMainScreen(BuildContext context, [Maker? maker]) {
         const Maker(
           nome: 'Maker',
           email: 'maker@sga.app',
-          senha: '',
           aceitouTermos: true,
         ),
   );

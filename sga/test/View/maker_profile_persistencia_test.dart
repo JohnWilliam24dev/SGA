@@ -5,7 +5,7 @@ import 'package:sga/View/profile/maker_profile_page.dart';
 
 import '../support/helpers.dart';
 
-const _maker = Maker(nome: 'joao', email: 'joao@gmail.com', senha: '', aceitouTermos: true);
+const _maker = Maker(nome: 'joao', email: 'joao@gmail.com', aceitouTermos: true);
 
 class _Repo implements MakerRepository {
   _Repo({this.locais = const [], this.falha});

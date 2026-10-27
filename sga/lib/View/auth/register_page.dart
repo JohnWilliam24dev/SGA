@@ -17,7 +17,7 @@ class RegisterPage extends StatefulWidget {
   });
 
   /// Pode ser assíncrono (ver `LoginPage.onLogin`).
-  final FutureOr<void> Function(Maker) onRegister;
+  final FutureOr<void> Function(Cadastro) onRegister;
   final VoidCallback onGoToLogin;
   final VoidCallback onBack;
 
@@ -35,11 +35,10 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     await widget.onRegister(
-      Maker(
+      Cadastro(
         nome: values['nome']!.trim(),
         email: values['email']!.trim(),
         senha: values['senha']!,
-        aceitouTermos: true,
       ),
     );
   }

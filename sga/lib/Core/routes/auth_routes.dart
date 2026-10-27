@@ -34,11 +34,11 @@ Widget buildWelcomeScreen(BuildContext context) {
 Widget buildRegisterScreen(BuildContext context) {
   final auth = AuthScope.of(context).auth;
   return RegisterPage(
-    onRegister: (maker) => _comMensagem(
+    onRegister: (cadastro) => _comMensagem(
       () => auth.cadastrar(
-        nome: maker.nome,
-        email: maker.email,
-        senha: maker.senha,
+        nome: cadastro.nome,
+        email: cadastro.email,
+        senha: cadastro.senha,
       ),
     ),
     onGoToLogin: () =>

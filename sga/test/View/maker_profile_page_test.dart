@@ -8,7 +8,6 @@ import '../support/helpers.dart';
 const _maker = Maker(
   nome: 'joao',
   email: 'joao@gmail.com',
-  senha: '',
   aceitouTermos: true,
 );
 

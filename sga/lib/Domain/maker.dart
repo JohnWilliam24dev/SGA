@@ -9,7 +9,6 @@ class Maker {
   const Maker({
     required this.nome,
     required this.email,
-    required this.senha,
     required this.aceitouTermos,
     this.nomeArtistico = '',
     this.biografia = '',
@@ -25,7 +24,6 @@ class Maker {
 
   final String nome;
   final String email;
-  final String senha;
   final bool aceitouTermos;
   final String nomeArtistico;
   final String biografia;
@@ -47,7 +45,6 @@ class Maker {
   Maker copyWith({
     String? nome,
     String? email,
-    String? senha,
     bool? aceitouTermos,
     String? nomeArtistico,
     String? biografia,
@@ -62,7 +59,6 @@ class Maker {
   }) => Maker(
     nome: nome ?? this.nome,
     email: email ?? this.email,
-    senha: senha ?? this.senha,
     aceitouTermos: aceitouTermos ?? this.aceitouTermos,
     nomeArtistico: nomeArtistico ?? this.nomeArtistico,
     biografia: biografia ?? this.biografia,
@@ -81,7 +77,6 @@ class Maker {
     return other is Maker &&
         other.nome == nome &&
         other.email == email &&
-        other.senha == senha &&
         other.aceitouTermos == aceitouTermos &&
         other.nomeArtistico == nomeArtistico &&
         other.biografia == biografia &&
@@ -99,7 +94,6 @@ class Maker {
   int get hashCode => Object.hash(
     nome,
     email,
-    senha,
     aceitouTermos,
     nomeArtistico,
     biografia,
@@ -113,7 +107,7 @@ class Maker {
     termosServico,
   );
 
-  // A senha fica de fora de propósito: não vaza em logs.
+  // O Maker não guarda senha: ela só existe no [Cadastro] e no login.
   @override
   String toString() => 'Maker(nome: $nome, email: $email)';
 }

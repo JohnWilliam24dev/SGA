@@ -24,7 +24,6 @@ void main() {
           maker: const Maker(
             nome: 'Joao',
             email: 'joao@exemplo.com',
-            senha: 'x',
             aceitouTermos: true,
           ),
         ),

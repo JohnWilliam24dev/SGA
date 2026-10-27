@@ -53,7 +53,6 @@ class _SessaoGateState extends State<SessaoGate> {
   Maker get _maker => Maker(
         nome: _escopo.sessao.nome ?? 'Maker',
         email: _escopo.sessao.email ?? '',
-        senha: '',
         aceitouTermos: true,
       );
 

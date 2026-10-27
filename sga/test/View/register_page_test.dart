@@ -18,7 +18,7 @@ Widget _cadastro({ValueChanged<Maker>? onRegister}) {
 void main() {
   testWidgets('enviar vazio revela os erros dos quatro campos', (tester) async {
     useTallViewport(tester);
-    Maker? recebido;
+    Cadastro? recebido;
     await tester.pumpWidget(_cadastro(onRegister: (m) => recebido = m));
     await tester.pumpAndSettle();
 
@@ -52,7 +52,7 @@ void main() {
 
   testWidgets('sem aceitar os termos não cadastra e avisa', (tester) async {
     useTallViewport(tester);
-    Maker? recebido;
+    Cadastro? recebido;
     await tester.pumpWidget(_cadastro(onRegister: (m) => recebido = m));
     await tester.pumpAndSettle();
 
@@ -66,7 +66,7 @@ void main() {
 
   testWidgets('tudo válido e termos aceitos entregam o Maker', (tester) async {
     useTallViewport(tester);
-    Maker? recebido;
+    Cadastro? recebido;
     await tester.pumpWidget(_cadastro(onRegister: (m) => recebido = m));
     await tester.pumpAndSettle();
 
@@ -78,11 +78,10 @@ void main() {
 
     expect(
       recebido,
-      const Maker(
+      const Cadastro(
         nome: 'Maria Silva',
         email: 'maria@exemplo.com',
         senha: 'Senha12345',
-        aceitouTermos: true,
       ),
     );
     expect(find.text('Você precisa aceitar os termos de uso.'), findsNothing);

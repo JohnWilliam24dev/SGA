@@ -11,13 +11,13 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
     required super.id,
     required super.token,
     required super.nomeCliente,
-    required super.tipoProdutoNome,
-    required super.precoSimulado,
+    super.tipoProdutoNome,
+    super.precoSimulado,
     super.orcamentoFinal,
     required super.posicao,
     required super.criadoEm,
     required this.statusId,
-    required this.tipoProdutoId,
+    this.tipoProdutoId,
     required this.contato,
     required this.descricao,
     required this.imagemRefUrl,
@@ -37,7 +37,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
       posicao: resumo.posicao,
       criadoEm: resumo.criadoEm,
       statusId: json['statusId'] as String,
-      tipoProdutoId: json['tipoProdutoId'] as String,
+      tipoProdutoId: json['tipoProdutoId'] as String?,
       contato: json['contato'] as String,
       descricao: json['descricao'] as String,
       imagemRefUrl: json['imagemRefUrl'] as String,
@@ -50,7 +50,8 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
   }
 
   final String statusId;
-  final String tipoProdutoId;
+  /// Nulo quando o pedido não tem tipo de produto.
+  final String? tipoProdutoId;
   final String contato;
   final String descricao;
   final String imagemRefUrl;

@@ -27,7 +27,7 @@ class DetailHeader extends StatelessWidget {
               Label(type: LabelType.title, text: commission.nomeCliente),
               Label(
                 type: LabelType.caption,
-                text: '${commission.tipoProdutoNome} · $statusNome',
+                text: '${commission.tipoProdutoNome ?? 'Sem tipo'} · $statusNome',
               ),
             ],
           ),

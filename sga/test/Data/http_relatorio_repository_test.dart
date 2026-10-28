@@ -62,6 +62,17 @@ void main() {
     expect((r.porTipo.single.nome, r.porTipo.single.receita), ('Ilustração', 300.0));
   });
 
+  test('tipo nulo no relatório vira "Sem tipo"', () async {
+    final t = _montar((_) async => jsonBody({
+          ..._resumo,
+          'porTipoProduto': [
+            {'tipoProdutoId': null, 'nome': null, 'total': 2, 'receita': '80.00'},
+          ],
+        }, 200));
+    final r = await t.repo.carregarResumo();
+    expect((r.porTipo.single.nome, r.porTipo.single.total), ('Sem tipo', 2));
+  });
+
   test('período inválido (400) chega com a mensagem do servidor', () async {
     final t = _montar((_) async => jsonBody({'error': 'Período maior que 366 dias.'}, 400));
     await expectLater(

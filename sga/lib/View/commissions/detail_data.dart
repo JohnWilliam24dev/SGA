@@ -39,12 +39,16 @@ class DetailData {
   /// Versão local, na hora, com os adicionais trocados e o valor simulado
   /// acertado (a mesma conta do repositório).
   DetailData comAdicionais(List<CommissionAdicionalModel> novos) {
-    final preco = detalhe.precoSimulado -
-        somaDosAdicionais(detalhe.adicionais) +
-        somaDosAdicionais(novos);
+    final atual = detalhe.precoSimulado;
+    final preco = atual == null
+        ? null
+        : atual -
+            somaDosAdicionais(detalhe.adicionais) +
+            somaDosAdicionais(novos);
     return DetailData(
       detalhe: detalhe.copyWith(
-        precoSimulado: arredondarCentavos(preco < 0 ? 0 : preco),
+        precoSimulado:
+            preco == null ? null : arredondarCentavos(preco < 0 ? 0 : preco),
         adicionais: novos,
       ),
       editavel: editavel,

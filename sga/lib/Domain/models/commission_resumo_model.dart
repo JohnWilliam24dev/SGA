@@ -9,8 +9,8 @@ class CommissionResumoModel {
     required this.id,
     required this.token,
     required this.nomeCliente,
-    required this.tipoProdutoNome,
-    required this.precoSimulado,
+    this.tipoProdutoNome,
+    this.precoSimulado,
     this.orcamentoFinal,
     required this.posicao,
     required this.criadoEm,
@@ -21,8 +21,8 @@ class CommissionResumoModel {
       id: json['id'] as String,
       token: json['token'] as String,
       nomeCliente: json['nomeCliente'] as String,
-      tipoProdutoNome: json['tipoProdutoNome'] as String,
-      precoSimulado: (json['precoSimulado'] as num).toDouble(),
+      tipoProdutoNome: json['tipoProdutoNome'] as String?,
+      precoSimulado: (json['precoSimulado'] as num?)?.toDouble(),
       orcamentoFinal: (json['orcamentoFinal'] as num?)?.toDouble(),
       posicao: json['posicao'] as int,
       criadoEm: DateTime.parse(json['criadoEm'] as String),
@@ -32,10 +32,12 @@ class CommissionResumoModel {
   final String id;
   final String token;
   final String nomeCliente;
-  final String tipoProdutoNome;
+  /// Nulo quando o pedido não tem tipo (Maker que orça tudo à mão).
+  final String? tipoProdutoNome;
 
   /// Valor estimado pelo simulador, antes de o artista fechar o orçamento.
-  final double precoSimulado;
+  /// Nulo quando o pedido não passou pelo catálogo.
+  final double? precoSimulado;
 
   /// Valor combinado de fato; nulo enquanto o orçamento não foi fechado.
   final double? orcamentoFinal;

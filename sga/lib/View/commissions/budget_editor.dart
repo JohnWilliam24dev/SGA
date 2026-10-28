@@ -18,7 +18,8 @@ class BudgetEditor extends StatefulWidget {
     this.onReabrir,
   });
 
-  final double simulado;
+  /// Nulo quando o pedido não tem valor simulado (orçado à mão).
+  final double? simulado;
   final double? orcamentoFinal;
   final bool editavel;
   final Future<void> Function(double valor) onFechar;
@@ -32,7 +33,9 @@ class BudgetEditor extends StatefulWidget {
 }
 
 class _BudgetEditorState extends State<BudgetEditor> {
-  late final _valor = TextEditingController(text: _texto(widget.simulado));
+  late final _valor = TextEditingController(
+    text: widget.simulado == null ? '' : _texto(widget.simulado!),
+  );
   bool _digitou = false;
 
   static String _texto(double v) => v.toStringAsFixed(2).replaceAll('.', ',');
@@ -42,7 +45,7 @@ class _BudgetEditorState extends State<BudgetEditor> {
     super.didUpdateWidget(old);
     // Enquanto a pessoa não mexeu no campo, ele acompanha o valor simulado.
     if (!_digitou && old.simulado != widget.simulado) {
-      _valor.text = _texto(widget.simulado);
+      _valor.text = widget.simulado == null ? '' : _texto(widget.simulado!);
     }
   }
 
@@ -87,7 +90,12 @@ class _BudgetEditorState extends State<BudgetEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        DetailField('Valor simulado', formatarMoeda(widget.simulado)),
+        DetailField(
+          'Valor simulado',
+          widget.simulado == null
+              ? 'Orçamento Pendente'
+              : formatarMoeda(widget.simulado!),
+        ),
         const SizedBox(height: 8),
         if (widget.editavel) ...[
           const Label(type: LabelType.caption, text: 'Orçamento final'),

@@ -6,11 +6,14 @@ import '../../Shared/shared.dart';
 import 'kanban_style.dart';
 
 /// Valor que o card destaca: o orçamento final, quando já foi fechado, ou o
-/// valor simulado (marcado como tal).
+/// valor simulado (marcado como tal). Sem nenhum dos dois (pedido que o
+/// Maker orça à mão), o card diz que o orçamento está pendente.
 String valorDoCard(CommissionResumoModel commission) {
   final fechado = commission.orcamentoFinal;
   if (fechado != null) return formatarMoeda(fechado);
-  return '${formatarMoeda(commission.precoSimulado)} (simulado)';
+  final simulado = commission.precoSimulado;
+  if (simulado == null) return 'Orçamento Pendente';
+  return '${formatarMoeda(simulado)} (simulado)';
 }
 
 /// Card de uma [CommissionResumoModel]: cliente em destaque, o tipo de
@@ -48,7 +51,7 @@ class CommissionCard extends StatelessWidget {
             ),
             Label(
               type: LabelType.caption,
-              text: commission.tipoProdutoNome,
+              text: commission.tipoProdutoNome ?? 'Sem tipo',
               maxLines: 1,
             ),
             Label(

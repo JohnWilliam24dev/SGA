@@ -252,4 +252,20 @@ void main() {
     expect(e.campos.single.campo, 'adicionais.1.quantidade');
     expect(e.mensagem, 'Quantidade do adicional inválida.');
   });
+
+  test('pedido sem tipo nem simulado (orçado à mão) é lido sem erro', () {
+    final cartao = resumoDeApi({
+      'id': 'c1', 'token': 'T', 'nomeCliente': 'x', 'tipoProduto': null,
+      'precoSimulado': null, 'orcamentoFinal': null, 'orcamentoFechado': false,
+      'posicao': 0, 'criadoEm': '2026-10-26T10:00:00.000Z',
+    });
+    expect((cartao.tipoProdutoNome, cartao.precoSimulado), (null, null));
+
+    final detalhe = detalheDeApi({
+      ..._detalhe, 'tipoProduto': null, 'precoSimulado': null,
+      'orcamentoFinal': null, 'orcamentoFechado': false, 'adicionais': [],
+    });
+    expect((detalhe.tipoProdutoId, detalhe.tipoProdutoNome, detalhe.precoSimulado), (null, null, null));
+    expect(detalhe.adicionais, isEmpty);
+  });
 }

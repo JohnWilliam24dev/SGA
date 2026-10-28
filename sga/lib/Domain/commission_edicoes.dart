@@ -72,12 +72,16 @@ mixin CommissionEdicoes on ChangeNotifier {
     final base = _buscar(commissionId);
     await _exigirEditavel(commissionId);
     _validarAdicionais(adicionais);
-    final preco = base.precoSimulado -
-        somaDosAdicionais(base.adicionais) +
-        somaDosAdicionais(adicionais);
+    final atual = base.precoSimulado;
+    final preco = atual == null
+        ? null
+        : atual -
+            somaDosAdicionais(base.adicionais) +
+            somaDosAdicionais(adicionais);
     atualizar(
       base.copyWith(
-        precoSimulado: arredondarCentavos(preco < 0 ? 0 : preco),
+        precoSimulado:
+            preco == null ? null : arredondarCentavos(preco < 0 ? 0 : preco),
         adicionais: List.unmodifiable(adicionais),
       ),
     );

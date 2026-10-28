@@ -26,10 +26,11 @@ class FakeRelatorioRepository implements RelatorioRepository {
     var receita = 0.0;
     for (final c in colunas) {
       for (final p in c.commissions) {
+        final nome = p.tipoProdutoNome ?? 'Sem tipo';
         final double ganho =
             c.tipo == StatusTipo.concluido ? (p.orcamentoFinal ?? 0) : 0;
-        final atual = tipos[p.tipoProdutoNome] ?? (total: 0, receita: 0.0);
-        tipos[p.tipoProdutoNome] = (
+        final atual = tipos[nome] ?? (total: 0, receita: 0.0);
+        tipos[nome] = (
           total: atual.total + 1,
           receita: atual.receita + ganho,
         );

@@ -27,7 +27,7 @@ RelatorioResumoModel relatorioDeApi(Map<String, dynamic> j) {
     porTipo: [
       for (final t in listaDe(j['porTipoProduto']))
         RelatorioPorTipo(
-          nome: t['nome'] as String,
+          nome: (t['nome'] as String?) ?? 'Sem tipo',
           total: t['total'] as int,
           receita: dinheiro(t['receita']),
         ),

@@ -120,9 +120,18 @@ class _DetailBodyState extends State<DetailBody> {
         ? [
             TwoColumns(orcamento, contato),
             pedido,
-            TwoColumns(adicionais, acompanhamento),
+            if (d.tipoProdutoId != null)
+              TwoColumns(adicionais, acompanhamento)
+            else
+              acompanhamento,
           ]
-        : [orcamento, pedido, adicionais, contato, acompanhamento];
+        : [
+            orcamento,
+            pedido,
+            if (d.tipoProdutoId != null) adicionais,
+            contato,
+            acompanhamento,
+          ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

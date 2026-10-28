@@ -29,8 +29,8 @@ CommissionResumoModel resumoDeApi(Map<String, dynamic> j) {
     id: j['id'] as String,
     token: j['token'] as String,
     nomeCliente: j['nomeCliente'] as String,
-    tipoProdutoNome: j['tipoProduto'] as String,
-    precoSimulado: dinheiro(j['precoSimulado']),
+    tipoProdutoNome: j['tipoProduto'] as String?,
+    precoSimulado: dinheiroOuNulo(j['precoSimulado']),
     orcamentoFinal: orcamentoFechadoDeApi(j),
     posicao: j['posicao'] as int,
     criadoEm: DateTime.parse(j['criadoEm'] as String),
@@ -49,10 +49,12 @@ CommissionAdicionalModel adicionalDeApi(Map<String, dynamic> j) {
 
 /// Detalhe: `status` e `tipoProduto` vêm aninhados e são achatados.
 CommissionDetalhadaModel detalheDeApi(Map<String, dynamic> j) {
+  // Sem tipo (Maker que orça à mão), `tipoProduto` vem nulo.
+  final tipo = j['tipoProduto'] == null ? null : mapaDe(j['tipoProduto']);
   final resumo = resumoDeApi({
     ...j,
     // No detalhe `tipoProduto` é um objeto; o resumo quer só o nome.
-    'tipoProduto': mapaDe(j['tipoProduto'])['nome'],
+    'tipoProduto': tipo?['nome'],
   });
   return CommissionDetalhadaModel(
     id: resumo.id,
@@ -64,7 +66,7 @@ CommissionDetalhadaModel detalheDeApi(Map<String, dynamic> j) {
     posicao: resumo.posicao,
     criadoEm: resumo.criadoEm,
     statusId: mapaDe(j['status'])['id'] as String,
-    tipoProdutoId: mapaDe(j['tipoProduto'])['id'] as String,
+    tipoProdutoId: tipo?['id'] as String?,
     contato: j['contato'] as String,
     descricao: j['descricao'] as String,
     imagemRefUrl: j['imagemRefUrl'] as String? ?? '',

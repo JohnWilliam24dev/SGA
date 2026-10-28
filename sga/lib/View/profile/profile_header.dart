@@ -26,7 +26,7 @@ class ProfileSectionTitle extends StatelessWidget {
   }
 }
 
-/// Cartão do topo: avatar, nome, contatos e o botão "Editar perfil". Em tela
+/// Cartão do topo: avatar, nome, e-mail e o botão "Editar perfil". Em tela
 /// estreita ([narrow]) o botão desce para baixo das informações.
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
@@ -94,13 +94,9 @@ class ProfileHeader extends StatelessWidget {
             color: colors.heading,
           ),
         ),
-        if (maker.nomeArtistico.isNotEmpty)
-          Text(maker.nome, style: TextStyle(color: colors.muted)),
-        const SizedBox(height: 8),
-        _contato(colors, Icons.email_outlined, maker.email),
-        if (maker.portfolio.isNotEmpty) ...[
-          const SizedBox(height: 5),
-          _contato(colors, Icons.language_rounded, maker.portfolio),
+        if (maker.email.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _contato(colors, Icons.email_outlined, maker.email),
         ],
       ],
     );

@@ -8,9 +8,8 @@ import '../support/helpers.dart';
 const _maker = Maker(nome: 'joao', email: 'joao@gmail.com', aceitouTermos: true);
 
 class _Repo implements MakerRepository {
-  _Repo({this.locais = const [], this.falha});
+  _Repo({this.falha});
 
-  final List<String> locais;
   final String? falha;
   final salvos = <({Maker anterior, Maker novo})>[];
 
@@ -18,10 +17,9 @@ class _Repo implements MakerRepository {
   Future<Maker> carregar(String makerId) => throw UnimplementedError();
 
   @override
-  Future<List<String>> salvar(String makerId, {required Maker anterior, required Maker novo}) async {
+  Future<void> salvar(String makerId, {required Maker anterior, required Maker novo}) async {
     if (falha != null) throw const CommissionRegraException('Servidor recusou');
     salvos.add((anterior: anterior, novo: novo));
-    return locais;
   }
 }
 
@@ -75,17 +73,6 @@ void main() {
 
     expect(repo.salvos, hasLength(1));
     expect(repo.salvos.single.novo.termosServico, 'Pago antes');
-  });
-
-  testWidgets('campo que o servidor não guarda vira aviso', (tester) async {
-    useTallViewport(tester);
-    await tester.pumpWidget(_pagina(_Repo(locais: const ['telefone'])));
-    await _avancar(tester);
-
-    await _adicionarItem(tester, 'Aquarela');
-
-    expect(find.textContaining('Ainda só vale nesta sessão'), findsOneWidget);
-    expect(find.textContaining('telefone'), findsOneWidget);
   });
 
   testWidgets('falha ao gravar mostra a mensagem do servidor', (tester) async {

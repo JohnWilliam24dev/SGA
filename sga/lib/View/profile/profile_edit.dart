@@ -11,33 +11,15 @@ Future<Maker?> editarPerfil(BuildContext context, Maker maker) {
     context,
     title: 'Editar perfil',
     saveText: 'Salvar alterações',
-    initialValues: {
-      'nome': maker.nome,
-      'email': maker.email,
-      'artista': maker.nomeArtistico,
-      'portfolio': maker.portfolio,
-    },
+    initialValues: {'nome': maker.nome},
     fields: (_) => [
       InputField(
         name: 'nome',
         label: 'Nome completo',
-        validation: [isRequired(), maxLength(80)],
+        validation: [isRequired(), maxLength(nomeMaximo)],
       ),
-      InputField(
-        name: 'email',
-        label: 'E-mail',
-        type: InputType.email,
-        validation: [isRequired(), isEmail()],
-      ),
-      const InputField(name: 'artista', label: 'Nome artístico'),
-      const InputField(name: 'portfolio', label: 'Portfólio / site'),
     ],
-    onSubmit: (values) => maker.copyWith(
-      nome: values['nome']!.trim(),
-      email: values['email']!.trim(),
-      nomeArtistico: values['artista']?.trim() ?? '',
-      portfolio: values['portfolio']?.trim() ?? '',
-    ),
+    onSubmit: (values) => maker.copyWith(nome: values['nome']!.trim()),
   );
 }
 

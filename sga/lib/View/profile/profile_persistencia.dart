@@ -28,7 +28,7 @@ mixin ProfilePersistencia<T extends StatefulWidget> on State<T> {
 
   /// Grava o [makerAtual]: já, ou [depois] de uma pausa na digitação (os
   /// termos são salvos enquanto se escreve). [silencioso] só avisa se algo
-  /// der errado ou ficar só no app.
+  /// der errado.
   void persistirMaker({Duration depois = Duration.zero, bool silencioso = false}) {
     if (repositorio == null || makerId == null) return;
     _atraso?.cancel();
@@ -42,21 +42,14 @@ mixin ProfilePersistencia<T extends StatefulWidget> on State<T> {
   Future<void> _enviar({required bool silencioso, bool avisar = true}) async {
     final novo = makerAtual;
     try {
-      final locais = await repositorio!.salvar(
+      await repositorio!.salvar(
         makerId!,
         anterior: _salvo ?? novo,
         novo: novo,
       );
       _salvo = novo;
-      if (!avisar || !mounted || (silencioso && locais.isEmpty)) return;
-      Toast.show(
-        context,
-        text: locais.isEmpty
-            ? 'Perfil salvo.'
-            : 'Salvo. Ainda só vale nesta sessão (o servidor não guarda): '
-                '${locais.join(', ')}.',
-        type: locais.isEmpty ? ToastType.success : ToastType.warning,
-      );
+      if (!avisar || !mounted || silencioso) return;
+      Toast.show(context, text: 'Perfil salvo.', type: ToastType.success);
     } catch (e) {
       if (!avisar || !mounted) return;
       final texto = mensagemDeErro(e, 'Não foi possível salvar o perfil.');

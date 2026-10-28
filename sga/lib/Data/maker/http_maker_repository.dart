@@ -26,7 +26,7 @@ class HttpMakerRepository implements MakerRepository {
   }
 
   @override
-  Future<List<String>> salvar(
+  Future<void> salvar(
     String makerId, {
     required Maker anterior,
     required Maker novo,
@@ -39,16 +39,6 @@ class HttpMakerRepository implements MakerRepository {
         'facoENaoFaco': codificarEscopo(novo.faz, novo.naoFaz),
     };
     if (corpo.isNotEmpty) await _client.patch('/makers/me', corpo: corpo);
-    return [
-      if (novo.email != anterior.email) 'e-mail',
-      if (novo.nomeArtistico != anterior.nomeArtistico) 'nome artístico',
-      if (novo.portfolio != anterior.portfolio) 'portfólio',
-      if (novo.biografia != anterior.biografia) 'biografia',
-      if (novo.telefone != anterior.telefone) 'telefone',
-      if (novo.cidade != anterior.cidade) 'cidade',
-      if (novo.estado != anterior.estado) 'estado',
-      if (novo.instagram != anterior.instagram) 'instagram',
-    ];
   }
 
   bool _mesmasListas(Maker a, Maker b) =>

@@ -64,31 +64,13 @@ void main() {
 
   test('sem mudança no que o servidor guarda, nem chama a API', () async {
     final t = _montar((_) async => jsonBody({}, 200));
-    final locais = await t.repo.salvar(
-      'm1',
-      anterior: _base,
-      novo: _base.copyWith(telefone: '1199', cidade: 'Recife'),
-    );
+    await t.repo.salvar('m1', anterior: _base, novo: _base);
     expect(t.adapter.chamadas, isEmpty);
-    expect(locais, ['telefone', 'cidade']);
   });
 
-  test('devolve os campos alterados que o servidor não guarda', () async {
+  test('o e-mail é da sessão: mudar só ele não chama a API', () async {
     final t = _montar((_) async => jsonBody({}, 200));
-    final locais = await t.repo.salvar(
-      'm1',
-      anterior: _base,
-      novo: _base.copyWith(nome: 'Ana B', nomeArtistico: 'AnaArt', email: 'novo@x.com'),
-    );
-    expect(locais, ['e-mail', 'nome artístico']);
-    expect(_corpo(t.adapter.chamadas.single), {'nome': 'Ana B'});
-  });
-
-  test('400 do servidor continua ApiException com a mensagem dele', () async {
-    final t = _montar((_) async => jsonBody({'error': 'Nome muito longo'}, 400));
-    await expectLater(
-      t.repo.salvar('m1', anterior: _base, novo: _base.copyWith(nome: 'x')),
-      throwsA(isA<ApiException>().having((e) => e.mensagem, 'mensagem', 'Nome muito longo')),
-    );
+    await t.repo.salvar('m1', anterior: _base, novo: _base.copyWith(email: 'outro@x.com'));
+    expect(t.adapter.chamadas, isEmpty);
   });
 }

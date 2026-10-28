@@ -2,21 +2,15 @@ import 'package:flutter/foundation.dart' show immutable, listEquals;
 
 /// Quem usa o SGA para criar e gerenciar a sua arte (o artista).
 ///
-/// Reúne o cadastro e as informações públicas usadas na contratação. A API
-/// guarda só o nome, os termos e o "faço e não faço"; ver [MakerRepository].
+/// Reúne só o que a API guarda (nome, termos e "faço e não faço") mais o
+/// e-mail da sessão, que o servidor não devolve no perfil; ver
+/// [MakerRepository].
 @immutable
 class Maker {
   const Maker({
     required this.nome,
     required this.email,
     required this.aceitouTermos,
-    this.nomeArtistico = '',
-    this.biografia = '',
-    this.telefone = '',
-    this.cidade = '',
-    this.estado = '',
-    this.instagram = '',
-    this.portfolio = '',
     this.faz = const [],
     this.naoFaz = const [],
     this.termosServico = '',
@@ -25,34 +19,20 @@ class Maker {
   final String nome;
   final String email;
   final bool aceitouTermos;
-  final String nomeArtistico;
-  final String biografia;
-  final String telefone;
-  final String cidade;
-  final String estado;
-  final String instagram;
-  final String portfolio;
   final List<String> faz;
   final List<String> naoFaz;
   final String termosServico;
 
-  String get nomeExibicao =>
-      nomeArtistico.trim().isEmpty ? nome : nomeArtistico.trim();
+  /// Nome mostrado no app (hoje, o próprio nome).
+  String get nomeExibicao => nome;
 
   String get inicial =>
-      nomeExibicao.trim().isEmpty ? '?' : nomeExibicao.trim()[0].toUpperCase();
+      nome.trim().isEmpty ? '?' : nome.trim()[0].toUpperCase();
 
   Maker copyWith({
     String? nome,
     String? email,
     bool? aceitouTermos,
-    String? nomeArtistico,
-    String? biografia,
-    String? telefone,
-    String? cidade,
-    String? estado,
-    String? instagram,
-    String? portfolio,
     List<String>? faz,
     List<String>? naoFaz,
     String? termosServico,
@@ -60,13 +40,6 @@ class Maker {
     nome: nome ?? this.nome,
     email: email ?? this.email,
     aceitouTermos: aceitouTermos ?? this.aceitouTermos,
-    nomeArtistico: nomeArtistico ?? this.nomeArtistico,
-    biografia: biografia ?? this.biografia,
-    telefone: telefone ?? this.telefone,
-    cidade: cidade ?? this.cidade,
-    estado: estado ?? this.estado,
-    instagram: instagram ?? this.instagram,
-    portfolio: portfolio ?? this.portfolio,
     faz: faz ?? this.faz,
     naoFaz: naoFaz ?? this.naoFaz,
     termosServico: termosServico ?? this.termosServico,
@@ -78,13 +51,6 @@ class Maker {
         other.nome == nome &&
         other.email == email &&
         other.aceitouTermos == aceitouTermos &&
-        other.nomeArtistico == nomeArtistico &&
-        other.biografia == biografia &&
-        other.telefone == telefone &&
-        other.cidade == cidade &&
-        other.estado == estado &&
-        other.instagram == instagram &&
-        other.portfolio == portfolio &&
         listEquals(other.faz, faz) &&
         listEquals(other.naoFaz, naoFaz) &&
         other.termosServico == termosServico;
@@ -95,13 +61,6 @@ class Maker {
     nome,
     email,
     aceitouTermos,
-    nomeArtistico,
-    biografia,
-    telefone,
-    cidade,
-    estado,
-    instagram,
-    portfolio,
     Object.hashAll(faz),
     Object.hashAll(naoFaz),
     termosServico,

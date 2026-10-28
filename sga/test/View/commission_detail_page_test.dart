@@ -204,6 +204,27 @@ void main() {
     expect((await tester.runAsync(() => repo.carregarDetalhe('c1')))!.orcamentoFinal, isNull);
   });
 
+  testWidgets('Fechar e concluir fecha o orçamento e leva o pedido para Concluído', (tester) async {
+    useTallViewport(tester);
+    final repo = FakeCommissionRepository(latencia: Duration.zero);
+    final resumo = await _resumo(tester, repo, 'c1');
+
+    await tester.pumpWidget(_pagina(repo, resumo));
+    await _aguardar(tester);
+    await tester.enterText(find.widgetWithText(TextField, '280,00'), '350,00');
+    await tester.tap(find.text('Fechar e concluir'));
+    await _aguardar(tester);
+    expect(find.text('Fechar e concluir?'), findsOneWidget);
+    await tester.tap(find.text('Fechar e concluir').last);
+    await _aguardar(tester);
+    await _aguardar(tester);
+
+    final quadro = (await tester.runAsync(repo.carregarQuadro))!;
+    final concluida = quadro.firstWhere((c) => c.tipo == StatusTipo.concluido);
+    final card = concluida.commissions.where((p) => p.id == 'c1').single;
+    expect(card.orcamentoFinal, 350.0);
+  });
+
   testWidgets('pedido em Concluído sem fechar não deixa editar o orçamento', (
     tester,
   ) async {

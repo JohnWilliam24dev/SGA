@@ -2,6 +2,7 @@ import 'package:easy_ui/easy_ui.dart';
 import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Shared/formatters.dart';
+import 'budget_dialogs.dart';
 import 'detail_parts.dart';
 
 /// Orçamento do pedido: o valor simulado e, enquanto a edição está aberta,
@@ -16,6 +17,7 @@ class BudgetEditor extends StatefulWidget {
     required this.onFechar,
     this.reabrivel = false,
     this.onReabrir,
+    this.onFecharEConcluir,
   });
 
   /// Nulo quando o pedido não tem valor simulado (orçado à mão).
@@ -27,6 +29,10 @@ class BudgetEditor extends StatefulWidget {
   /// Orçamento fechado que o Maker pode reabrir.
   final bool reabrivel;
   final Future<void> Function()? onReabrir;
+
+  /// Fecha o orçamento com o valor e já move o pedido para Concluído.
+  /// Sem ele, o botão "Fechar e concluir" não aparece.
+  final Future<void> Function(double valor)? onFecharEConcluir;
 
   @override
   State<BudgetEditor> createState() => _BudgetEditorState();
@@ -55,33 +61,18 @@ class _BudgetEditorState extends State<BudgetEditor> {
     super.dispose();
   }
 
-  Future<void> _fechar() async {
+  Future<void> _fechar({bool concluir = false}) async {
     final valor = parseDecimal(_valor.text);
     if (valor == null || valor < 0) {
       Toast.show(context, text: 'Informe um valor válido.', type: ToastType.warning);
       return;
     }
-    final ok = await Modal.confirm(
-      context,
-      title: 'Fechar orçamento?',
-      message:
-          'O valor de ${formatarMoeda(valor)} não poderá mais ser editado e '
-          'passa a valer no lugar do valor simulado.',
-      confirmText: 'Fechar orçamento',
-    );
-    if (ok == true) await widget.onFechar(valor);
+    if (!await confirmarFechamento(context, valor, concluir: concluir)) return;
+    await (concluir ? widget.onFecharEConcluir! : widget.onFechar)(valor);
   }
 
   Future<void> _reabrir() async {
-    final ok = await Modal.confirm(
-      context,
-      title: 'Reabrir orçamento?',
-      message:
-          'O valor volta a poder ser editado e deixa de substituir o valor '
-          'simulado até você fechar de novo.',
-      confirmText: 'Reabrir orçamento',
-    );
-    if (ok == true) await widget.onReabrir!();
+    if (await confirmarReabertura(context)) await widget.onReabrir!();
   }
 
   @override
@@ -117,6 +108,12 @@ class _BudgetEditorState extends State<BudgetEditor> {
               Button(text: 'Fechar Orçamento', onPressed: _fechar),
             ],
           ),
+          if (widget.onFecharEConcluir != null)
+            Button(
+              text: 'Fechar e concluir',
+              variant: ButtonVariant.outline,
+              onPressed: () => _fechar(concluir: true),
+            ),
           const Label(
             type: LabelType.caption,
             text: 'Você pode editar o valor até fechar o orçamento.',

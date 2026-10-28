@@ -5,6 +5,7 @@ import '../../Domain/domain.dart';
 import '../../Shared/formatters.dart';
 import 'additionals_editor.dart';
 import 'budget_editor.dart';
+import 'detail_concluir.dart';
 import 'detail_data.dart';
 import 'detail_parts.dart';
 import 'detail_sections.dart';
@@ -90,6 +91,9 @@ class _DetailBodyState extends State<DetailBody> {
         onReabrir: () => _executar(() => widget.repository.reabrirOrcamento(_id)),
         onFechar: (valor) =>
             _executar(() => widget.repository.fecharOrcamento(_id, valor)),
+        onFecharEConcluir: (valor) => _executar(
+          () => fecharEConcluir(widget.repository, _id, valor),
+        ),
       ),
     ]);
     final pedido = _s('Pedido', [

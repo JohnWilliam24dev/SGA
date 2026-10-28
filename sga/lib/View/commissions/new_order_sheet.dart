@@ -9,20 +9,23 @@ import 'additionals_editor.dart';
 /// pedido montado, ou `null` se o Maker cancelar.
 Future<NovaCommission?> pedirNovoPedido(
   BuildContext context,
-  List<OpcaoDeTipo> opcoes,
-) {
+  List<OpcaoDeTipo> opcoes, {
+  bool manual = false,
+}) {
   return Modal.sheet<NovaCommission>(
     context,
-    builder: (_) => NewOrderSheet(opcoes: opcoes),
+    builder: (_) => NewOrderSheet(opcoes: opcoes, manual: manual),
   );
 }
 
 /// Formulário completo do pedido: cliente, contato, tipo, adicionais e
 /// descrição. Só devolve o pedido quando todos os campos estão válidos.
+/// No modo [manual] (Maker que orça à mão) não há tipo nem adicionais.
 class NewOrderSheet extends StatefulWidget {
-  const NewOrderSheet({super.key, required this.opcoes});
+  const NewOrderSheet({super.key, required this.opcoes, this.manual = false});
 
   final List<OpcaoDeTipo> opcoes;
+  final bool manual;
 
   @override
   State<NewOrderSheet> createState() => _NewOrderSheetState();
@@ -42,7 +45,7 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
 
   void _enviar(FormValues values) {
     final opcao = _opcao;
-    if (opcao == null) return;
+    if (opcao == null && !widget.manual) return;
     final email = values['email']?.trim() ?? '';
     Navigator.of(context).pop(
       NovaCommission(
@@ -50,10 +53,10 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
         contato: values['contato']!.trim(),
         email: email.isEmpty ? null : email,
         descricao: values['descricao']!.trim(),
-        tipoProdutoId: opcao.tipo.id,
-        tipoProdutoNome: opcao.tipo.nome,
-        precoBase: opcao.tipo.precoBase,
-        adicionais: _itens,
+        tipoProdutoId: opcao?.tipo.id,
+        tipoProdutoNome: opcao?.tipo.nome,
+        precoBase: opcao?.tipo.precoBase,
+        adicionais: opcao == null ? const [] : _itens,
       ),
     );
   }
@@ -91,6 +94,7 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
                     type: InputType.email,
                     validation: [isEmail(), maxLength(emailMaximo)],
                   ),
+                  if (!widget.manual)
                   Select<String>.single(
                     name: 'tipo',
                     label: 'Tipo do produto',
@@ -104,7 +108,7 @@ class _NewOrderSheetState extends State<NewOrderSheet> {
                     onChanged: _escolherTipo,
                     validation: [isRequired()],
                   ),
-                  if (opcao != null) ...[
+                  if (!widget.manual && opcao != null) ...[
                     const Label(type: LabelType.subtitle, text: 'Adicionais'),
                     AdditionalsEditor(
                       itens: _itens,

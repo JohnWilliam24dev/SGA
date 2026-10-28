@@ -268,4 +268,23 @@ void main() {
     expect((detalhe.tipoProdutoId, detalhe.tipoProdutoNome, detalhe.precoSimulado), (null, null, null));
     expect(detalhe.adicionais, isEmpty);
   });
+
+  test('criar no modo manual não manda tipo nem adicionais', () async {
+    final t = _montar((_) async => jsonBody({
+          'id': 'c9', 'token': 'AB3DE', 'nomeCliente': 'Bia', 'contato': '@bia',
+          'email': null, 'descricao': 'Retrato', 'imagemRefUrl': null,
+          'precoSimulado': null, 'orcamentoFinal': null, 'orcamentoFechado': false,
+          'posicao': 0, 'criadoEm': '2026-10-26T10:00:00.000Z',
+          'status': {'id': 's1', 'nome': 'Fila', 'tipo': 'INICIAL'},
+          'tipoProduto': null, 'adicionais': [],
+        }, 201));
+
+    final criada = await t.repo.criar(const NovaCommission(
+      nomeCliente: 'Bia', contato: '@bia', descricao: 'Retrato',
+    ));
+
+    final campos = {for (final f in (t.adapter.chamadas.single.data as FormData).fields) f.key: f.value};
+    expect(campos.keys.toSet(), {'nomeCliente', 'contato', 'descricao'});
+    expect((criada.tipoProdutoId, criada.precoSimulado), (null, null));
+  });
 }

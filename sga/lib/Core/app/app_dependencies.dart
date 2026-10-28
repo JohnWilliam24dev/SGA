@@ -12,6 +12,7 @@ class AppDependencies {
     required this.catalogoAdmin,
     required this.produtos,
     required this.relatorios,
+    required this.config,
     this.maker,
   });
 
@@ -31,6 +32,7 @@ class AppDependencies {
       catalogoAdmin: FakeCatalogoAdminRepository(),
       produtos: FakeProdutoRepository(),
       relatorios: FakeRelatorioRepository(commission),
+      config: FakeConfigMakerRepository(),
     );
   }
 
@@ -44,6 +46,7 @@ class AppDependencies {
       catalogoAdmin: catalogo,
       produtos: HttpProdutoRepository(client),
       relatorios: HttpRelatorioRepository(client),
+      config: HttpConfigMakerRepository(client),
       maker: HttpMakerRepository(client),
     );
   }
@@ -54,6 +57,7 @@ class AppDependencies {
   final CatalogoAdminRepository catalogoAdmin;
   final ProdutoRepository produtos;
   final RelatorioRepository relatorios;
+  final ConfigMakerRepository config;
 
   /// Perfil na API; `null` nos dados simulados (o perfil fica só no app).
   final MakerRepository? maker;

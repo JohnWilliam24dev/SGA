@@ -4,6 +4,7 @@ library;
 export 'auth_repository.dart';
 export 'commission_board.dart';
 export 'commission_column.dart';
+export 'config_maker_repository.dart';
 export 'catalogo_admin_repository.dart';
 export 'catalogo_repository.dart';
 export 'commission_regra_exception.dart';

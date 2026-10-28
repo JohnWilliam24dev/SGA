@@ -30,12 +30,13 @@ mixin HttpCommissionAcoes on ChangeNotifier {
   Future<CommissionDetalhadaModel> criar(NovaCommission nova) => regra(() async {
         final email = nova.email?.trim() ?? '';
         final form = FormData.fromMap({
-          'tipoProdutoId': nova.tipoProdutoId,
+          if (nova.tipoProdutoId != null) 'tipoProdutoId': nova.tipoProdutoId,
           'nomeCliente': nova.nomeCliente,
           'contato': nova.contato,
           if (email.isNotEmpty) 'email': email,
           'descricao': nova.descricao,
-          'adicionais': jsonEncode([for (final a in nova.adicionais) _item(a)]),
+          if (nova.tipoProdutoId != null)
+            'adicionais': jsonEncode([for (final a in nova.adicionais) _item(a)]),
         });
         final criada = detalheDeApi(
           mapaDe(await cliente.post('/commissions/manual', corpo: form)),

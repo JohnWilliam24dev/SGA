@@ -26,6 +26,7 @@ class MainShell extends StatefulWidget {
     this.produtos,
     this.relatorioRepository,
     this.doisFator,
+    this.configMaker,
     this.makerRepository,
     this.makerId,
   });
@@ -42,6 +43,9 @@ class MainShell extends StatefulWidget {
 
   /// Gestão do 2FA em Configurações; sem ele, a seção Segurança não aparece.
   final DoisFatorRepository? doisFator;
+
+  /// Modalidade de orçamento (Configurações e novo pedido).
+  final ConfigMakerRepository? configMaker;
 
   /// Portfólio; sem ele, a seção usa o portfólio simulado.
   final ProdutoRepository? produtos;
@@ -109,12 +113,16 @@ class _MainShellState extends State<MainShell> {
         repository: widget.makerRepository,
         makerId: widget.makerId,
       ),
-      Secao.settings => SettingsPage(doisFator: widget.doisFator),
+      Secao.settings => SettingsPage(
+        doisFator: widget.doisFator,
+        config: widget.configMaker,
+      ),
       Secao.support => const SupportPage(),
       _ => CommissionsPage(
         repository: widget.commissionRepository,
         statusRepository: widget.statusRepository,
         catalogo: widget.catalogoRepository,
+        configMaker: widget.configMaker,
         onOpenCommission: widget.onOpenCommission,
       ),
     };

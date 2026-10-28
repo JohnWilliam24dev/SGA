@@ -3,6 +3,7 @@ library;
 
 export 'adicional_model.dart';
 export 'commission_adicional_model.dart';
+export 'config_maker_model.dart';
 export 'commission_detalhada_model.dart';
 export 'commission_resumo_model.dart';
 export 'produto_model.dart';

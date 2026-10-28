@@ -3,10 +3,14 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
 import '../../Domain/domain.dart';
+import 'orcamento_section.dart';
 import 'two_factor_section.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key, this.doisFator});
+  const SettingsPage({super.key, this.doisFator, this.config});
+
+  /// Modalidade de orçamento; sem ele, a seção some.
+  final ConfigMakerRepository? config;
 
   /// Gestão do 2FA; sem ele (testes de layout), a seção Segurança some.
   final DoisFatorRepository? doisFator;
@@ -50,6 +54,7 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
+            if (config != null) OrcamentoSection(repository: config!),
             if (doisFator != null) TwoFactorSection(repository: doisFator!),
           ],
         );

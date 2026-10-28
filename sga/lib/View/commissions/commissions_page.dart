@@ -23,6 +23,7 @@ class CommissionsPage extends StatefulWidget {
     required this.statusRepository,
     required this.onOpenCommission,
     this.catalogo,
+    this.configMaker,
   });
 
   final CommissionRepository repository;
@@ -30,6 +31,9 @@ class CommissionsPage extends StatefulWidget {
 
   /// Tipos e adicionais para montar um pedido novo.
   final CatalogoRepository? catalogo;
+
+  /// Modalidade de orçamento: no modo manual o pedido nasce sem tipo.
+  final ConfigMakerRepository? configMaker;
   final void Function(CommissionResumoModel commission, String statusNome)
   onOpenCommission;
 
@@ -48,6 +52,9 @@ class _CommissionsPageState extends State<CommissionsPage>
   @override
   CatalogoRepository get catalogo =>
       widget.catalogo ?? const FakeCatalogoRepository();
+
+  @override
+  ConfigMakerRepository? get configMaker => widget.configMaker;
 
   @override
   void initState() {

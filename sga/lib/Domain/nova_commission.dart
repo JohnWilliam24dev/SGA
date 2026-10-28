@@ -12,9 +12,9 @@ class NovaCommission {
     required this.contato,
     this.email,
     required this.descricao,
-    required this.tipoProdutoId,
-    required this.tipoProdutoNome,
-    required this.precoBase,
+    this.tipoProdutoId,
+    this.tipoProdutoNome,
+    this.precoBase,
     this.adicionais = const [],
   });
 
@@ -22,12 +22,14 @@ class NovaCommission {
   final String contato;
   final String? email;
   final String descricao;
-  final String tipoProdutoId;
-  final String tipoProdutoNome;
-  final double precoBase;
+  /// Os três ficam nulos no modo manual (o Maker orça o pedido à mão).
+  final String? tipoProdutoId;
+  final String? tipoProdutoNome;
+  final double? precoBase;
   final List<CommissionAdicionalModel> adicionais;
 
-  /// Preço base mais os adicionais escolhidos.
-  double get precoSimulado =>
-      arredondarCentavos(precoBase + somaDosAdicionais(adicionais));
+  /// Preço base mais os adicionais escolhidos; nulo sem tipo de produto.
+  double? get precoSimulado => precoBase == null
+      ? null
+      : arredondarCentavos(precoBase! + somaDosAdicionais(adicionais));
 }

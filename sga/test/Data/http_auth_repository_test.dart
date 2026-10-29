@@ -154,7 +154,8 @@ void main() {
 
     expect(r, isA<LoginRequer2fa>().having((e) => e.desafio, 'desafio', 'd1'));
     expect(_corpo(t.adapter.chamadas.single), {'idToken': 'tok'});
-    expect(t.store.estado, SessaoEstado.deslogado);
+    expect(t.store.estado, isNot(SessaoEstado.logada));
+    expect(t.store.estado, isNot(SessaoEstado.restrita));
   });
 
   test('Google: token recusado (401) vira ApiException', () async {

@@ -1,4 +1,5 @@
 import 'package:easy_ui/easy_ui.dart';
+import 'package:flutter/material.dart' show Scaffold;
 import 'package:flutter/widgets.dart' show Size;
 import 'package:flutter_test/flutter_test.dart' hide matches;
 import 'package:sga/Domain/domain.dart';
@@ -19,7 +20,7 @@ void main() {
     expect(find.text('Orçamento dos pedidos'), findsOneWidget);
     expect(find.textContaining('tipo de produto, adicionais'), findsOneWidget);
 
-    await tester.tap(find.byType(Toggle).at(0));
+    await tester.tap(find.byWidgetPredicate((w) => w is Toggle).first);
     await tester.pumpAndSettle();
 
     expect(find.textContaining('orça cada pedido à mão'), findsOneWidget);
@@ -37,13 +38,13 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(sgaHome(const NewOrderSheet(opcoes: [], manual: true)));
+    await tester.pumpWidget(sgaHome(const Scaffold(body: NewOrderSheet(opcoes: [], manual: true))));
     await tester.pumpAndSettle();
     expect(find.text('Nome do cliente'), findsOneWidget);
     expect(find.text('Tipo do produto'), findsNothing);
     expect(find.text('Adicionais'), findsNothing);
 
-    await tester.pumpWidget(sgaHome(const NewOrderSheet(opcoes: [])));
+    await tester.pumpWidget(sgaHome(const Scaffold(body: NewOrderSheet(opcoes: []))));
     await tester.pumpAndSettle();
     expect(find.text('Tipo do produto'), findsOneWidget);
   });

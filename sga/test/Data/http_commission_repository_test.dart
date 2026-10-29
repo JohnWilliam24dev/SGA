@@ -287,4 +287,18 @@ void main() {
     expect(campos.keys.toSet(), {'nomeCliente', 'contato', 'descricao'});
     expect((criada.tipoProdutoId, criada.precoSimulado), (null, null));
   });
+
+  test('valorSimuladoVisivel: lido do detalhe e verdadeiro quando ausente', () {
+    final base = {..._detalhe, 'orcamentoFinal': null, 'orcamentoFechado': false};
+    expect(detalheDeApi({...base, 'valorSimuladoVisivel': false}).valorSimuladoVisivel, isFalse);
+    expect(detalheDeApi({...base, 'valorSimuladoVisivel': true}).valorSimuladoVisivel, isTrue);
+    expect(detalheDeApi(base).valorSimuladoVisivel, isTrue);
+  });
+
+  test('429 sem Retry-After (não exposto no CORS) tem mensagem genérica', () {
+    final e = ApiException.deResposta(429, {'error': 'Muitas requisições.'});
+    expect(e.tipo, ApiErroTipo.limite);
+    expect(e.retryAfter, isNull);
+    expect(e.mensagemParaUsuario, 'Muitas requisições.');
+  });
 }

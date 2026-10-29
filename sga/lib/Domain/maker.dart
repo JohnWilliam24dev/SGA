@@ -14,6 +14,7 @@ class Maker {
     this.faz = const [],
     this.naoFaz = const [],
     this.termosServico = '',
+    this.publicId,
   });
 
   final String nome;
@@ -22,6 +23,9 @@ class Maker {
   final List<String> faz;
   final List<String> naoFaz;
   final String termosServico;
+
+  /// Id público do Maker (`makerPublicId` do formulário do site); só vem da API.
+  final String? publicId;
 
   /// Nome mostrado no app (hoje, o próprio nome).
   String get nomeExibicao => nome;
@@ -36,6 +40,7 @@ class Maker {
     List<String>? faz,
     List<String>? naoFaz,
     String? termosServico,
+    String? publicId,
   }) => Maker(
     nome: nome ?? this.nome,
     email: email ?? this.email,
@@ -43,6 +48,7 @@ class Maker {
     faz: faz ?? this.faz,
     naoFaz: naoFaz ?? this.naoFaz,
     termosServico: termosServico ?? this.termosServico,
+    publicId: publicId ?? this.publicId,
   );
 
   @override
@@ -53,7 +59,8 @@ class Maker {
         other.aceitouTermos == aceitouTermos &&
         listEquals(other.faz, faz) &&
         listEquals(other.naoFaz, naoFaz) &&
-        other.termosServico == termosServico;
+        other.termosServico == termosServico &&
+        other.publicId == publicId;
   }
 
   @override
@@ -64,6 +71,7 @@ class Maker {
     Object.hashAll(faz),
     Object.hashAll(naoFaz),
     termosServico,
+    publicId,
   );
 
   // O Maker não guarda senha: ela só existe no [Cadastro] e no login.

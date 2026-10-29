@@ -91,6 +91,7 @@ class _MainShellState extends State<MainShell> {
             termosServico: remoto.termosServico,
             faz: remoto.faz,
             naoFaz: remoto.naoFaz,
+            publicId: remoto.publicId,
           ));
     } catch (_) {
       // O perfil é secundário: sem ele, o app abre com os dados da sessão.

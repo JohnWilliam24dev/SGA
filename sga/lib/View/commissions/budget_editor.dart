@@ -18,6 +18,7 @@ class BudgetEditor extends StatefulWidget {
     this.reabrivel = false,
     this.onReabrir,
     this.onFecharEConcluir,
+    this.simuladoVisivel = true,
   });
 
   /// Nulo quando o pedido não tem valor simulado (orçado à mão).
@@ -33,6 +34,9 @@ class BudgetEditor extends StatefulWidget {
   /// Fecha o orçamento com o valor e já move o pedido para Concluído.
   /// Sem ele, o botão "Fechar e concluir" não aparece.
   final Future<void> Function(double valor)? onFecharEConcluir;
+
+  /// `false` quando o cliente não vê o valor simulado (só o orçamento fechado).
+  final bool simuladoVisivel;
 
   @override
   State<BudgetEditor> createState() => _BudgetEditorState();
@@ -87,6 +91,11 @@ class _BudgetEditorState extends State<BudgetEditor> {
               ? 'Orçamento Pendente'
               : formatarMoeda(widget.simulado!),
         ),
+        if (widget.simulado != null && !widget.simuladoVisivel)
+          const Label(
+            type: LabelType.caption,
+            text: 'O cliente não vê o valor simulado, só o orçamento fechado.',
+          ),
         const SizedBox(height: 8),
         if (widget.editavel) ...[
           const Label(type: LabelType.caption, text: 'Orçamento final'),

@@ -4,10 +4,9 @@ import '../mappers/api_mappers.dart';
 
 /// Configuração de orçamento na API: `GET` e `PATCH /config-maker`.
 ///
-/// ATENÇÃO: contrato PROPOSTO no planejamento do backend (modalidades de
-/// orçamento, fase 3), ainda não implementado lá. Corpo: `usaCatalogo` e
-/// `exibirValorSimulado` (booleanos). O `PATCH` é parcial (ao menos um campo)
-/// e devolve o estado final. Conferir com o `openapi.json` quando sair.
+/// Corpo e resposta: `{ usaCatalogo, exibirValorSimulado }` (booleanos, padrão
+/// `true`). O `PATCH` é parcial (ao menos um campo, campo extra é 400) e
+/// devolve o estado final. Só vale para pedidos criados depois da mudança.
 class HttpConfigMakerRepository implements ConfigMakerRepository {
   HttpConfigMakerRepository(this._client);
 

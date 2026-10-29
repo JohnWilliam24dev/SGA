@@ -141,7 +141,7 @@ class ApiException implements Exception {
     ApiErroTipo.naoEncontrado: 'Não encontrado.',
     ApiErroTipo.conflito: 'Essa ação conflita com o estado atual.',
     ApiErroTipo.arquivoGrande: 'Arquivo grande demais. O limite é 4 MB.',
-    ApiErroTipo.limite: 'Muitas tentativas.',
+    ApiErroTipo.limite: 'Muitas requisições. Aguarde um instante e tente de novo.',
     ApiErroTipo.conexao:
         'Sem conexão com o servidor. Verifique a internet e tente de novo.',
     ApiErroTipo.servidor: 'Erro no servidor. Tente de novo em instantes.',

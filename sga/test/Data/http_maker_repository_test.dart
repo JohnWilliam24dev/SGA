@@ -73,4 +73,13 @@ void main() {
     await t.repo.salvar('m1', anterior: _base, novo: _base.copyWith(email: 'outro@x.com'));
     expect(t.adapter.chamadas, isEmpty);
   });
+
+  test('carregar traz o id público do Maker', () async {
+    final t = _montar((_) async => jsonBody({
+          'id': 'm1', 'publicId': 'b3f1c2a4-0000-4000-8000-000000000001',
+          'nome': 'Ana', 'termosCondicoes': null, 'facoENaoFaco': null,
+        }, 200));
+    final m = await t.repo.carregar('m1');
+    expect(m.publicId, 'b3f1c2a4-0000-4000-8000-000000000001');
+  });
 }

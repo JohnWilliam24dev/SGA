@@ -5,6 +5,7 @@ import '../../Domain/domain.dart';
 import 'profile_edit.dart';
 import 'profile_header.dart';
 import 'profile_persistencia.dart';
+import 'public_id_tile.dart';
 import 'profile_terms.dart';
 import 'scope_pair.dart';
 
@@ -115,6 +116,10 @@ class _MakerProfilePageState extends State<MakerProfilePage>
                 narrow: narrow,
                 onEdit: _editarPerfil,
               ),
+              if (_maker.publicId != null) ...[
+                const SizedBox(height: 12),
+                PublicIdTile(publicId: _maker.publicId!),
+              ],
               const SizedBox(height: 16),
               const ProfileSectionTitle('Como você trabalha'),
               const SizedBox(height: 8),

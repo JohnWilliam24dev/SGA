@@ -88,6 +88,7 @@ class _DetailBodyState extends State<DetailBody> {
         orcamentoFinal: d.orcamentoFinal,
         editavel: _data.editavel,
         reabrivel: _data.reabrivel,
+        simuladoVisivel: d.valorSimuladoVisivel,
         onReabrir: () => _executar(() => widget.repository.reabrirOrcamento(_id)),
         onFechar: (valor) =>
             _executar(() => widget.repository.fecharOrcamento(_id, valor)),

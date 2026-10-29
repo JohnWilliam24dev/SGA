@@ -72,6 +72,7 @@ CommissionDetalhadaModel detalheDeApi(Map<String, dynamic> j) {
     imagemRefUrl: j['imagemRefUrl'] as String? ?? '',
     email: j['email'] as String?,
     adicionais: [for (final a in listaDe(j['adicionais'])) adicionalDeApi(a)],
+    valorSimuladoVisivel: j['valorSimuladoVisivel'] != false,
   );
 }
 

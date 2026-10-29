@@ -20,6 +20,7 @@ class HttpMakerRepository implements MakerRepository {
       email: '',
       aceitouTermos: true,
       termosServico: json['termosCondicoes'] as String? ?? '',
+      publicId: json['publicId'] as String?,
       faz: escopo.faz,
       naoFaz: escopo.naoFaz,
     );

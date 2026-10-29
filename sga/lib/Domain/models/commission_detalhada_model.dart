@@ -23,6 +23,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
     required this.imagemRefUrl,
     this.email,
     required this.adicionais,
+    this.valorSimuladoVisivel = true,
   });
 
   factory CommissionDetalhadaModel.fromJson(Map<String, dynamic> json) {
@@ -46,6 +47,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
         for (final item in json['adicionais'] as List<dynamic>)
           CommissionAdicionalModel.fromJson(item as Map<String, dynamic>),
       ],
+      valorSimuladoVisivel: json['valorSimuladoVisivel'] as bool? ?? true,
     );
   }
 
@@ -57,6 +59,10 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
   final String imagemRefUrl;
   final String? email;
   final List<CommissionAdicionalModel> adicionais;
+
+  /// Se o cliente enxerga o valor simulado (decidido quando o pedido foi
+  /// criado). O painel sempre mostra o simulado, quando existe.
+  final bool valorSimuladoVisivel;
 
   /// Só a parte de resumo (o que a listagem mostra no card).
   CommissionResumoModel get resumo => CommissionResumoModel(
@@ -98,6 +104,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
       imagemRefUrl: imagemRefUrl,
       email: email,
       adicionais: adicionais ?? this.adicionais,
+      valorSimuladoVisivel: valorSimuladoVisivel,
     );
   }
 
@@ -111,6 +118,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
         'imagemRefUrl': imagemRefUrl,
         'email': email,
         'adicionais': [for (final a in adicionais) a.toJson()],
+        'valorSimuladoVisivel': valorSimuladoVisivel,
       };
 
   @override
@@ -123,6 +131,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
         other.descricao == descricao &&
         other.imagemRefUrl == imagemRefUrl &&
         other.email == email &&
+        other.valorSimuladoVisivel == valorSimuladoVisivel &&
         listEquals(other.adicionais, adicionais);
   }
 
@@ -136,6 +145,7 @@ class CommissionDetalhadaModel extends CommissionResumoModel {
         imagemRefUrl,
         email,
         Object.hashAll(adicionais),
+        valorSimuladoVisivel,
       );
 
   @override

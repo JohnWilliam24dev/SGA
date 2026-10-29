@@ -1,4 +1,5 @@
 import 'credenciais.dart';
+import 'google_credencial.dart';
 
 /// Resultado do login com e-mail e senha.
 sealed class LoginResultado {
@@ -38,6 +39,14 @@ abstract interface class AuthRepository {
     String? codigo,
     String? codigoRecuperacao,
   });
+
+  /// Entra com a conta Google (`POST /auth/google`); o servidor cria a conta
+  /// se ela não existir. Como no login comum, a conta pode pedir o 2FA.
+  Future<LoginResultado> entrarComGoogle(GoogleCredencial credencial);
+
+  /// Vincula a conta Google à conta já logada (`POST /auth/google/vincular`,
+  /// exige sessão completa).
+  Future<void> vincularGoogle(GoogleCredencial credencial);
 
   /// Encerra a sessão. Sai do aparelho mesmo se o servidor não responder.
   Future<void> sair();

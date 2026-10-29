@@ -27,6 +27,7 @@ class MainShell extends StatefulWidget {
     this.relatorioRepository,
     this.doisFator,
     this.configMaker,
+    this.onVincularGoogle,
     this.makerRepository,
     this.makerId,
   });
@@ -46,6 +47,9 @@ class MainShell extends StatefulWidget {
 
   /// Modalidade de orçamento (Configurações e novo pedido).
   final ConfigMakerRepository? configMaker;
+
+  /// Vincula a conta Google em Configurações; sem ele, a seção não aparece.
+  final Future<bool> Function()? onVincularGoogle;
 
   /// Portfólio; sem ele, a seção usa o portfólio simulado.
   final ProdutoRepository? produtos;
@@ -116,6 +120,7 @@ class _MainShellState extends State<MainShell> {
       Secao.settings => SettingsPage(
         doisFator: widget.doisFator,
         config: widget.configMaker,
+        onVincularGoogle: widget.onVincularGoogle,
       ),
       Secao.support => const SupportPage(),
       _ => CommissionsPage(

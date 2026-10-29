@@ -8,6 +8,7 @@ import '../support/helpers.dart';
 Widget _login({
   ValueChanged<Credenciais>? onLogin,
   VoidCallback? onForgotPassword,
+  Future<void> Function()? onGoogle,
 }) {
   return sgaHome(
     LoginPage(
@@ -15,6 +16,7 @@ Widget _login({
       onForgotPassword: onForgotPassword ?? () {},
       onGoToRegister: () {},
       onBack: () {},
+      onGoogle: onGoogle,
     ),
   );
 }
@@ -69,5 +71,24 @@ void main() {
 
     await tester.tap(find.text('Esqueci a senha'));
     expect(chamado, isTrue);
+  });
+
+  testWidgets('sem provedor do Google, o botão não aparece', (tester) async {
+    useTallViewport(tester);
+    await tester.pumpWidget(_login());
+    await tester.pumpAndSettle();
+    expect(find.text('Entrar com Google'), findsNothing);
+  });
+
+  testWidgets('com provedor, o botão do Google chama onGoogle', (tester) async {
+    useTallViewport(tester);
+    var chamou = 0;
+    await tester.pumpWidget(_login(onGoogle: () async => chamou++));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Entrar com Google'));
+    await tester.pump();
+
+    expect(chamou, 1);
   });
 }

@@ -4,8 +4,9 @@ import '../../Domain/domain.dart';
 Map<String, dynamic> _mapa(Object? json) =>
     Map<String, dynamic>.from(json as Map);
 
-/// Auth na API real: `/auth/cadastro`, `/auth/login`, `/auth/login/2fa` e
-/// `/auth/logout`. Todas são rotas públicas (sem Bearer).
+/// Auth na API real: `/auth/cadastro`, `/auth/login`, `/auth/login/2fa`,
+/// `/auth/google` e `/auth/logout` são públicas (sem Bearer); só
+/// `/auth/google/vincular` exige a sessão.
 class HttpAuthRepository implements AuthRepository {
   HttpAuthRepository({required ApiClient client, required SessaoStore sessao})
       : _client = client,
@@ -43,14 +44,41 @@ class HttpAuthRepository implements AuthRepository {
         autenticado: false,
       ),
     );
+    return _aposLogin(json, email: credenciais.email);
+  }
+
+  /// Resposta de login: sessão pronta ou desafio de 2FA.
+  Future<LoginResultado> _aposLogin(
+    Map<String, dynamic> json, {
+    String? email,
+  }) async {
     if (json['requer2fa'] == true) {
       return LoginRequer2fa(json['desafio'] as String);
     }
-    await _sessao.iniciar(
-      SessaoTokens.fromJson(json),
-      email: credenciais.email,
-    );
+    await _sessao.iniciar(SessaoTokens.fromJson(json), email: email);
     return const LoginConcluido();
+  }
+
+  Map<String, Object> _corpoGoogle(GoogleCredencial c) => {
+    'idToken': c.idToken,
+    if (c.nonce != null) 'nonce': c.nonce!,
+  };
+
+  @override
+  Future<LoginResultado> entrarComGoogle(GoogleCredencial credencial) async {
+    final json = _mapa(
+      await _client.post(
+        '/auth/google',
+        corpo: _corpoGoogle(credencial),
+        autenticado: false,
+      ),
+    );
+    return _aposLogin(json);
+  }
+
+  @override
+  Future<void> vincularGoogle(GoogleCredencial credencial) async {
+    await _client.post('/auth/google/vincular', corpo: _corpoGoogle(credencial));
   }
 
   @override

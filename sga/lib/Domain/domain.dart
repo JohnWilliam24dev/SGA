@@ -11,6 +11,7 @@ export 'commission_regra_exception.dart';
 export 'commission_repository.dart';
 export 'credenciais.dart';
 export 'fake_catalogo_admin_repository.dart';
+export 'google_credencial.dart';
 export 'fake_commission_repository.dart';
 export 'fake_produto_repository.dart';
 export 'fake_relatorio_repository.dart';

@@ -131,4 +131,45 @@ void main() {
 
     expect(t.store.estado, SessaoEstado.deslogado);
   });
+
+  test('Google: manda idToken e nonce sem Bearer e entra com sessão completa', () async {
+    final t = _montar((_) async => jsonBody(sessaoJson('1'), 200));
+
+    final r = await t.repo.entrarComGoogle(const GoogleCredencial(idToken: 'tok', nonce: 'n1'));
+
+    final req = t.adapter.chamadas.single;
+    expect(req.path, '/auth/google');
+    expect(_corpo(req), {'idToken': 'tok', 'nonce': 'n1'});
+    expect(req.headers.containsKey('Authorization'), isFalse);
+    expect(r, isA<LoginConcluido>());
+    expect(t.store.estado, SessaoEstado.logada);
+  });
+
+  test('Google: conta com 2FA devolve o desafio e não abre sessão', () async {
+    final t = _montar((_) async => jsonBody({
+          'requer2fa': true, 'desafio': 'd1', 'desafioExpiraEm': '2026-10-28T12:00:00.000Z',
+        }, 200));
+
+    final r = await t.repo.entrarComGoogle(const GoogleCredencial(idToken: 'tok'));
+
+    expect(r, isA<LoginRequer2fa>().having((e) => e.desafio, 'desafio', 'd1'));
+    expect(_corpo(t.adapter.chamadas.single), {'idToken': 'tok'});
+    expect(t.store.estado, SessaoEstado.deslogado);
+  });
+
+  test('Google: token recusado (401) vira ApiException', () async {
+    final t = _montar((_) async => jsonBody({'error': 'Não foi possível entrar com o Google.'}, 401));
+    await expectLater(
+      t.repo.entrarComGoogle(const GoogleCredencial(idToken: 'ruim')),
+      throwsA(isA<ApiException>()),
+    );
+  });
+
+  test('vincular Google usa a sessão (Bearer) e aceita o 204', () async {
+    final t = _montar((_) async => ResponseBody.fromString('', 204), tokensA1);
+    await t.repo.vincularGoogle(const GoogleCredencial(idToken: 'tok'));
+    final req = t.adapter.chamadas.single;
+    expect((req.method, req.path), ('POST', '/auth/google/vincular'));
+    expect(req.headers['Authorization'], startsWith('Bearer '));
+  });
 }

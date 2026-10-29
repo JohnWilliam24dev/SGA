@@ -14,7 +14,14 @@ import 'sessao_gate.dart';
 /// Sem [sessao] e [auth], usa auth simulada em memória (testes e demo); o
 /// [doisFator] e os [dados] também caem no simulado se não vierem. O `main` passa as reais.
 class SgaApp extends StatefulWidget {
-  const SgaApp({super.key, this.sessao, this.auth, this.doisFator, this.dados})
+  const SgaApp({
+    super.key,
+    this.sessao,
+    this.auth,
+    this.doisFator,
+    this.dados,
+    this.google,
+  })
       : assert(
           (sessao == null) == (auth == null),
           'Informe sessao e auth juntos, ou nenhum.',
@@ -24,6 +31,7 @@ class SgaApp extends StatefulWidget {
   final AuthRepository? auth;
   final DoisFatorRepository? doisFator;
   final AppDependencies? dados;
+  final GoogleSignInProvider? google;
 
   @override
   State<SgaApp> createState() => _SgaAppState();
@@ -50,6 +58,7 @@ class _SgaAppState extends State<SgaApp> {
       auth: _auth,
       doisFator: _doisFator,
       dados: _dados,
+      google: widget.google,
       sessao: _sessao,
       child: ValueListenableBuilder<AppThemeMode>(
         valueListenable: sgaThemeMode,

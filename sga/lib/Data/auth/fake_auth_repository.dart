@@ -33,6 +33,15 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<LoginResultado> entrarComGoogle(GoogleCredencial credencial) async {
+    await _sessao.iniciar(_tokens, nome: 'Conta Google', email: 'google@exemplo.com');
+    return const LoginConcluido();
+  }
+
+  @override
+  Future<void> vincularGoogle(GoogleCredencial credencial) async {}
+
+  @override
   Future<int?> confirmarLogin2fa({
     required String desafio,
     String? codigo,

@@ -47,17 +47,40 @@ Widget buildRegisterScreen(BuildContext context) {
   );
 }
 
+/// Conta com 2FA: abre o segundo passo por cima do login.
+void _abrirDesafio(BuildContext context, LoginResultado resultado) {
+  if (resultado is LoginRequer2fa && context.mounted) {
+    Navigator.of(context).push(
+      appRoute((_) => buildTwoFactorScreen(context, resultado.desafio)),
+    );
+  }
+}
+
+/// Pede a credencial ao Google e entrega ao servidor. Cancelar não é erro;
+/// falha vira um aviso (o botão do Google não tem campo para mostrar erro).
+Future<void> _entrarComGoogle(BuildContext context) async {
+  final escopo = AuthScope.of(context);
+  try {
+    final credencial = await escopo.google!.obter();
+    if (credencial == null) return;
+    _abrirDesafio(context, await escopo.auth.entrarComGoogle(credencial));
+  } on ApiException catch (e) {
+    if (context.mounted) Toast.error(context, text: e.mensagemParaUsuario);
+  } catch (_) {
+    if (context.mounted) {
+      Toast.error(context, text: 'Não foi possível entrar com o Google.');
+    }
+  }
+}
+
 Widget buildLoginScreen(BuildContext context) {
-  final auth = AuthScope.of(context).auth;
+  final escopo = AuthScope.of(context);
+  final auth = escopo.auth;
   return LoginPage(
-    onLogin: (credenciais) => _comMensagem(() async {
-      final resultado = await auth.entrar(credenciais);
-      if (resultado is LoginRequer2fa && context.mounted) {
-        Navigator.of(context).push(
-          appRoute((_) => buildTwoFactorScreen(context, resultado.desafio)),
-        );
-      }
-    }),
+    onGoogle: escopo.google == null ? null : () => _entrarComGoogle(context),
+    onLogin: (credenciais) => _comMensagem(
+      () async => _abrirDesafio(context, await auth.entrar(credenciais)),
+    ),
     onForgotPassword: () =>
         Toast.show(context, text: 'Recuperação de senha em breve.'),
     onGoToRegister: () =>

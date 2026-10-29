@@ -13,6 +13,7 @@ class LoginPage extends StatelessWidget {
     required this.onForgotPassword,
     required this.onGoToRegister,
     required this.onBack,
+    this.onGoogle,
   });
 
   /// Pode ser assíncrono: o botão mostra o carregamento até terminar e
@@ -21,6 +22,10 @@ class LoginPage extends StatelessWidget {
   final VoidCallback onForgotPassword;
   final VoidCallback onGoToRegister;
   final VoidCallback onBack;
+
+  /// Entrar com a conta Google; sem ele, o botão não aparece. Quem chama
+  /// cuida dos próprios avisos de erro.
+  final Future<void> Function()? onGoogle;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +90,15 @@ class LoginPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (onGoogle != null) ...[
+                    const Label(type: LabelType.caption, text: 'ou'),
+                    Button(
+                      text: 'Entrar com Google',
+                      variant: ButtonVariant.outline,
+                      expanded: true,
+                      onPressed: () => unawaited(onGoogle!()),
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -3,11 +3,20 @@ import 'package:flutter/widgets.dart' hide Icon;
 
 import '../../Core/theme/sga_theme.dart';
 import '../../Domain/domain.dart';
+import 'google_section.dart';
 import 'orcamento_section.dart';
 import 'two_factor_section.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key, this.doisFator, this.config});
+  const SettingsPage({
+    super.key,
+    this.doisFator,
+    this.config,
+    this.onVincularGoogle,
+  });
+
+  /// Vincula a conta Google; sem ele, a seção Conta Google some.
+  final Future<bool> Function()? onVincularGoogle;
 
   /// Modalidade de orçamento; sem ele, a seção some.
   final ConfigMakerRepository? config;
@@ -55,6 +64,8 @@ class SettingsPage extends StatelessWidget {
               ],
             ),
             if (config != null) OrcamentoSection(repository: config!),
+            if (onVincularGoogle != null)
+              GoogleSection(onVincular: onVincularGoogle!),
             if (doisFator != null) TwoFactorSection(repository: doisFator!),
           ],
         );

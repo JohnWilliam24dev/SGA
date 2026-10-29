@@ -10,7 +10,8 @@ import 'commission_routes.dart';
 /// A área logada do app: o shell com o menu e as seções. O logout só
 /// encerra a sessão; o `SessaoGate` volta para a tela inicial.
 Widget buildMainScreen(BuildContext context, [Maker? maker]) {
-  final dados = AuthScope.of(context).dados;
+  final escopo = AuthScope.of(context);
+  final dados = escopo.dados;
   return MainShell(
     commissionRepository: dados.commission,
     statusRepository: dados.status,
@@ -20,6 +21,14 @@ Widget buildMainScreen(BuildContext context, [Maker? maker]) {
     relatorioRepository: dados.relatorios,
     doisFator: AuthScope.of(context).doisFator,
     configMaker: dados.config,
+    onVincularGoogle: escopo.google == null
+        ? null
+        : () async {
+            final credencial = await escopo.google!.obter();
+            if (credencial == null) return false;
+            await escopo.auth.vincularGoogle(credencial);
+            return true;
+          },
     makerRepository: dados.maker,
     makerId: AuthScope.of(context).sessao.makerId,
     onOpenCommission: (commission, statusNome) => openCommissionDetail(

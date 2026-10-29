@@ -38,5 +38,12 @@ class Auth2fa implements AuthRepository {
   }) async {}
 
   @override
+  Future<LoginResultado> entrarComGoogle(GoogleCredencial credencial) async =>
+      const LoginRequer2fa('desafio-1');
+
+  @override
+  Future<void> vincularGoogle(GoogleCredencial credencial) async {}
+
+  @override
   Future<void> sair() => sessao.encerrar();
 }

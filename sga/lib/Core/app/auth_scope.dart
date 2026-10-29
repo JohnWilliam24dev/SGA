@@ -14,12 +14,16 @@ class AuthScope extends InheritedWidget {
     required this.sessao,
     required this.doisFator,
     required this.dados,
+    this.google,
     required super.child,
   });
 
   final AuthRepository auth;
   final DoisFatorRepository doisFator;
   final AppDependencies dados;
+
+  /// Login do Google no aparelho; sem ele, os botões do Google não aparecem.
+  final GoogleSignInProvider? google;
   final SessaoStore sessao;
 
   /// Os dois objetos não mudam durante a vida do app, então quem lê não

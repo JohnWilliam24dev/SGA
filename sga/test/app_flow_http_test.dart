@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart' show RequestOptions, ResponseBody;
-import 'package:flutter/material.dart' show ElevatedButton, TextField;
+import 'package:flutter/material.dart' show Checkbox, ElevatedButton, TextField;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:easy_ui/easy_ui.dart' show Toggle;
 import 'package:sga/Core/core.dart';
@@ -89,6 +89,8 @@ void main() {
     await tester.tap(find.text('Cadastre-se'));
     await tester.pumpAndSettle();
     await preencherCadastro(tester);
+    await tester.tap(find.byType(Checkbox));
+    await tester.pump();
     await tester.tap(find.byType(ElevatedButton));
     await _aguardar(tester);
 

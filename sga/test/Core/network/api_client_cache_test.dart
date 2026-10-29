@@ -99,13 +99,11 @@ void main() {
   });
 
   test('fim de sessão descarta o cache', () async {
-    final t = _montar();
-    await t.client.get('/status');
-    t.client.onSessaoEncerrada = () {};
-    // Simula o aviso de sessão encerrada (refresh recusado).
-    final adapter = FakeAdapter((o) async => o.path == '/auth/refresh'
-        ? jsonBody({'error': 'Sessão inválida'}, 401)
-        : jsonBody({'x': 1}, 401));
+    final adapter = FakeAdapter((o) async => switch (o.path) {
+          '/status' => jsonBody({'ok': true}, 200),
+          '/auth/refresh' => jsonBody({'error': 'Sessão inválida'}, 401),
+          _ => jsonBody({'error': 'Expirou'}, 401),
+        });
     final client = ApiClient(
       config: const ApiConfig(baseUrl: 'http://api.teste/'),
       storage: MemoryTokenStorage(tokensA1),
@@ -113,7 +111,12 @@ void main() {
     );
     var avisos = 0;
     client.onSessaoEncerrada = () => avisos++;
-    await expectLater(client.get('/status'), apiErro(ApiErroTipo.sessaoExpirada));
+
+    await client.get('/status'); // fica guardado
+    await expectLater(client.get('/outra'), apiErro(ApiErroTipo.sessaoExpirada));
     expect(avisos, 1);
+
+    await client.get('/status'); // o guardado era da sessão que acabou
+    expect(adapter.contar('/status'), 2);
   });
 }

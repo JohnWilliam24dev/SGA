@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart' show Size;
 import 'package:flutter_test/flutter_test.dart' hide matches;
 import 'package:sga/Domain/domain.dart';
 import 'package:sga/View/commissions/new_order_sheet.dart';
+import 'package:sga/View/settings/orcamento_section.dart';
 import 'package:sga/View/settings/settings_page.dart';
 
 import '../support/helpers.dart';
@@ -20,7 +21,13 @@ void main() {
     expect(find.text('Orçamento dos pedidos'), findsOneWidget);
     expect(find.textContaining('tipo de produto, adicionais'), findsOneWidget);
 
-    await tester.tap(find.byWidgetPredicate((w) => w is Toggle).first);
+    // A página tem outros interruptores: aqui interessa o da seção de orçamento.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(OrcamentoSection),
+        matching: find.byWidgetPredicate((w) => w is Toggle),
+      ).first,
+    );
     await tester.pumpAndSettle();
 
     expect(find.textContaining('orça cada pedido à mão'), findsOneWidget);

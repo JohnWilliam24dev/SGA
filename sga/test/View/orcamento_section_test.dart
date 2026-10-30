@@ -31,7 +31,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('orça cada pedido à mão'), findsOneWidget);
-    expect((await repo.carregar()).usaCatalogo, isFalse);
+    // O fake espera com Future.delayed: no testWidgets o relógio é falso, então
+    // só dentro de runAsync (tempo real) a espera termina.
+    final gravado = await tester.runAsync(repo.carregar);
+    expect(gravado!.usaCatalogo, isFalse);
   });
 
   testWidgets('sem repositório de config a seção não aparece', (tester) async {
